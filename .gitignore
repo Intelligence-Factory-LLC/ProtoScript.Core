@@ -1,0 +1,29 @@
+.vs/
+.vscode/
+
+# Build outputs
+**/bin/
+**/obj/
+artifacts/
+TestResults/
+
+# Deploy build copies
+Deploy/*.dll
+Deploy/*.pdb
+Deploy/*.deps.json
+Deploy/*.runtimeconfig.json
+Deploy/*.exe
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Package outputs
+*.nupkg
+*.snupkg
+
+# Logs and caches
+*.log
+*.cache
