@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<DisableBuildCompression>true</DisableBuildCompression>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ProtoScript.Workbench.Api\ProtoScript.Workbench.Api.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Buffaly.Common">
+			<HintPath>..\lib\Buffaly.Common.dll</HintPath>
+		</Reference>
+		<Reference Include="BasicUtilities">
+			<HintPath>..\lib\BasicUtilities.dll</HintPath>
+		</Reference>
+		<Reference Include="RooTrax.Cache">
+			<HintPath>..\lib\RooTrax.Cache.dll</HintPath>
+		</Reference>
+		<Reference Include="RooTrax.Common">
+			<HintPath>..\lib\RooTrax.Common.dll</HintPath>
+		</Reference>
+		<Reference Include="RooTrax.Common.DB">
+			<HintPath>..\lib\RooTrax.Common.DB.dll</HintPath>
+		</Reference>
+		<Reference Include="WebAppUtilities">
+			<HintPath>..\lib\WebAppUtilities.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProtoScript.Parsers\ProtoScript.Parsers.csproj" />
+    <ProjectReference Include="..\ProtoScript\ProtoScript.csproj" />
+    <Reference Include="Ontology">
+      <HintPath>..\Deploy\Ontology.dll</HintPath>
+    </Reference>
+    <Reference Include="Ontology.Parsers">
+      <HintPath>..\Deploy\Ontology.Parsers.dll</HintPath>
+    </Reference>
+    <Reference Include="Ontology.Simulation">
+      <HintPath>..\Deploy\Ontology.Simulation.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BasicUtilities">
+      <HintPath>..\lib\BasicUtilities.dll</HintPath>
+    </Reference>
+    <Reference Include="RooTrax.Cache">
+      <HintPath>..\lib\RooTrax.Cache.dll</HintPath>
+    </Reference>
+    <Reference Include="RooTrax.Common.DB">
+      <HintPath>..\lib\RooTrax.Common.DB.dll</HintPath>
+    </Reference>
+    <Reference Include="WebAppUtilities">
+      <HintPath>..\lib\WebAppUtilities.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' != 'Release'">
+    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(MSBuildProjectDirectory)\..\Deploy\$(ProjectName).dll&quot;" />
+  </Target>
+</Project>

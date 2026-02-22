@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ProtoScript.Workbench.Api\ProtoScript.Workbench.Api.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="BasicUtilities">
+	    <HintPath>..\lib\BasicUtilities.dll</HintPath>
+	  </Reference>
+	  <Reference Include="WebAppUtilities">
+	    <HintPath>..\lib\WebAppUtilities.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' != 'Release'">
+		<Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(MSBuildProjectDirectory)\..\Deploy\$(ProjectName).dll&quot;" />
+	</Target>
+</Project>

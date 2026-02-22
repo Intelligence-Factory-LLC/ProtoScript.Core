@@ -1,0 +1,158 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "Ontology.GraphInduction/1.0.0": {
+        "dependencies": {
+          "ProtoScript": "1.0.0",
+          "ProtoScript.Interpretter": "1.0.0",
+          "ProtoScript.Parsers": "1.0.0",
+          "BasicUtilities": "1.0.0.0",
+          "CSharp": "1.0.0.0",
+          "CSharp.Parsers": "1.0.0.0",
+          "Ontology": "1.0.0.0",
+          "Ontology.Simulation": "1.0.0.0",
+          "WebAppUtilities": "1.0.0.0"
+        },
+        "runtime": {
+          "Ontology.GraphInduction.dll": {}
+        }
+      },
+      "ProtoScript/1.0.0": {
+        "runtime": {
+          "ProtoScript.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "ProtoScript.Interpretter/1.0.0": {
+        "dependencies": {
+          "ProtoScript": "1.0.0",
+          "ProtoScript.Parsers": "1.0.0"
+        },
+        "runtime": {
+          "ProtoScript.Interpretter.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "ProtoScript.Parsers/1.0.0": {
+        "dependencies": {
+          "ProtoScript": "1.0.0"
+        },
+        "runtime": {
+          "ProtoScript.Parsers.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "BasicUtilities/1.0.0.0": {
+        "runtime": {
+          "BasicUtilities.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "CSharp/1.0.0.0": {
+        "runtime": {
+          "CSharp.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "CSharp.Parsers/1.0.0.0": {
+        "runtime": {
+          "CSharp.Parsers.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Ontology/1.0.0.0": {
+        "runtime": {
+          "Ontology.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Ontology.Simulation/1.0.0.0": {
+        "runtime": {
+          "Ontology.Simulation.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "WebAppUtilities/1.0.0.0": {
+        "runtime": {
+          "WebAppUtilities.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Ontology.GraphInduction/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ProtoScript/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ProtoScript.Interpretter/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ProtoScript.Parsers/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BasicUtilities/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "CSharp/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "CSharp.Parsers/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Ontology/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Ontology.Simulation/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WebAppUtilities/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

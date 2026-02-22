@@ -1,0 +1,176 @@
+{
+  "version": 3,
+  "targets": {
+    "net9.0": {
+      "ProtoScript/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/ProtoScript.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ProtoScript.dll": {}
+        }
+      },
+      "ProtoScript.CLI.Validation/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "ProtoScript.Workbench.Api": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ProtoScript.CLI.Validation.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ProtoScript.CLI.Validation.dll": {}
+        }
+      },
+      "ProtoScript.Interpretter/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "ProtoScript": "1.0.0",
+          "ProtoScript.Parsers": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ProtoScript.Interpretter.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ProtoScript.Interpretter.dll": {}
+        }
+      },
+      "ProtoScript.Parsers/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "ProtoScript": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ProtoScript.Parsers.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ProtoScript.Parsers.dll": {}
+        }
+      },
+      "ProtoScript.Workbench.Api/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "ProtoScript": "1.0.0",
+          "ProtoScript.Interpretter": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ProtoScript.Workbench.Api.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ProtoScript.Workbench.Api.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ProtoScript/1.0.0": {
+      "type": "project",
+      "path": "../ProtoScript/ProtoScript.csproj",
+      "msbuildProject": "../ProtoScript/ProtoScript.csproj"
+    },
+    "ProtoScript.CLI.Validation/1.0.0": {
+      "type": "project",
+      "path": "../ProtoScript.CLI.Validation/ProtoScript.CLI.Validation.csproj",
+      "msbuildProject": "../ProtoScript.CLI.Validation/ProtoScript.CLI.Validation.csproj"
+    },
+    "ProtoScript.Interpretter/1.0.0": {
+      "type": "project",
+      "path": "../ProtoScript.Interpretter/ProtoScript.Interpretter.csproj",
+      "msbuildProject": "../ProtoScript.Interpretter/ProtoScript.Interpretter.csproj"
+    },
+    "ProtoScript.Parsers/1.0.0": {
+      "type": "project",
+      "path": "../ProtoScript.Parsers/ProtoScript.Parsers.csproj",
+      "msbuildProject": "../ProtoScript.Parsers/ProtoScript.Parsers.csproj"
+    },
+    "ProtoScript.Workbench.Api/1.0.0": {
+      "type": "project",
+      "path": "../ProtoScript.Workbench.Api/ProtoScript.Workbench.Api.csproj",
+      "msbuildProject": "../ProtoScript.Workbench.Api/ProtoScript.Workbench.Api.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net9.0": [
+      "ProtoScript.CLI.Validation >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Administrator\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\dev\\Buffaly\\protoscript-core\\ProtoScript.CLI\\ProtoScript.CLI.csproj",
+      "projectName": "protoscript-cli",
+      "projectPath": "C:\\dev\\Buffaly\\protoscript-core\\ProtoScript.CLI\\ProtoScript.CLI.csproj",
+      "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+      "outputPath": "C:\\dev\\Buffaly\\protoscript-core\\ProtoScript.CLI\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net9.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "projectReferences": {
+            "C:\\dev\\Buffaly\\protoscript-core\\ProtoScript.CLI.Validation\\ProtoScript.CLI.Validation.csproj": {
+              "projectPath": "C:\\dev\\Buffaly\\protoscript-core\\ProtoScript.CLI.Validation\\ProtoScript.CLI.Validation.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
+    },
+    "frameworks": {
+      "net9.0": {
+        "targetAlias": "net9.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
