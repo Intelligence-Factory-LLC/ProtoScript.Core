@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<BuildInParallel>false</BuildInParallel>
+		<DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Helpers\ICDCodeHelper.cs" />
+		<Compile Remove="Helpers\PrototypePropertiesCollectionExtensions2.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+		<PackageReference Include="MSTest" Version="3.6.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Ontology">
+			<HintPath>..\Deploy\Ontology.dll</HintPath>
+		</Reference>
+		<Reference Include="Ontology.Simulation">
+			<HintPath>..\Deploy\Ontology.Simulation.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ProtoScript.CLI.Validation\ProtoScript.CLI.Validation.csproj" />
+		<ProjectReference Include="..\ProtoScript\ProtoScript.csproj" />
+		<ProjectReference Include="..\ProtoScript.Parsers\ProtoScript.Parsers.csproj" />
+		<ProjectReference Include="..\ProtoScript.Interpretter\ProtoScript.Interpretter.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="BasicUtilities">
+			<HintPath>..\lib\BasicUtilities.dll</HintPath>
+		</Reference>
+		<Reference Include="RooTrax.Cache">
+			<HintPath>..\lib\RooTrax.Cache.dll</HintPath>
+		</Reference>
+		<Reference Include="RooTrax.Common">
+			<HintPath>..\lib\RooTrax.Common.dll</HintPath>
+		</Reference>
+		<Reference Include="RooTrax.Common.DB">
+			<HintPath>..\lib\RooTrax.Common.DB.dll</HintPath>
+		</Reference>
+		<Reference Include="WebAppUtilities">
+			<HintPath>..\lib\WebAppUtilities.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+	</ItemGroup>
+
+</Project>
