@@ -5,6 +5,8 @@ const divSolution = document.getElementById("divSolution");
 const divImmediateHistory = document.getElementById("divImmediateHistory");
 const fileList = document.getElementById("divProject");
 const symbolList = document.getElementById("divSymbolTable");
+const solutionHistoryList = document.getElementById("divSolutionHistory");
+const solutionExamplesList = document.getElementById("divSolutionExamples");
 const searchFilesInput = document.getElementById("txtProjectFileSearch");
 const searchSymbolsInput = document.getElementById("txtSymbolSearch");
 const searchHistoryInput = document.getElementById("txtFileSearch");
@@ -41,6 +43,7 @@ let filteredProjectFiles = [];
 const LocalSettings = JSON.parse(localStorage.getItem("EditorSettings") || "{}");
 if (!LocalSettings.FileHistory) LocalSettings.FileHistory = [];
 if (!LocalSettings.ImmediateHistory) LocalSettings.ImmediateHistory = [];
+if (!LocalSettings.SolutionHistory) LocalSettings.SolutionHistory = [];
 if (!LocalSettings.WindowSize) LocalSettings.WindowSize = "Halfize";
 
 let editor;
@@ -190,6 +193,65 @@ function Output(msg) {
 	appendToConsole(msg, "RESULT");
 }
 
+function formatErrorMessage(err) {
+	if (!err) {
+		return "Unknown error";
+	}
+
+	if (typeof err === "string") {
+		return err;
+	}
+
+	if (err.message) {
+		return err.message;
+	}
+
+	if (err.Error) {
+		if (typeof err.Error === "string") {
+			return err.Error;
+		}
+		if (err.Error.Error) {
+			return err.Error.Error;
+		}
+		if (err.Error.Message) {
+			return err.Error.Message;
+		}
+	}
+
+	try {
+		return JSON.stringify(err);
+	}
+	catch {
+		return String(err);
+	}
+}
+
+function ensureEditorReady() {
+	if (!editor) {
+		appendToConsole("Editor is not initialized yet.", "ERROR");
+		return false;
+	}
+
+	return true;
+}
+
+function OnEnter(cm) {
+	const cur = cm.getCursor();
+	const line = cm.getLine(cur.line);
+
+	if (!StringUtil.IsEmpty(line)) {
+		const splits = StringUtil.Split(line, " ");
+		if (splits.length >= 3 && splits[0] === "linknaked") {
+			ProtoScriptWorkbench.GenerateLinkNaked(splits[1], splits[2], function (res) {
+				ReplaceCurrentLine(res);
+			});
+			return;
+		}
+	}
+
+	OnPredictNextLine(cm);
+}
+
 // ───────────────────────────────────────────────────────────
 // CodeMirror helpers
 // ───────────────────────────────────────────────────────────
@@ -296,6 +358,7 @@ editor = CodeMirror.fromTextArea(document.getElementById("codeEditor"), {
 	hintOptions: { hint: OnSuggest, completeSingle: false },
 	gutters: ["gutter-error", "breakpoints", "CodeMirror-linenumbers"]
 });
+window.editor = editor;
 
 editor.on("gutterClick", (cm, n) => {
 	const info = cm.lineInfo(n);
@@ -330,6 +393,7 @@ function makeBreakpoint() {
 // ───────────────────────────────────────────────────────────
 bindFileHistory();
 bindImmediateHistory();
+bindSolutionHistory();
 
 if (searchFilesInput) {
 	searchFilesInput.addEventListener("input", filterProjectFiles);
@@ -486,61 +550,148 @@ function renderSymbolList(list) {
 // ───────────────────────────────────────────────────────────
 // Project loading & file opening
 // ───────────────────────────────────────────────────────────
+function bindSolutionHistory() {
+	if (solutionHistoryList) {
+		solutionHistoryList.innerHTML = "";
+		LocalSettings.SolutionHistory.forEach(item => {
+			const div = document.createElement("div");
+			div.className = "cursor-pointer px-1 py-1";
+			div.textContent = item;
+			div.onclick = () => {
+				modalProjectPathInput.value = item;
+				OnLoadProject();
+			};
+			solutionHistoryList.appendChild(div);
+		});
+	}
+
+	if (solutionExamplesList) {
+		solutionExamplesList.innerHTML = "";
+		const examples = ["projects\\hello.pts", "projects\\Simpsons.pts"];
+		examples.forEach(example => {
+			const div = document.createElement("div");
+			div.className = "cursor-pointer px-1 py-1";
+			div.textContent = example;
+			div.onclick = () => {
+				modalProjectPathInput.value = example;
+				OnLoadProject();
+			};
+			solutionExamplesList.appendChild(div);
+		});
+	}
+}
+
 async function OnLoadProject() {
-	const path = modalProjectPathInput.value.trim();
-	if (!path) {
+	const path = (modalProjectPathInput.value || "").trim();
+	if (StringUtil.IsEmpty(path)) {
 		appendToConsole("Project path cannot be empty.", "WARN");
 		return;
 	}
-	appendToConsole(`Loading project: ${path}`, "INFO");
-	const root = path.substring(0, path.lastIndexOf("\\"));
-	const files = await new Promise(r => ProtoScriptWorkbench.LoadProject(path, r));
-	fileList.innerHTML = "";
-	let firstDiv = null;
-	files.forEach((f, i) => {
-		const div = createFileItem(f, getRelativePath(root, f));
-		fileList.appendChild(div);
-		if (i === 0) firstDiv = div;
-	});
-	filteredProjectFiles = [];
-	currentProjectName = path.split(/[\\/]/).pop();
-	updateTitle();
-	LocalSettings.Solution = path;
-	saveLocalSettings();
-
-	if (LocalSettings.File || firstDiv) {
-		const fileToOpen = LocalSettings.File || firstDiv.title;
-		document.getElementById("txtFileName").value = fileToOpen;
-		await OnLoadFile();
-		const match = Array.from(fileList.children)
-			.find(d => d.title.toLowerCase() === fileToOpen.toLowerCase());
-		if (match) highlightActiveFile(match);
+	if (!path.toLowerCase().endsWith(".pts")) {
+		appendToConsole("Project path must point to a .pts file.", "WARN");
+		return;
 	}
-	bindFileHistory();
-	loadProjectModal.style.display = "none";
-	modalProjectPathInput.value = "";
+
+	modalConfirmLoadBtn.disabled = true;
+	appendToConsole(`Loading project: ${path}`, "INFO");
+
+	const prevErrorHandler = ProtoScriptWorkbench.LoadProject.onErrorReceived;
+	try {
+		const files = await new Promise((resolve, reject) => {
+			ProtoScriptWorkbench.LoadProject.onErrorReceived = function (err) {
+				reject(err);
+			};
+
+			ProtoScriptWorkbench.LoadProject(path, function (res) {
+				resolve(res || []);
+			});
+		});
+
+		const rootSeparatorIdx = path.lastIndexOf("\\");
+		const root = rootSeparatorIdx >= 0 ? path.substring(0, rootSeparatorIdx) : path;
+
+		fileList.innerHTML = "";
+		let firstDiv = null;
+		files.forEach((f, i) => {
+			const div = createFileItem(f, getRelativePath(root, f));
+			fileList.appendChild(div);
+			if (i === 0) firstDiv = div;
+		});
+
+		filteredProjectFiles = [];
+		currentProjectName = path.split(/[\\/]/).pop();
+		updateTitle();
+		LocalSettings.Solution = path;
+		LocalSettings.SolutionHistory = queueFront(LocalSettings.SolutionHistory, path, 20);
+		saveLocalSettings();
+		bindSolutionHistory();
+
+		if (LocalSettings.File || firstDiv) {
+			const fileToOpen = LocalSettings.File || firstDiv.title;
+			document.getElementById("txtFileName").value = fileToOpen;
+			await OnLoadFile();
+			const match = Array.from(fileList.children)
+				.find(d => d.title.toLowerCase() === fileToOpen.toLowerCase());
+			if (match) highlightActiveFile(match);
+		}
+
+		bindFileHistory();
+		if (typeof hideModal === "function") {
+			hideModal();
+		}
+		else if (loadProjectModal) {
+			loadProjectModal.style.display = "none";
+		}
+		modalProjectPathInput.value = "";
+		appendToConsole(`Project loaded: ${path}`, "INFO");
+	}
+	catch (err) {
+		appendToConsole(`Load project failed: ${formatErrorMessage(err)}`, "ERROR");
+	}
+	finally {
+		ProtoScriptWorkbench.LoadProject.onErrorReceived = prevErrorHandler;
+		modalConfirmLoadBtn.disabled = false;
+	}
 }
 
 async function OnLoadFile() {
+	if (!ensureEditorReady()) return;
+
 	const file = document.getElementById("txtFileName").value;
 	if (!isCurrentFileSaved() &&
 	!confirm("You have unsaved changes, continue?")) return;
-	const content = await new Promise(r =>
-	ProtoScriptWorkbench.LoadFile(LocalSettings.Solution, file, r)
-	);
-	editor.setValue(content);
-	sLastSaved = content;
-	await parseAndDisplaySymbols(file);
-	LocalSettings.File = file;
-	addFileToHistory(file);
-	bindFileHistory();
-	saveLocalSettings();
+
+	const prevErrorHandler = ProtoScriptWorkbench.LoadFile.onErrorReceived;
+	try {
+		const content = await new Promise((resolve, reject) => {
+			ProtoScriptWorkbench.LoadFile.onErrorReceived = function (err) {
+				reject(err);
+			};
+
+			ProtoScriptWorkbench.LoadFile(LocalSettings.Solution, file, resolve);
+		});
+		editor.setValue(content || "");
+		sLastSaved = content || "";
+		await parseAndDisplaySymbols(file);
+		LocalSettings.File = file;
+		addFileToHistory(file);
+		bindFileHistory();
+		saveLocalSettings();
+	}
+	catch (err) {
+		appendToConsole(`Load file failed: ${formatErrorMessage(err)}`, "ERROR");
+	}
+	finally {
+		ProtoScriptWorkbench.LoadFile.onErrorReceived = prevErrorHandler;
+	}
 }
 
 // ───────────────────────────────────────────────────────────
 // Save current file
 // ───────────────────────────────────────────────────────────
 async function SaveCurrentFile() {
+	if (!ensureEditorReady()) return;
+
 	const code = editor.getValue();
 	sLastSaved = code;
 	await new Promise(r =>
@@ -592,6 +743,10 @@ async function OnAddFileConfirm() {
 // Error handling & compilation
 // ───────────────────────────────────────────────────────────
 function clearErrors() {
+	if (!editor || typeof editor.clearGutter !== "function") {
+		return;
+	}
+
 	editor.clearGutter("gutter-error");
 }
 function makeMarker(msg) {
@@ -614,6 +769,8 @@ function highlightError(err) {
 }
 
 async function CompileCode() {
+	if (!ensureEditorReady()) return;
+
 	if (!isCurrentFileSaved()) await SaveCurrentFile();
 	appendToConsole("Compilation starting...", "INFO");
 	clearErrors();
@@ -778,6 +935,10 @@ function filterSymbols() {
 }
 
 function SetBreakPoint(info) {
+	if (!window.editor) {
+		return;
+	}
+
 	const start = window.editor.indexFromPos(CodeMirror.Pos(info.line, 0));
 	Breakpoints.push({
 		StartingOffset: start,
@@ -1063,6 +1224,17 @@ function ShowTab(tabId) {
         if (content) content.classList.add("active");
 }
 
+async function restoreLastProjectOnRefresh() {
+	const lastProject = (LocalSettings.Solution || "").trim();
+	if (StringUtil.IsEmpty(lastProject)) {
+		return;
+	}
+
+	modalProjectPathInput.value = lastProject;
+	appendToConsole(`Restoring last project: ${lastProject}`, "INFO");
+	await OnLoadProject();
+}
+
 window.addEventListener("error", e => {
 appendToConsole(e.message, "ERROR");
 });
@@ -1070,4 +1242,8 @@ appendToConsole(e.message, "ERROR");
 window.addEventListener("unhandledrejection", e => {
 const msg = e.reason && e.reason.message ? e.reason.message : String(e.reason);
 appendToConsole(msg, "ERROR");
+});
+
+window.addEventListener("load", () => {
+	restoreLastProjectOnRefresh();
 });
