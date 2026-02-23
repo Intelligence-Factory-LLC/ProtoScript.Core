@@ -5,9 +5,11 @@ using WebAppUtilities;
 
 ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
 configurationBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+configurationBuilder.AddEnvironmentVariables();
 IConfigurationRoot config = configurationBuilder.Build();
 
-BasicUtilities.Settings.SetAppSettings(config);
+BasicUtilities.Settings.SetAppSettings(config.GetSection("AppSettings"));
+StartupConfigurator.ConfigureLogs(config);
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 WebApplication app = builder.Build();
