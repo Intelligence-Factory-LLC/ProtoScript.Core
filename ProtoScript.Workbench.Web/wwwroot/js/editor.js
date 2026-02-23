@@ -58,6 +58,7 @@ let Breakpoints = [];
 let currentBlockedOn = null;
 let currentProjectName = "Untitled Project";
 let currentFileSymbols = [];
+let currentProjectRoot = "";
 
 // ───────────────────────────────────────────────────────────
 // Initialization
@@ -113,15 +114,97 @@ function InsertAtOffset(text, info) {
 	editor.replaceRange(text, pos);
 }
 
+function normalizePath(path) {
+	return (path || "").replace(/\//g, "\\").replace(/\\+/g, "\\").trim();
+}
+
+function getPathParts(path) {
+	return normalizePath(path).split("\\").filter(Boolean);
+}
+
+function getFileNameFromPath(path) {
+	const normalized = normalizePath(path);
+	const idx = normalized.lastIndexOf("\\");
+	return idx >= 0 ? normalized.substring(idx + 1) : normalized;
+}
+
+function getDirectoryPath(path) {
+	const normalized = normalizePath(path);
+	const idx = normalized.lastIndexOf("\\");
+	return idx >= 0 ? normalized.substring(0, idx) : "";
+}
+
+function resolveProjectPathFromFiles(inputPath, files) {
+	const normalizedInput = normalizePath(inputPath).toLowerCase();
+	const fileName = getFileNameFromPath(inputPath).toLowerCase();
+
+	let exact = files.find(f => normalizePath(f).toLowerCase() === normalizedInput);
+	if (exact) {
+		return normalizePath(exact);
+	}
+
+	let suffix = files.find(f => normalizePath(f).toLowerCase().endsWith("\\" + normalizedInput));
+	if (suffix) {
+		return normalizePath(suffix);
+	}
+
+	let byName = files.find(f => getFileNameFromPath(f).toLowerCase() === fileName);
+	if (byName) {
+		return normalizePath(byName);
+	}
+
+	return normalizePath(inputPath);
+}
+
 function getRelativePath(root, path) {
-	return path.toLowerCase().startsWith(root.toLowerCase() + "\\")
-		? path.substring(root.length + 1)
-		: path;
+	const normalizedRoot = normalizePath(root);
+	const normalizedPath = normalizePath(path);
+	if (StringUtil.IsEmpty(normalizedPath)) {
+		return "";
+	}
+	if (StringUtil.IsEmpty(normalizedRoot)) {
+		return getFileNameFromPath(normalizedPath);
+	}
+
+	const rootParts = getPathParts(normalizedRoot);
+	const pathParts = getPathParts(normalizedPath);
+	if (rootParts.length === 0 || pathParts.length === 0) {
+		return normalizedPath;
+	}
+
+	const rootDrive = /:$/.test(rootParts[0]) ? rootParts[0].toLowerCase() : "";
+	const pathDrive = /:$/.test(pathParts[0]) ? pathParts[0].toLowerCase() : "";
+	if (!StringUtil.IsEmpty(rootDrive) && !StringUtil.IsEmpty(pathDrive) && rootDrive !== pathDrive) {
+		return getFileNameFromPath(normalizedPath);
+	}
+
+	let idx = 0;
+	while (
+		idx < rootParts.length &&
+		idx < pathParts.length &&
+		rootParts[idx].toLowerCase() === pathParts[idx].toLowerCase()
+	) {
+		idx++;
+	}
+
+	const relativeParts = [];
+	for (let i = idx; i < rootParts.length; i++) {
+		relativeParts.push("..");
+	}
+	for (let i = idx; i < pathParts.length; i++) {
+		relativeParts.push(pathParts[i]);
+	}
+
+	if (relativeParts.length === 0) {
+		return getFileNameFromPath(normalizedPath);
+	}
+
+	return relativeParts.join("\\");
 }
 
 function createFileItem(fullPath, displayPath) {
 	const fileDiv = document.createElement("div");
-	fileDiv.className = "file-item p-1.5 rounded-md cursor-pointer text-gray-700";
+	fileDiv.className = "file-item";
 	fileDiv.textContent = displayPath || fullPath;
 	fileDiv.title = fullPath;
 	fileDiv.onclick = () => {
@@ -144,9 +227,9 @@ function addFileToHistory(file) {
 function bindFileHistory() {
         if (!divSolution) return;
         divSolution.innerHTML = "";
-        const root = LocalSettings.Solution
-                ? LocalSettings.Solution.substring(0, LocalSettings.Solution.lastIndexOf("\\"))
-                : "";
+        const root = StringUtil.IsEmpty(currentProjectRoot)
+                ? getDirectoryPath(LocalSettings.Solution || "")
+                : currentProjectRoot;
         LocalSettings.FileHistory.forEach(item => {
                 const div = createFileItem(item.File, getRelativePath(root, item.File));
                 divSolution.appendChild(div);
@@ -158,7 +241,7 @@ function bindImmediateHistory() {
 	divImmediateHistory.innerHTML = "";
 	LocalSettings.ImmediateHistory.forEach(cmd => {
 		const div = document.createElement("div");
-		div.className = "cursor-pointer px-1 hover:bg-gray-100";
+		div.className = "history-item";
 		div.textContent = cmd;
 		div.onclick = () => {
 			immediateCommandInput.value = cmd;
@@ -528,11 +611,11 @@ function renderSymbolList(list) {
 
 	list.forEach(sym => {
 	const item = document.createElement("div");
-	item.className = "symbol-item flex items-center p-1 text-xs cursor-pointer";
+	item.className = "symbol-item";
 	item.innerHTML =
 	getSymbolIcon(sym.type) +
-	`<span class="ml-1">${sym.name}</span>` +
-	`<span class="ml-auto text-gray-400 text-xxs">L:${sym.line}</span>`;
+	`<span class="symbol-name">${sym.name}</span>` +
+	`<span class="symbol-line">L:${sym.line}</span>`;
 	item.onclick = () => {
 	appendToConsole(`Symbol clicked: ${sym.name}`, "DEBUG");
 	if (sym.line > 0) {
@@ -555,7 +638,7 @@ function bindSolutionHistory() {
 		solutionHistoryList.innerHTML = "";
 		LocalSettings.SolutionHistory.forEach(item => {
 			const div = document.createElement("div");
-			div.className = "cursor-pointer px-1 py-1";
+			div.className = "solution-entry";
 			div.textContent = item;
 			div.onclick = () => {
 				modalProjectPathInput.value = item;
@@ -570,7 +653,7 @@ function bindSolutionHistory() {
 		const examples = ["projects\\hello.pts", "projects\\Simpsons.pts"];
 		examples.forEach(example => {
 			const div = document.createElement("div");
-			div.className = "cursor-pointer px-1 py-1";
+			div.className = "solution-entry";
 			div.textContent = example;
 			div.onclick = () => {
 				modalProjectPathInput.value = example;
@@ -607,8 +690,9 @@ async function OnLoadProject() {
 			});
 		});
 
-		const rootSeparatorIdx = path.lastIndexOf("\\");
-		const root = rootSeparatorIdx >= 0 ? path.substring(0, rootSeparatorIdx) : path;
+		const resolvedProjectPath = resolveProjectPathFromFiles(path, files);
+		const root = getDirectoryPath(resolvedProjectPath);
+		currentProjectRoot = root;
 
 		fileList.innerHTML = "";
 		let firstDiv = null;
@@ -619,10 +703,10 @@ async function OnLoadProject() {
 		});
 
 		filteredProjectFiles = [];
-		currentProjectName = path.split(/[\\/]/).pop();
+		currentProjectName = getFileNameFromPath(resolvedProjectPath);
 		updateTitle();
-		LocalSettings.Solution = path;
-		LocalSettings.SolutionHistory = queueFront(LocalSettings.SolutionHistory, path, 20);
+		LocalSettings.Solution = resolvedProjectPath;
+		LocalSettings.SolutionHistory = queueFront(LocalSettings.SolutionHistory, resolvedProjectPath, 20);
 		saveLocalSettings();
 		bindSolutionHistory();
 
@@ -643,7 +727,7 @@ async function OnLoadProject() {
 			loadProjectModal.style.display = "none";
 		}
 		modalProjectPathInput.value = "";
-		appendToConsole(`Project loaded: ${path}`, "INFO");
+		appendToConsole(`Project loaded: ${resolvedProjectPath}`, "INFO");
 	}
 	catch (err) {
 		appendToConsole(`Load project failed: ${formatErrorMessage(err)}`, "ERROR");

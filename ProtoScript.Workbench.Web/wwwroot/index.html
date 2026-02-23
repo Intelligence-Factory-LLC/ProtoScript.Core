@@ -10,20 +10,83 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/neat.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/dialog/dialog.min.css">
 	<link rel="stylesheet" href="/js/plugins/codemirror/simple-hint.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="/custom_css/editor.css">
 	<link rel="stylesheet" href="/custom_css/protoscript-workbench.css">
 	<style>
+		:root {
+			--bg-main: #edf2f9;
+			--bg-accent: #dce8ff;
+			--surface: #ffffff;
+			--surface-soft: #f6f9ff;
+			--border: #d4ddeb;
+			--text: #1e2b3f;
+			--muted: #5a6a82;
+			--primary: #1f6feb;
+			--primary-soft: #dce9ff;
+			--shadow: 0 10px 28px rgba(21, 38, 67, 0.1);
+		}
+
 		html, body {
 			height: 100%;
 		}
 
+		body {
+			background:
+				radial-gradient(circle at 20% 0%, var(--bg-accent) 0%, transparent 40%),
+				linear-gradient(180deg, #f5f8fe 0%, var(--bg-main) 100%);
+			color: var(--text);
+			font-family: "Source Sans 3", "Segoe UI", Tahoma, Geneva, sans-serif;
+		}
+
+		.container-fluid {
+			padding: 12px !important;
+			gap: 8px;
+		}
+
+		header {
+			background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 100%);
+			border: 1px solid var(--border);
+			border-radius: 14px;
+			padding: 10px 12px;
+			box-shadow: var(--shadow);
+		}
+
+		h1.h5 {
+			font-weight: 700;
+			letter-spacing: 0.01em;
+		}
+
+		#headerProjectName {
+			display: inline-block;
+			color: var(--muted) !important;
+			font-family: "IBM Plex Mono", Consolas, "Courier New", monospace;
+			font-size: 0.82rem;
+		}
+
+		.card {
+			border: 1px solid var(--border);
+			border-radius: 14px;
+			box-shadow: var(--shadow);
+			background: var(--surface);
+		}
+
+		.card-header {
+			background: var(--surface-soft);
+			border-bottom: 1px solid var(--border);
+		}
+
 		.CodeMirror {
 			height: 100%;
-			font-size: 13px;
+			font-size: 14px;
+			border: 0;
+			background: #fcfdff;
 		}
 
 		.editor-shell {
-			height: calc(100vh - 140px);
+			height: calc(100vh - 185px);
 			min-height: 420px;
 		}
 
@@ -35,12 +98,33 @@
 		#outputResizer {
 			height: 6px;
 			cursor: ns-resize;
-			background: #dee2e6;
+			background: linear-gradient(90deg, #c9d5e8, #b9c8df, #c9d5e8);
+			border-radius: 99px;
+			margin: 0 4px;
 		}
 
 		#outputWindow {
-			height: 38vh;
+			height: 34vh;
 			min-height: 150px;
+		}
+
+		#txtResults2 {
+			background: #0f1724;
+			color: #dbe7ff;
+			font-family: "IBM Plex Mono", Consolas, "Courier New", monospace;
+			font-size: 12px;
+			line-height: 1.45;
+		}
+
+		#txtImmediate {
+			font-family: "IBM Plex Mono", Consolas, "Courier New", monospace;
+			font-size: 0.9rem;
+			resize: vertical;
+			min-height: 52px;
+		}
+
+		#runImmediateCmdBtn {
+			min-width: 88px;
 		}
 
 		.tab-content {
@@ -56,9 +140,87 @@
 			display: flex;
 		}
 
-		.tab-button.active {
+		.tab-button {
 			font-weight: 600;
-			border-bottom: 2px solid #0d6efd;
+			color: #3f516d;
+			transition: all 0.15s ease;
+		}
+
+		.tab-button:hover {
+			color: var(--primary);
+			background: #f1f6ff;
+		}
+
+		.tab-button.active {
+			color: var(--primary);
+			background: #eef4ff !important;
+			border-bottom: 2px solid var(--primary);
+		}
+
+		.file-item,
+		.symbol-item,
+		.history-item,
+		.solution-entry {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 7px 10px;
+			border-radius: 9px;
+			cursor: pointer;
+			transition: background-color 0.14s ease, color 0.14s ease;
+		}
+
+		.file-item,
+		.solution-entry {
+			font-family: "IBM Plex Mono", Consolas, "Courier New", monospace;
+			font-size: 0.8rem;
+			word-break: break-word;
+		}
+
+		.history-item {
+			font-family: "IBM Plex Mono", Consolas, "Courier New", monospace;
+			font-size: 0.8rem;
+		}
+
+		.symbol-item .symbol-name {
+			flex: 1;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.symbol-item .symbol-line {
+			margin-left: auto;
+			color: var(--muted);
+			font-size: 0.74rem;
+			font-family: "IBM Plex Mono", Consolas, "Courier New", monospace;
+		}
+
+		.file-item:hover,
+		.symbol-item:hover,
+		.history-item:hover,
+		.solution-entry:hover {
+			background: #eef4ff;
+		}
+
+		.file-item.active,
+		.symbol-item.active {
+			background: var(--primary-soft);
+			color: #164992;
+			font-weight: 600;
+		}
+
+		#divProject,
+		#divSolution,
+		#divSolutionHistory,
+		#divSolutionExamples,
+		#divImmediateHistory,
+		#divSymbolTable,
+		#divRecentSymbols {
+			background: linear-gradient(180deg, #f9fbff 0%, #f4f8ff 100%);
+			border: 1px solid #e3eaf7;
+			border-radius: 10px;
 		}
 
 		.modal {
@@ -66,14 +228,21 @@
 			position: fixed;
 			z-index: 1050;
 			inset: 0;
-			background: rgba(0, 0, 0, 0.45);
+			background: rgba(13, 24, 40, 0.38);
+			backdrop-filter: blur(3px);
 		}
 
 		.modal-card {
-			width: min(720px, 95vw);
+			width: min(760px, 95vw);
 			max-height: 90vh;
 			overflow: auto;
-			margin: 5vh auto;
+			margin: 4.5vh auto;
+			border-radius: 14px;
+		}
+
+		.btn {
+			border-radius: 9px;
+			font-weight: 600;
 		}
 
 		.debug-break-marker {
@@ -82,6 +251,39 @@
 
 		.hidden {
 			display: none !important;
+		}
+
+		::-webkit-scrollbar {
+			width: 10px;
+			height: 10px;
+		}
+
+		::-webkit-scrollbar-track {
+			background: #dde5f2;
+		}
+
+		::-webkit-scrollbar-thumb {
+			background: #9eb1cc;
+			border-radius: 99px;
+			border: 2px solid #dde5f2;
+		}
+
+		@media (max-width: 992px) {
+			.editor-shell {
+				flex-direction: column;
+				height: auto;
+				min-height: 0;
+			}
+
+			#rightPanel {
+				width: 100%;
+				min-width: 0;
+				height: 42vh;
+			}
+
+			#outputWindow {
+				height: 40vh;
+			}
 		}
 	</style>
 </head>
