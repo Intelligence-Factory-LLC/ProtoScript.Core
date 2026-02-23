@@ -42,15 +42,15 @@
 		}
 
 		.container-fluid {
-			padding: 12px !important;
-			gap: 8px;
+			padding: 9px !important;
+			gap: 6px;
 		}
 
 		header {
 			background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 100%);
 			border: 1px solid var(--border);
 			border-radius: 14px;
-			padding: 10px 12px;
+			padding: 8px 10px;
 			box-shadow: var(--shadow);
 		}
 
@@ -86,12 +86,12 @@
 		}
 
 		.editor-shell {
-			height: calc(100vh - 185px);
+			height: calc(100vh - 168px);
 			min-height: 420px;
 		}
 
 		#rightPanel {
-			width: 360px;
+			width: 348px;
 			min-width: 280px;
 		}
 
@@ -245,6 +245,55 @@
 			font-weight: 600;
 		}
 
+		.top-toolbar {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 12px;
+			padding: 7px 8px;
+			box-shadow: var(--shadow);
+		}
+
+		.top-toolbar .btn-group .btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+		}
+
+		.window-size-controls .btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+		}
+
+		.setting-check {
+			margin: 0;
+			padding-right: 6px;
+		}
+
+		.setting-check .form-check-input {
+			width: 2.2rem;
+			height: 1.15rem;
+			border-color: #9fb3d8;
+			background-color: #d9e4f8;
+			cursor: pointer;
+		}
+
+		.setting-check .form-check-input:checked {
+			border-color: var(--primary);
+			background-color: var(--primary);
+		}
+
+		.setting-check .form-check-label {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			color: #32435f;
+			font-weight: 600;
+			font-size: 0.84rem;
+			cursor: pointer;
+			margin-left: 2px;
+		}
+
 		.debug-break-marker {
 			background: rgba(255, 193, 7, 0.3);
 		}
@@ -285,43 +334,97 @@
 				height: 40vh;
 			}
 		}
+
+		@media (max-width: 768px) {
+			header {
+				flex-direction: column;
+				align-items: flex-start !important;
+				gap: 8px;
+			}
+
+			.window-size-controls {
+				width: 100%;
+				justify-content: space-between;
+			}
+
+			.top-toolbar {
+				padding: 6px;
+				gap: 6px !important;
+			}
+
+			.top-toolbar .btn-group {
+				width: 100%;
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 6px;
+			}
+
+			.top-toolbar .btn-group .btn {
+				border-radius: 8px !important;
+				justify-content: center;
+			}
+
+			.top-toolbar .settings-wrap {
+				width: 100%;
+				margin-left: 0 !important;
+				padding-top: 2px;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+
+			.setting-check .form-check-label {
+				font-size: 0.8rem;
+			}
+
+			.modal-card {
+				margin: 2vh auto;
+				width: min(96vw, 760px);
+			}
+
+			#outputWindow {
+				height: 34vh;
+			}
+		}
 	</style>
 </head>
 <body class="bg-body-tertiary">
 	<div class="container-fluid p-2 d-flex flex-column h-100">
-		<header class="d-flex align-items-center justify-content-between mb-2">
+		<header class="d-flex align-items-center justify-content-between mb-1">
 			<div>
 				<h1 class="h5 mb-0">ProtoScript Workbench</h1>
 				<small id="headerProjectName" class="text-secondary"></small>
 			</div>
-			<div class="d-flex align-items-center gap-2">
-				<button type="button" class="btn btn-sm btn-outline-secondary" onclick="OnMaximize()">Max</button>
-				<button type="button" class="btn btn-sm btn-outline-secondary" onclick="OnHalfize()">Half</button>
-				<button type="button" class="btn btn-sm btn-outline-secondary" onclick="OnMinimize()">Min</button>
+			<div class="window-size-controls d-flex align-items-center gap-2">
+				<button type="button" class="btn btn-sm btn-outline-secondary" onclick="OnMaximize()"><i class="bi bi-arrows-fullscreen"></i>Max</button>
+				<button type="button" class="btn btn-sm btn-outline-secondary" onclick="OnHalfize()"><i class="bi bi-layout-split"></i>Half</button>
+				<button type="button" class="btn btn-sm btn-outline-secondary" onclick="OnMinimize()"><i class="bi bi-dash-square"></i>Min</button>
 			</div>
 		</header>
 
-		<div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+		<div class="top-toolbar d-flex flex-wrap gap-2 align-items-center mb-1">
 			<div class="btn-group btn-group-sm" role="group" aria-label="File actions">
-				<button type="button" class="btn btn-outline-primary" onclick="OnMenuLoadProject()">Load Project</button>
-				<button type="button" class="btn btn-outline-primary" onclick="OnMenuAddFile()">Add File</button>
-				<button type="button" class="btn btn-outline-primary" onclick="OnMenuSaveFile()">Save</button>
+				<button type="button" class="btn btn-outline-primary" onclick="OnMenuLoadProject()"><i class="bi bi-folder2-open"></i>Load Project</button>
+				<button type="button" class="btn btn-outline-primary" onclick="OnMenuAddFile()"><i class="bi bi-file-earmark-plus"></i>Add File</button>
+				<button type="button" class="btn btn-outline-primary" onclick="OnMenuSaveFile()"><i class="bi bi-floppy"></i>Save</button>
 			</div>
 			<div class="btn-group btn-group-sm" role="group" aria-label="Build actions">
 				<button type="button" class="btn btn-outline-primary" onclick="CompileCode()"><i class="bi bi-building"></i> Compile</button>
-				<button type="button" class="btn btn-outline-primary" onclick="OnInterpretImmediate()"><i class="bi bi-play-fill"></i> Interpret</button>
+				<button type="button" class="btn btn-outline-primary" onclick="OnInterpretImmediate()"><i class="bi bi-lightning-charge-fill"></i> Interpret</button>
 			</div>
-			<div class="form-check form-check-inline ms-2">
+			<div class="settings-wrap d-flex flex-wrap align-items-center gap-1 ms-1">
+			<div class="form-check form-switch form-check-inline setting-check">
 				<input class="form-check-input" type="checkbox" id="settingShowTypeOfs" onclick="OnSettingShowTypeOfs(this)">
-				<label class="form-check-label" for="settingShowTypeOfs">Show Type Ofs</label>
+				<label class="form-check-label" for="settingShowTypeOfs"><i class="bi bi-diagram-3"></i>Type Ofs</label>
 			</div>
-			<div class="form-check form-check-inline">
+			<div class="form-check form-switch form-check-inline setting-check">
 				<input class="form-check-input" type="checkbox" id="settingDebugMode" onclick="OnSettingDebugMode(this)">
-				<label class="form-check-label" for="settingDebugMode">Debug</label>
+				<label class="form-check-label" for="settingDebugMode"><i class="bi bi-bug"></i>Debug</label>
 			</div>
-			<div class="form-check form-check-inline">
+			<div class="form-check form-switch form-check-inline setting-check">
 				<input class="form-check-input" type="checkbox" id="settingResumeExecution" onclick="OnSettingResumeExecution(this)">
-				<label class="form-check-label" for="settingResumeExecution">Resume</label>
+				<label class="form-check-label" for="settingResumeExecution"><i class="bi bi-arrow-repeat"></i>Resume</label>
+			</div>
 			</div>
 			<span id="txtTaggingProgress" class="small text-secondary"></span>
 		</div>
@@ -362,10 +465,10 @@
 
 		<div id="outputResizer"></div>
 
-		<section id="outputWindow" class="card d-flex flex-column mt-2 overflow-hidden">
+		<section id="outputWindow" class="card d-flex flex-column mt-1 overflow-hidden">
 			<div class="card-header p-1 d-flex align-items-center justify-content-between">
 				<div>
-					<button type="button" class="tab-button bottom-tab-button btn btn-sm btn-light active" data-pane="bottom" data-tab="consoleContent">Debugger</button>
+					<button type="button" class="tab-button bottom-tab-button btn btn-sm btn-light active" data-pane="bottom" data-tab="consoleContent"><i class="bi bi-terminal me-1"></i>Debugger</button>
 				</div>
 				<div class="DebuggingControls hidden d-flex gap-1">
 					<button type="button" class="btn btn-sm btn-outline-primary" onclick="OnResumeDebugging()" title="Resume"><i class="bi bi-play-fill"></i></button>
