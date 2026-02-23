@@ -86,10 +86,20 @@ namespace ProtoScript.Extensions
 
 		static public string LoadFile(string strSessionKey, string strFile)
 		{
-			SessionObject session = GetOrCreateSession(strSessionKey);
-			string strContents = FileUtil.ReadFile(strFile);
-			session.Context.SetCurrentFile(strFile);
-			return strContents;
+			try
+			{
+				Logs.DebugLog.WriteEvent("ProtoScriptWorkbench.LoadFile.Start", $"{strSessionKey} -> {strFile}");
+				SessionObject session = GetOrCreateSession(strSessionKey);
+				string strContents = FileUtil.ReadFile(strFile);
+				session.Context.SetCurrentFile(strFile);
+				Logs.DebugLog.WriteEvent("ProtoScriptWorkbench.LoadFile.Stop", strFile);
+				return strContents;
+			}
+			catch (Exception err)
+			{
+				Logs.LogError(err);
+				throw;
+			}
 		}
 
 		public static bool CreateNewFile(string strProject, string strNewFile)
@@ -133,8 +143,19 @@ namespace ProtoScript.Extensions
 
 		static public List<string> LoadProject(string strProject)
 		{
-			SessionObject session = GetOrCreateSession(strProject);
-			return LoadProjectInternal(session);
+			try
+			{
+				Logs.DebugLog.WriteEvent("ProtoScriptWorkbench.LoadProject.Start", strProject);
+				SessionObject session = GetOrCreateSession(strProject);
+				List<string> files = LoadProjectInternal(session);
+				Logs.DebugLog.WriteEvent("ProtoScriptWorkbench.LoadProject.Stop", $"{strProject} ({files.Count} files)");
+				return files;
+			}
+			catch (Exception err)
+			{
+				Logs.LogError(err);
+				throw;
+			}
 		}
 
 		static private List<string> LoadProjectInternal(SessionObject session)
@@ -184,6 +205,7 @@ namespace ProtoScript.Extensions
 			}
 			catch (ProtoScriptParsingException err)
 			{
+				Logs.LogError(err);
 				throw new JsonWsException(err.Message + ", " + err.Explanation);
 			}
 		}
