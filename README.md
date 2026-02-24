@@ -43,20 +43,20 @@ Current solution membership:
 ## 📚 ProtoScript reference docs (jump links)
 The reference manual is split into focused sections under `docs/ProtoScript/`.
 
-- Index: `docs/ProtoScript/README.md`
-- Introduction: `docs/ProtoScript/introduction.md`
-- Ontology context: `docs/ProtoScript/ontology-context.md`
-- What are prototypes?: `docs/ProtoScript/what-are-prototypes.md`
-- Syntax and features: `docs/ProtoScript/syntax-and-features.md`
-- Native value prototypes: `docs/ProtoScript/native-value-prototypes.md`
-- Examples of prototype creation: `docs/ProtoScript/examples-of-prototype-creation.md`
-- Simpsons example: `docs/ProtoScript/simpsons-example.md`
-- Relationships: `docs/ProtoScript/relationships.md`
-- Shadows and LGG: `docs/ProtoScript/shadows-and-lgg.md`
-- Prototype paths: `docs/ProtoScript/prototype-paths.md`
-- Subtypes: `docs/ProtoScript/subtypes.md`
-- Transformation functions: `docs/ProtoScript/transformation-functions.md`
-- Ternary expression support spec: `docs/ProtoScript/ternary-expression-support-spec.md`
+- Index: [docs/ProtoScript/README.md](docs/ProtoScript/README.md)
+- Introduction: [docs/ProtoScript/introduction.md](docs/ProtoScript/introduction.md)
+- Ontology context: [docs/ProtoScript/ontology-context.md](docs/ProtoScript/ontology-context.md)
+- What are prototypes?: [docs/ProtoScript/what-are-prototypes.md](docs/ProtoScript/what-are-prototypes.md)
+- Syntax and features: [docs/ProtoScript/syntax-and-features.md](docs/ProtoScript/syntax-and-features.md)
+- Native value prototypes: [docs/ProtoScript/native-value-prototypes.md](docs/ProtoScript/native-value-prototypes.md)
+- Examples of prototype creation: [docs/ProtoScript/examples-of-prototype-creation.md](docs/ProtoScript/examples-of-prototype-creation.md)
+- Simpsons example: [docs/ProtoScript/simpsons-example.md](docs/ProtoScript/simpsons-example.md)
+- Relationships: [docs/ProtoScript/relationships.md](docs/ProtoScript/relationships.md)
+- Shadows and LGG: [docs/ProtoScript/shadows-and-lgg.md](docs/ProtoScript/shadows-and-lgg.md)
+- Prototype paths: [docs/ProtoScript/prototype-paths.md](docs/ProtoScript/prototype-paths.md)
+- Subtypes: [docs/ProtoScript/subtypes.md](docs/ProtoScript/subtypes.md)
+- Transformation functions: [docs/ProtoScript/transformation-functions.md](docs/ProtoScript/transformation-functions.md)
+- Ternary expression support spec: [docs/ProtoScript/ternary-expression-support-spec.md](docs/ProtoScript/ternary-expression-support-spec.md)
 
 ## 🚀 Build
 The split repos are designed to sit as **siblings** on disk so `Scripts\update_dlls.bat` can copy DLLs between `..\ontology-core`, `..\protoscript-core`, and `..\buffaly-nlu`.
