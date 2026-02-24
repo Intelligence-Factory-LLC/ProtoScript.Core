@@ -28,6 +28,10 @@ namespace ProtoScript.CLI.Validation
 				};
 				response.Summary.FileCount = files.Count;
 			}
+			catch (ProtoScript.Parsers.ProtoScriptTokenizingException err)
+			{
+				AddParseDiagnostic(response, err, request.ProjectPath);
+			}
 			catch (UnauthorizedAccessException err)
 			{
 				AddIoDiagnostic(response, err.Message, request.ProjectPath, "PS8002");
@@ -83,6 +87,10 @@ namespace ProtoScript.CLI.Validation
 					ProjectFile = projectPath
 				};
 				response.Summary.FileCount = TryGetProjectFileCount(projectPath);
+			}
+			catch (ProtoScript.Parsers.ProtoScriptTokenizingException err)
+			{
+				AddParseDiagnostic(response, err, request.ProjectPath);
 			}
 			catch (UnauthorizedAccessException err)
 			{
@@ -142,6 +150,10 @@ namespace ProtoScript.CLI.Validation
 					ProjectFile = projectPath
 				};
 				response.Summary.FileCount = TryGetProjectFileCount(projectPath);
+			}
+			catch (ProtoScript.Parsers.ProtoScriptTokenizingException err)
+			{
+				AddParseDiagnostic(response, err, request.ProjectPath);
 			}
 			catch (UnauthorizedAccessException err)
 			{
@@ -222,6 +234,35 @@ namespace ProtoScript.CLI.Validation
 		{
 			response.ExitCode = ProtoScriptValidationExitCodes.InternalError;
 			AddDiagnostic(response, "config", "PS9002", err.Message, null, null, null, err);
+		}
+
+		private static void AddParseDiagnostic(ProtoScriptValidationResponse response, ProtoScript.Parsers.ProtoScriptTokenizingException err, string? fallbackProjectPath)
+		{
+			response.ExitCode = ProtoScriptValidationExitCodes.ValidationFailed;
+			AddDiagnostic(
+				response,
+				"parse",
+				"PS1001",
+				BuildParseDiagnosticMessage(err),
+				string.IsNullOrWhiteSpace(err.File) ? fallbackProjectPath : err.File,
+				err.Cursor,
+				1,
+				err);
+		}
+
+		private static string BuildParseDiagnosticMessage(ProtoScript.Parsers.ProtoScriptTokenizingException err)
+		{
+			if (!string.IsNullOrWhiteSpace(err.Explanation))
+			{
+				return err.Explanation;
+			}
+
+			if (!string.IsNullOrWhiteSpace(err.Expected))
+			{
+				return "Expected: " + err.Expected;
+			}
+
+			return err.Message;
 		}
 
 		private static ProtoScriptValidationResponse CompleteResponse(ProtoScriptValidationResponse response, Stopwatch stopwatch)

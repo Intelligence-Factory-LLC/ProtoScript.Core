@@ -24,21 +24,49 @@ namespace ProtoScript.Parsers
 				result.Recursive = true;
 			}
 
-			result.FileName = ProtoScript.Parsers.Identifiers.ParseMultiple(tok);
+			string strPathToken = tok.peekNextToken();
+			if (!IsIncludePathStringLiteral(strPathToken))
+			{
+				throw new ProtoScriptParsingException(
+					tok.getString(),
+					tok.getCursor(),
+					"string literal",
+					"Include path must be a quoted string literal. Example: include \"Critic/CriticOps.pts\";");
+			}
+
+			result.FileName = tok.getNextToken();
 
 			tok.MustBeNext(";");
 
-			if (result.FileName.StartsWith("@"))
-				result.FileName = result.FileName.Substring(1);
-
-			if (result.FileName.StartsWith("\"") && result.FileName.EndsWith("\""))
+			if (result.FileName.StartsWith("@\"") && result.FileName.EndsWith("\""))
+			{
+				result.FileName = StringUtil.BetweenQuotes(result.FileName).Replace("\"\"", "\"");
+			}
+			else if (result.FileName.StartsWith("\"") && result.FileName.EndsWith("\""))
+			{
 				result.FileName = StringUtil.BetweenQuotes(result.FileName);
+			}
 
 
 
 			result.Info.StopStatement(tok.getCursor());
 
 			return result;
+		}
+
+		private static bool IsIncludePathStringLiteral(string token)
+		{
+			if (string.IsNullOrEmpty(token))
+			{
+				return false;
+			}
+
+			if (token.StartsWith("@\"") && token.EndsWith("\"") && token.Length >= 3)
+			{
+				return true;
+			}
+
+			return token.StartsWith("\"") && token.EndsWith("\"") && token.Length >= 2;
 		}
 	}
 }

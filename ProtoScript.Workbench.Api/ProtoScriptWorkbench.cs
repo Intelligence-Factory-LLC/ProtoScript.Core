@@ -203,10 +203,10 @@ namespace ProtoScript.Extensions
 				});
 				return project.Files.Select(x => x.FileName).ToList();
 			}
-			catch (ProtoScriptParsingException err)
+			catch (ProtoScriptTokenizingException err)
 			{
 				Logs.LogError(err);
-				throw new JsonWsException(err.Message + ", " + err.Explanation);
+				throw;
 			}
 		}
 
@@ -269,7 +269,7 @@ namespace ProtoScript.Extensions
 				return new Diagnostic()
 				{
 					Type = "Parsing",
-					Message = "Expected: " + err.Expected,
+					Message = BuildParserDiagnosticMessage(err),
 					Info = new StatementParsingInfo() { StartingOffset = err.Cursor }
 				};
 			}
@@ -294,7 +294,7 @@ namespace ProtoScript.Extensions
 				lstDiagnostics.Add(new Diagnostic()
 				{
 					Type = "Parsing",
-					Message = "Expected: " + err.Expected + " " + err.Explanation,
+					Message = BuildParserDiagnosticMessage(err),
 					Info = new StatementParsingInfo() { StartingOffset = err.Cursor, Length = 1, File = err.File }
 				});
 			}
@@ -319,7 +319,7 @@ namespace ProtoScript.Extensions
 				lstDiagnostics.Add(new Diagnostic()
 				{
 					Type = "Parsing",
-					Message = "Expected: " + err.Expected + " " + err.Explanation,
+					Message = BuildParserDiagnosticMessage(err),
 					Info = new StatementParsingInfo() { StartingOffset = err.Cursor, Length = 1, File = err.File }
 				});
 			}
@@ -359,6 +359,21 @@ namespace ProtoScript.Extensions
 				lstDiagnostics.Add(diagnostic);
 			}
 			return lstDiagnostics;
+		}
+
+		private static string BuildParserDiagnosticMessage(ProtoScriptTokenizingException err)
+		{
+			if (!string.IsNullOrWhiteSpace(err.Explanation))
+			{
+				return err.Explanation;
+			}
+
+			if (!string.IsNullOrWhiteSpace(err.Expected))
+			{
+				return "Expected: " + err.Expected;
+			}
+
+			return err.Message;
 		}
 
 		public class Symbol
@@ -652,7 +667,7 @@ namespace ProtoScript.Extensions
 			}
 			catch (ProtoScriptTokenizingException err)
 			{
-				result.Error = err.Message + ", " + err.Explanation;
+				result.Error = BuildParserDiagnosticMessage(err);
 				result.ErrorStatement = new StatementParsingInfo() { StartingOffset = err.Cursor, Length = 1, File = err.File };
 			}
 			catch (RuntimeException err)
