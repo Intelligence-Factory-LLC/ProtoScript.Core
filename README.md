@@ -88,6 +88,10 @@ Integration tests load sample project files from the Buffaly portal project dire
 - ProtoScript core: https://github.com/Intelligence-Factory-LLC/ProtoScript.Core
 - Buffaly NLU: https://github.com/Intelligence-Factory-LLC/Buffaly.NLU
 
+## 🛡 License
+ProtoScript.Core is released under the **GNU General Public License v3.0**.
+See [`LICENSE`](LICENSE).
+
 ## 🏥 Need help?
 We deploy explainable, neurosymbolic systems in regulated domains (healthcare and beyond).
 If you'd like guidance or custom development, email **support@intelligencefactory.ai** or visit **https://intelligencefactory.ai**.
