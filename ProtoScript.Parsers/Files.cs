@@ -98,7 +98,16 @@ namespace ProtoScript.Parsers
 
 					case "import":
 						{
-							result.Imports.Add(ProtoScript.Parsers.ImportStatements.Parse(tok));
+							int saveCursor = tok.getCursor();
+							if (ProtoScript.Parsers.IncludeStatements.TryParseImportAsInclude(tok, out ProtoScript.IncludeStatement includeStatement))
+							{
+								result.Includes.Add(includeStatement);
+							}
+							else
+							{
+								tok.setCursor(saveCursor);
+								result.Imports.Add(ProtoScript.Parsers.ImportStatements.Parse(tok));
+							}
 							break;
 						}
 
