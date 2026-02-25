@@ -364,12 +364,115 @@ prototype State {
 * `CountCities` iterates over `Cities`, counting nodes.  
 * **Graph View**: The `foreach` traverses `Cities` edges to increment `count`.
 
+### **9\. File-Level Directives (`include`, `reference`, `import`)**
+
+**Purpose**: Load other ProtoScript files and import .NET types into the ProtoScript type system.
+
+**Syntax**:
+
+```protoscript
+// Include other ProtoScript files
+include "Critic/CriticOps.pts";
+include Critic/CriticOps.pts;
+include Path\CriticOps.pts;
+include recursive "Shared/*.pts";
+
+// Reference a .NET assembly
+reference Ontology.Simulation;
+reference Ontology.Simulation Ontology.Simulation;
+
+// Import a .NET type into a short ProtoScript alias
+import Ontology.Simulation Ontology.Simulation.StringWrapper String;
+
+// Compatibility form: import path is treated as include
+import File.pts;
+import Path\File.pts;
+import Path/File.pts;
+```
+
+**Details**:
+
+* `include` accepts quoted and unquoted path literals.  
+* Unquoted paths must be contiguous tokens; if the path contains whitespace, quote it.  
+* `include recursive` enables wildcard discovery under subdirectories.  
+* `reference` loads an assembly, with an optional local alias.  
+* `import <referenceAlias> <fullTypeName> <alias>;` binds a .NET type into ProtoScript.  
+* `import <path>.pts;` is treated as an include-style file load for compatibility.
+
+**Example**:
+
+```protoscript
+reference Ontology.Simulation Ontology.Simulation;
+import Ontology.Simulation Ontology.Simulation.StringWrapper String;
+include Critic/CriticOps.pts;
+
+prototype MessageHolder {
+    String Value;
+}
+```
+
+**What’s Happening?**
+
+* The assembly is loaded under `Ontology.Simulation`.  
+* `StringWrapper` is available as `String` in ProtoScript type declarations.  
+* `Critic/CriticOps.pts` is parsed as an included ProtoScript source file.
+
+### **10\. External Runtime Object Declarations (`extern`)**
+
+**Purpose**: Declare host-injected runtime objects so compilation can type-check member access before runtime values are provided.
+
+**Syntax**:
+
+```protoscript
+extern String RuntimeMessage;
+```
+
+**Rules**:
+
+* `extern` declarations are file/global scope declarations.  
+* `extern` declarations cannot have an initializer.  
+* The declared type must already be resolvable (for example via `import`).  
+* Method and property access on an `extern` symbol are type-checked at compile time using the declared type.  
+* The host runtime must inject a compatible object before executing code that uses it.
+
+**Example**:
+
+```protoscript
+reference Ontology.Simulation Ontology.Simulation;
+import Ontology.Simulation Ontology.Simulation.StringWrapper String;
+
+extern String RuntimeMessage;
+
+function main() : string
+{
+    return RuntimeMessage.GetStringValue();
+}
+```
+
+**Host Integration (C\#)**:
+
+```csharp
+var compiler = new Compiler();
+compiler.Initialize();
+var compiled = compiler.Compile(file);
+
+var interpreter = new NativeInterpretter(compiler);
+interpreter.InsertGlobalObject("RuntimeMessage", new StringWrapper("hello from host"));
+interpreter.Evaluate(compiled);
+```
+
+**What’s Happening?**
+
+* The compiler validates `RuntimeMessage.GetStringValue()` against the imported `String` type.  
+* The host injects the concrete runtime object by name before executing `main`.
+
 ## **Integration with C\#**
 
 ProtoScript integrates seamlessly with C\#:
 
 * **Native Types**: `System.String`, `System.Int32`, etc., mirror C\# primitives, wrapped as NativeValuePrototypes.  
 * **Runtime Calls**: Functions can invoke C\# methods (e.g., `String.Format`).  
+* **Runtime Injection**: `extern` declarations let the host inject compatible .NET objects while preserving compile-time checking.  
 * **Type Conversions**: The runtime handles mappings between ProtoScript and C\# types.
 
 **Example**:
