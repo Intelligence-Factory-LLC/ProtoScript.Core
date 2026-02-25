@@ -125,7 +125,6 @@ namespace ProtoScript.Parsers
 							break;
 						}
 					case "partial":
-					case "extern":
 					case "prototype":
 						{
 							PrototypeDefinition protoDef = ProtoScript.Parsers.PrototypeDefinitions.Parse(tok);
@@ -135,6 +134,35 @@ namespace ProtoScript.Parsers
 								lstAnnotations = new List<AnnotationExpression>();
 							}
 							result.PrototypeDefinitions.Add(protoDef);
+
+							break;
+						}
+					case "extern":
+						{
+							if (IsPrototypeDefinitionAhead(tok))
+							{
+								PrototypeDefinition protoDef = ProtoScript.Parsers.PrototypeDefinitions.Parse(tok);
+								if (lstAnnotations.Count > 0)
+								{
+									protoDef.Annotations = lstAnnotations;
+									lstAnnotations = new List<AnnotationExpression>();
+								}
+								result.PrototypeDefinitions.Add(protoDef);
+								break;
+							}
+
+							Statement statement = Statements.Parse(tok);
+							if (statement is FunctionDefinition && lstAnnotations.Count > 0)
+							{
+								FunctionDefinition functionDefinition = statement as FunctionDefinition;
+								functionDefinition.Annotations = lstAnnotations;
+								lstAnnotations = new List<AnnotationExpression>();
+							}
+
+							if (statement != null)
+							{
+								result.Statements.Add(statement);
+							}
 
 							break;
 						}
@@ -171,6 +199,20 @@ namespace ProtoScript.Parsers
 			}
 
 			return result;
+		}
+
+		private static bool IsPrototypeDefinitionAhead(Tokenizer tok)
+		{
+			int saveCursor = tok.getCursor();
+			try
+			{
+				ProtoScript.Parsers.Modifiers.Parse(tok);
+				return tok.peekNextToken() == "prototype";
+			}
+			finally
+			{
+				tok.setCursor(saveCursor);
+			}
 		}
 	}
 }

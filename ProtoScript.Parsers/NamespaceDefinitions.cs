@@ -34,7 +34,6 @@
 				switch (strToken)
 				{
 					case "partial":
-					case "extern":
 					case "prototype":
 						{
 							PrototypeDefinition protoDef = ProtoScript.Parsers.PrototypeDefinitions.Parse(tok);
@@ -45,6 +44,24 @@
 							}
 							result.PrototypeDefinitions.Add(protoDef);
 
+							break;
+						}
+					case "extern":
+						{
+							if (IsPrototypeDefinitionAhead(tok))
+							{
+								PrototypeDefinition protoDef = ProtoScript.Parsers.PrototypeDefinitions.Parse(tok);
+								if (lstAnnotations.Count > 0)
+								{
+									protoDef.Annotations = lstAnnotations;
+									lstAnnotations = new List<AnnotationExpression>();
+								}
+								result.PrototypeDefinitions.Add(protoDef);
+								break;
+							}
+
+							Statement statement = Statements.Parse(tok);
+							result.Statements.Add(statement);
 							break;
 						}
 
@@ -83,6 +100,20 @@
 			result.Info.StopStatement(tok.getCursor());
 
 			return result;
+		}
+
+		private static bool IsPrototypeDefinitionAhead(Tokenizer tok)
+		{
+			int saveCursor = tok.getCursor();
+			try
+			{
+				ProtoScript.Parsers.Modifiers.Parse(tok);
+				return tok.peekNextToken() == "prototype";
+			}
+			finally
+			{
+				tok.setCursor(saveCursor);
+			}
 		}
 
 	}

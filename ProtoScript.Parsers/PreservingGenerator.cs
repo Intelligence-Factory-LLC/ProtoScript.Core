@@ -431,6 +431,9 @@ namespace ProtoScript.Parsers
 			if (!bNaked)
 				WriteStart();
 
+			if (oDeclaration.IsExternal)
+				Write("extern ");
+
 			if (oDeclaration.IsConst)
 				Write("const ");
 

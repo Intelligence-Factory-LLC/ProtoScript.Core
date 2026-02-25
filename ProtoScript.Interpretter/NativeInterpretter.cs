@@ -149,6 +149,33 @@ namespace ProtoScript.Interpretter
 
 		public void InsertGlobalObject(string strName, object obj)
 		{
+			Scope globalScope = Compiler.Symbols.GetGlobalScope();
+			if (globalScope.TryGetSymbol(strName, out object existing) && existing is ValueRuntimeInfo existingInfo)
+			{
+				TypeInfo sourceType = new TypeInfo(obj.GetType());
+				if (!SimpleInterpretter.IsAssignableFrom(sourceType, existingInfo.Type))
+				{
+					throw new Exception($"Cannot inject object of type {obj.GetType().FullName} into {strName} declared as {existingInfo.Type}");
+				}
+
+				existingInfo.Value = obj;
+				if (existingInfo.Index >= 0 && existingInfo.Index < Compiler.Symbols.GlobalStack.Count)
+				{
+					object existingStackEntry = Compiler.Symbols.GlobalStack[existingInfo.Index];
+					if (existingStackEntry is ValueRuntimeInfo existingStackInfo)
+					{
+						existingStackInfo.Value = obj;
+					}
+					else
+					{
+						Compiler.Symbols.GlobalStack[existingInfo.Index] = existingInfo;
+					}
+				}
+
+				globalScope.InsertSymbol(strName, existingInfo);
+				return;
+			}
+
 			DotNetTypeInfo info = new DotNetTypeInfo(obj.GetType());
 			info.Index = Compiler.Symbols.GlobalStack.Add(info);
 
@@ -157,7 +184,7 @@ namespace ProtoScript.Interpretter
 			valueRuntimeInfo.Value = obj;
 			valueRuntimeInfo.Index = Compiler.Symbols.GlobalStack.Add(valueRuntimeInfo);
 
-			Compiler.Symbols.GetGlobalScope().InsertSymbol(strName, valueRuntimeInfo);
+			globalScope.InsertSymbol(strName, valueRuntimeInfo);
 		}
 
 		public void InsertLocalPrototype(string strName, Prototype prototype)

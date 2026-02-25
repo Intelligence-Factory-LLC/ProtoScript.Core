@@ -19,8 +19,22 @@
 				result.Info.StartStatement(tok.getCursor());
 				result.Info.File = Files.CurrentFile;
 
-				if (tok.CouldBeNext("const"))
-					result.IsConst = true;
+				while (true)
+				{
+					if (tok.CouldBeNext("extern"))
+					{
+						result.IsExternal = true;
+						continue;
+					}
+
+					if (tok.CouldBeNext("const"))
+					{
+						result.IsConst = true;
+						continue;
+					}
+
+					break;
+				}
 
 				result.Type = ProtoScript.Parsers.Types.Parse(tok);
 
@@ -36,6 +50,8 @@
 					VariableDeclaration declaration = new VariableDeclaration();
 					declaration.Type = result.Type; 
 					declaration.VariableName = ProtoScript.Parsers.Identifiers.Parse(tok);
+					declaration.IsConst = result.IsConst;
+					declaration.IsExternal = result.IsExternal;
 
 					if (tok.CouldBeNext("="))
 						declaration.Initializer = ParseInitializer(tok);
@@ -75,8 +91,22 @@ throw;
 				result.Info.StartStatement(tok.getCursor());
 				result.Info.File = Files.CurrentFile;
 
-				if (tok.CouldBeNext("const"))
-					result.IsConst = true;
+				while (true)
+				{
+					if (tok.CouldBeNext("extern"))
+					{
+						result.IsExternal = true;
+						continue;
+					}
+
+					if (tok.CouldBeNext("const"))
+					{
+						result.IsConst = true;
+						continue;
+					}
+
+					break;
+				}
 
 				if (tok.IsOperator(tok.peekNextToken()))
 					return null;
@@ -98,6 +128,8 @@ throw;
 					VariableDeclaration declaration = new VariableDeclaration();
 					declaration.Type = result.Type;
 					declaration.VariableName = ProtoScript.Parsers.Identifiers.Parse(tok);
+					declaration.IsConst = result.IsConst;
+					declaration.IsExternal = result.IsExternal;
 
 					if (tok.CouldBeNext("="))
 						declaration.Initializer = ParseInitializer(tok);

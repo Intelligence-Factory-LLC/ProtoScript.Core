@@ -283,6 +283,14 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			}
 			Logs.DebugLog.WriteTimer("CompileProject.DeclareFileFunctions");
 
+			//──────────────────────────── Declare-ExternalVariables ────────────────
+			Logs.DebugLog.CreateTimer("CompileProject.DeclareExternalVariables");
+			foreach (File fileCurrent in lstFiles)
+			{
+				compiler.DeclareFileExternalVariables(fileCurrent);
+			}
+			Logs.DebugLog.WriteTimer("CompileProject.DeclareExternalVariables");
+
 			//──────────────────────────── Compile-FileFunctions ───────────────────
 			Logs.DebugLog.CreateTimer("CompileProject.CompileFileFunctions");
 			foreach (File fileCurrent in lstFiles)
@@ -736,6 +744,54 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			return lstStatements;
 		}
 
+		public void DeclareFileExternalVariables(ProtoScript.File file)
+		{
+			Compiler compiler = this;
+			compiler.Source = file.RawCode;
+
+			foreach (Statement statement in file.Statements)
+			{
+				if (statement is not VariableDeclaration variableDeclaration || !variableDeclaration.IsExternal)
+					continue;
+
+				TypeInfo typeInfo = ResolveTypeInfo(variableDeclaration.Type, variableDeclaration, variableDeclaration.Type);
+				if (null == typeInfo)
+					continue;
+
+				if (Symbols.ActiveScope().TryGetSymbol(variableDeclaration.VariableName, out object existing))
+				{
+					if (existing is VariableRuntimeInfo existingVariableInfo)
+					{
+						if (!SimpleInterpretter.IsAssignableFrom(existingVariableInfo.Type, typeInfo)
+							|| !SimpleInterpretter.IsAssignableFrom(typeInfo, existingVariableInfo.Type))
+						{
+							this.AddDiagnostic(
+								new Diagnostic($"Extern declaration {variableDeclaration.VariableName} conflicts with an existing declaration"),
+								variableDeclaration,
+								variableDeclaration.Type);
+						}
+					}
+					else
+					{
+						this.AddDiagnostic(
+							new Diagnostic($"Extern declaration {variableDeclaration.VariableName} conflicts with an existing symbol"),
+							variableDeclaration,
+							variableDeclaration.Type);
+					}
+
+					continue;
+				}
+
+				VariableRuntimeInfo info = new VariableRuntimeInfo
+				{
+					Type = typeInfo,
+					OriginalType = typeInfo.Clone()
+				};
+				info.Index = Symbols.LocalStack.Add(info);
+				Symbols.InsertSymbol(variableDeclaration.VariableName, info);
+			}
+		}
+
 
 		public List<Compiled.Statement> CompileFileFunctionAnnotations(ProtoScript.File file)
 		{
@@ -903,6 +959,18 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 		public Compiled.VariableDeclaration Compile(VariableDeclaration statement)
 		{
+			if (statement.IsExternal && statement.Initializer != null)
+			{
+				this.AddDiagnostic(new Diagnostic("Extern declarations cannot have initializers"), statement, statement.Initializer);
+				return null;
+			}
+
+			if (statement.IsExternal && Symbols.ActiveScope().ScopeType != Scope.ScopeTypes.Global && Symbols.ActiveScope().ScopeType != Scope.ScopeTypes.File)
+			{
+				this.AddDiagnostic(new Diagnostic("Extern declarations are only valid at file scope"), statement, null);
+				return null;
+			}
+
 			TypeInfo typeInfo = ResolveTypeInfo(statement.Type, statement, statement.Type);
 			if (null == typeInfo)
 				return null;
@@ -910,6 +978,14 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 			if (Symbols.ActiveScope().TryGetSymbol(statement.VariableName, out object oExisting))
 			{
+				if (statement.IsExternal && oExisting is VariableRuntimeInfo predeclaredExternal)
+				{
+					Compiled.VariableDeclaration externalDeclaration = new Compiled.VariableDeclaration();
+					externalDeclaration.Info = statement.Info;
+					externalDeclaration.RuntimeInfo = predeclaredExternal;
+					return externalDeclaration;
+				}
+
 				this.AddDiagnostic(new Diagnostic($"{statement.VariableName} already declared in local scope"), statement, null);
 				return null;
 			}

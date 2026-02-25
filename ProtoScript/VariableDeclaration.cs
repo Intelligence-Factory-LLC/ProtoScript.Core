@@ -7,6 +7,7 @@ namespace ProtoScript
 		public ProtoScript.Type Type;
 		public string VariableName;
 		public bool IsConst;
+		public bool IsExternal;
 		public Expression Initializer;
 
 		public List<VariableDeclaration> ChainedDeclarations;
@@ -14,6 +15,9 @@ namespace ProtoScript
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
+			if (IsExternal)
+				sb.Append("extern ");
+
 			if (IsConst)
 				sb.Append("const ");
 

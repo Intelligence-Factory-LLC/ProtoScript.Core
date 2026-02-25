@@ -545,6 +545,9 @@ if (op.Value == "." || op.Value == "?.")
 			if (!bNaked)
 				WriteStart();
 
+			if (oDeclaration.IsExternal)
+				Write("extern ");
+
 			if (oDeclaration.IsConst)
 				Write("const ");
 
