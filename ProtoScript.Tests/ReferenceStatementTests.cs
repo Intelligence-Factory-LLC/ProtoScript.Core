@@ -44,7 +44,7 @@ namespace ProtoScript.Tests
 		{
 			string parsersAssemblyPath = typeof(Files).Assembly.Location.Replace("\\", "/");
 			string code = $@"
-reference \"{parsersAssemblyPath}\" ParsersAsm;
+reference ""{parsersAssemblyPath}"" ParsersAsm;
 import ParsersAsm ProtoScript.Parsers.Files FilesParser;
 ";
 			ProtoScript.File file = Files.ParseFileContents(code);
@@ -62,8 +62,8 @@ import ParsersAsm ProtoScript.Parsers.Files FilesParser;
 		{
 			string parsersAssemblyPath = typeof(Files).Assembly.Location.Replace("\\", "/");
 			string code = $@"
-reference \"{parsersAssemblyPath}\" AliasA;
-reference \"{parsersAssemblyPath}\" AliasB;
+reference ""{parsersAssemblyPath}"" AliasA;
+reference ""{parsersAssemblyPath}"" AliasB;
 ";
 			ProtoScript.File file = Files.ParseFileContents(code);
 			Compiler compiler = new Compiler();
