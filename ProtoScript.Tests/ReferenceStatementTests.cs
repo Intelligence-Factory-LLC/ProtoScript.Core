@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ProtoScript.Interpretter;
 using ProtoScript.Parsers;
+using System.Reflection;
 
 namespace ProtoScript.Tests
 {
@@ -10,9 +12,87 @@ namespace ProtoScript.Tests
 		[TestMethod]
 		public void ParseReferenceWithImplicitName()
 		{
-			ProtoScript.ReferenceStatement statement = ReferenceStatements.Parse("reference CSharp.Extensions;;");
+			ProtoScript.ReferenceStatement statement = ReferenceStatements.Parse("reference CSharp.Extensions;");
 			Assert.AreEqual("CSharp.Extensions", statement.AssemblyName);
 			Assert.AreEqual("CSharp.Extensions", statement.Reference);
+			Assert.IsFalse(statement.IsFileReference);
+		}
+
+		[TestMethod]
+		public void ParseReferencePathWithImplicitAlias()
+		{
+			ProtoScript.ReferenceStatement statement = ReferenceStatements.Parse("reference \"Skills/TwitterXApi/lib/Buffaly.XApi.dll\";");
+			Assert.IsTrue(statement.IsFileReference);
+			Assert.AreEqual("Skills/TwitterXApi/lib/Buffaly.XApi.dll", statement.AssemblyName);
+			Assert.AreEqual("Buffaly.XApi", statement.Reference);
+		}
+
+		[TestMethod]
+		public void CompileReferencePath_MissingDll_FailsFast()
+		{
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			ProtoScript.ReferenceStatement statement = ReferenceStatements.Parse("reference \"missing/missing-lib.dll\";");
+
+			compiler.Compile(statement);
+
+			Assert.IsTrue(compiler.Diagnostics.Any(x => x.Diagnostic.Message.Contains("Reference DLL not found", StringComparison.OrdinalIgnoreCase)));
+		}
+
+		[TestMethod]
+		public void CompileReferencePath_LoadsAssembly_AndImportBindsType()
+		{
+			string parsersAssemblyPath = typeof(Files).Assembly.Location.Replace("\\", "/");
+			string code = $@"
+reference \"{parsersAssemblyPath}\" ParsersAsm;
+import ParsersAsm ProtoScript.Parsers.Files FilesParser;
+";
+			ProtoScript.File file = Files.ParseFileContents(code);
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			compiler.Compile(file);
+
+			Assert.AreEqual(0, compiler.Diagnostics.Count);
+			Assert.IsTrue(compiler.References.ContainsKey("ParsersAsm"));
+			Assert.IsNotNull(compiler.Symbols.GetTypeInfo("FilesParser"));
+		}
+
+		[TestMethod]
+		public void CompileReferencePath_IsCachedByFullPathAcrossAliases()
+		{
+			string parsersAssemblyPath = typeof(Files).Assembly.Location.Replace("\\", "/");
+			string code = $@"
+reference \"{parsersAssemblyPath}\" AliasA;
+reference \"{parsersAssemblyPath}\" AliasB;
+";
+			ProtoScript.File file = Files.ParseFileContents(code);
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			compiler.Compile(file);
+
+			Assert.AreEqual(0, compiler.Diagnostics.Count);
+			Assert.IsTrue(compiler.References.TryGetValue("AliasA", out object? aliasA));
+			Assert.IsTrue(compiler.References.TryGetValue("AliasB", out object? aliasB));
+			Assert.AreSame(aliasA as Assembly, aliasB as Assembly);
+		}
+
+		[TestMethod]
+		public void CompileReferencePath_ResolvesRelativeToSourceFile()
+		{
+			string parsersAssemblyFullPath = typeof(Files).Assembly.Location;
+			string assemblyFileName = Path.GetFileName(parsersAssemblyFullPath);
+			string sourceDir = Path.GetDirectoryName(parsersAssemblyFullPath)!;
+
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			ProtoScript.ReferenceStatement statement = ReferenceStatements.Parse($"reference \"{assemblyFileName}\" ParsersAsm;");
+			statement.Info.File = Path.Combine(sourceDir, "TestFile.pts");
+
+			compiler.Compile(statement);
+
+			Assert.AreEqual(0, compiler.Diagnostics.Count);
+			Assert.IsTrue(compiler.References.ContainsKey("ParsersAsm"));
+			Assert.AreEqual(Path.GetFullPath(parsersAssemblyFullPath), statement.ResolvedAssemblyPath);
 		}
 	}
 }

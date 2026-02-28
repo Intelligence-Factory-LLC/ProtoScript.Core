@@ -9,6 +9,8 @@ using ProtoScript.Interpretter.RuntimeInfo;
 using ProtoScript.Interpretter.Symbols;
 using ProtoScript.Parsers;
 using System.Collections.Concurrent;
+using System.Reflection;
+using TypeInfo = ProtoScript.Interpretter.RuntimeInfo.TypeInfo;
 
 namespace ProtoScript.Interpretter
 {
@@ -32,6 +34,8 @@ namespace ProtoScript.Interpretter
 		public string Source = string.Empty;
 		public List<File> Files = new List<File>();
 		public bool AllowParallelism = false;
+		private static readonly ConcurrentDictionary<string, Assembly> s_assemblyPathCache =
+			new ConcurrentDictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
 
 		public void AddDiagnostic(Diagnostic diagnostic, Statement? statement, Expression? expression)
 		{
@@ -2658,21 +2662,53 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 		public void Compile(ReferenceStatement statement)
 		{
-			System.Reflection.Assembly ? assembly = null;
-
-			try
+			Assembly? assembly = null;
+			if (statement.IsFileReference || LooksLikeAssemblyPath(statement.AssemblyName))
 			{
-				assembly = System.Reflection.Assembly.Load(statement.AssemblyName);
+				if (!TryResolveReferenceAssemblyPath(statement, out string fullPath, out string? resolveError))
+				{
+					this.AddDiagnostic(new Diagnostic(resolveError ?? $"Could not resolve reference path {statement.AssemblyName}"), statement, null);
+					return;
+				}
+
+				statement.ResolvedAssemblyPath = fullPath;
+				if (!StringUtil.EqualNoCase(Path.GetExtension(fullPath), ".dll"))
+				{
+					this.AddDiagnostic(new Diagnostic($"Reference path must point to a .dll file: {fullPath}"), statement, null);
+					return;
+				}
+
+				try
+				{
+					assembly = LoadAssemblyFromResolvedPath(fullPath);
+				}
+				catch (BadImageFormatException)
+				{
+					this.AddDiagnostic(new Diagnostic($"Invalid .dll reference: {fullPath}"), statement, null);
+					return;
+				}
+				catch (Exception err)
+				{
+					this.AddDiagnostic(new Diagnostic($"Could not load assembly from path {fullPath}: {err.Message}"), statement, null);
+					return;
+				}
 			}
-			catch
+			else
 			{
 				try
 				{
-					assembly = System.Reflection.Assembly.LoadFrom(statement.AssemblyName);
+					assembly = Assembly.Load(statement.AssemblyName);
 				}
 				catch
 				{
-					assembly = null;
+					try
+					{
+						assembly = Assembly.LoadFrom(statement.AssemblyName);
+					}
+					catch
+					{
+						assembly = null;
+					}
 				}
 			}
 
@@ -2682,8 +2718,149 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				return;
 			}
 
-			if (!References.ContainsKey(statement.Reference))
-				References.Add(statement.Reference, assembly);
+			if (string.IsNullOrWhiteSpace(statement.Reference))
+				statement.Reference = assembly.GetName().Name ?? statement.AssemblyName;
+
+			References[statement.Reference] = assembly;
+		}
+
+		private static bool LooksLikeAssemblyPath(string assemblyName)
+		{
+			if (string.IsNullOrWhiteSpace(assemblyName))
+				return false;
+
+			return assemblyName.Contains("\\")
+				|| assemblyName.Contains("/")
+				|| assemblyName.Contains(":")
+				|| assemblyName.EndsWith(".dll", StringComparison.OrdinalIgnoreCase);
+		}
+
+		private static bool TryResolveReferenceAssemblyPath(ReferenceStatement statement, out string fullPath, out string? error)
+		{
+			fullPath = string.Empty;
+			error = null;
+
+			string rawPath = statement.AssemblyName;
+			if (string.IsNullOrWhiteSpace(rawPath))
+			{
+				error = "Reference path is missing";
+				return false;
+			}
+
+			string candidatePath;
+			if (Path.IsPathRooted(rawPath))
+			{
+				candidatePath = rawPath;
+			}
+			else
+			{
+				string baseDirectory = Environment.CurrentDirectory;
+				if (!string.IsNullOrWhiteSpace(statement.Info?.File))
+				{
+					try
+					{
+						string? statementDirectory = Path.GetDirectoryName(statement.Info.File);
+						if (!string.IsNullOrWhiteSpace(statementDirectory))
+							baseDirectory = statementDirectory;
+					}
+					catch
+					{
+						// keep current working directory as fallback
+					}
+				}
+
+				candidatePath = Path.Combine(baseDirectory, rawPath);
+			}
+
+			try
+			{
+				fullPath = Path.GetFullPath(candidatePath);
+			}
+			catch (Exception err)
+			{
+				error = $"Invalid reference path {rawPath}: {err.Message}";
+				return false;
+			}
+
+			if (!System.IO.File.Exists(fullPath))
+			{
+				error = $"Reference DLL not found: {fullPath}";
+				return false;
+			}
+
+			return true;
+		}
+
+		private static Assembly LoadAssemblyFromResolvedPath(string fullPath)
+		{
+			if (s_assemblyPathCache.TryGetValue(fullPath, out Assembly? cached))
+				return cached;
+
+			foreach (Assembly loaded in AppDomain.CurrentDomain.GetAssemblies())
+			{
+				if (!string.IsNullOrWhiteSpace(loaded.Location)
+					&& StringUtil.EqualNoCase(loaded.Location, fullPath))
+				{
+					s_assemblyPathCache.TryAdd(fullPath, loaded);
+					return loaded;
+				}
+			}
+
+			AssemblyName assemblyIdentity = AssemblyName.GetAssemblyName(fullPath);
+			foreach (Assembly loaded in AppDomain.CurrentDomain.GetAssemblies())
+			{
+				if (StringUtil.EqualNoCase(loaded.GetName().Name, assemblyIdentity.Name))
+				{
+					s_assemblyPathCache.TryAdd(fullPath, loaded);
+					return loaded;
+				}
+			}
+
+			string directory = Path.GetDirectoryName(fullPath) ?? string.Empty;
+			ResolveEventHandler resolver = (_, args) =>
+			{
+				AssemblyName requestedName = new AssemblyName(args.Name);
+				foreach (Assembly loaded in AppDomain.CurrentDomain.GetAssemblies())
+				{
+					if (StringUtil.EqualNoCase(loaded.GetName().Name, requestedName.Name))
+					{
+						return loaded;
+					}
+				}
+
+				if (string.IsNullOrWhiteSpace(requestedName.Name))
+				{
+					return null;
+				}
+
+				string dependencyPath = Path.Combine(directory, requestedName.Name + ".dll");
+				if (!System.IO.File.Exists(dependencyPath))
+				{
+					return null;
+				}
+
+				string dependencyFullPath = Path.GetFullPath(dependencyPath);
+				if (s_assemblyPathCache.TryGetValue(dependencyFullPath, out Assembly? depCached))
+				{
+					return depCached;
+				}
+
+				Assembly loadedDependency = Assembly.LoadFrom(dependencyFullPath);
+				s_assemblyPathCache.TryAdd(dependencyFullPath, loadedDependency);
+				return loadedDependency;
+			};
+
+			AppDomain.CurrentDomain.AssemblyResolve += resolver;
+			try
+			{
+				Assembly loadedAssembly = Assembly.LoadFrom(fullPath);
+				s_assemblyPathCache.TryAdd(fullPath, loadedAssembly);
+				return loadedAssembly;
+			}
+			finally
+			{
+				AppDomain.CurrentDomain.AssemblyResolve -= resolver;
+			}
 		}
 
 		public void Compile(ImportStatement statement)
