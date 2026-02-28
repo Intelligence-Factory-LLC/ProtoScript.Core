@@ -298,6 +298,15 @@ namespace ProtoScript.Extensions
 					Info = new StatementParsingInfo() { StartingOffset = err.Cursor, Length = 1, File = err.File }
 				});
 			}
+			catch (ProtoScriptCompilerException err)
+			{
+				lstDiagnostics.Add(CreateCompilerExceptionDiagnostic(err));
+			}
+			catch (Exception err)
+			{
+				Logs.LogError(err);
+				lstDiagnostics.Add(CreateUnhandledCompileDiagnostic(err));
+			}
 
 			return lstDiagnostics;
 		}
@@ -323,7 +332,7 @@ namespace ProtoScript.Extensions
 					Info = new StatementParsingInfo() { StartingOffset = err.Cursor, Length = 1, File = err.File }
 				});
 			}
-			catch (Exception)
+			catch (ProtoScriptCompilerException err)
 			{
 				if (session.Context.Compiler != null)
 				{
@@ -331,7 +340,19 @@ namespace ProtoScript.Extensions
 				}
 				if (lstDiagnostics.Count == 0)
 				{
-					throw;
+					lstDiagnostics.Add(CreateCompilerExceptionDiagnostic(err));
+				}
+			}
+			catch (Exception err)
+			{
+				Logs.LogError(err);
+				if (session.Context.Compiler != null)
+				{
+					lstDiagnostics = GetCompilerDiagnostics(session.Context.Compiler);
+				}
+				if (lstDiagnostics.Count == 0)
+				{
+					lstDiagnostics.Add(CreateUnhandledCompileDiagnostic(err));
 				}
 			}
 
@@ -344,6 +365,7 @@ namespace ProtoScript.Extensions
 			foreach (CompilerDiagnostic compilerDiagnostic in compiler.Diagnostics)
 			{
 				Diagnostic diagnostic = new Diagnostic();
+				diagnostic.Type = "Compiler";
 				diagnostic.Message = compilerDiagnostic.Diagnostic.Message;
 				if (compilerDiagnostic.Statement != null)
 				{
@@ -359,6 +381,32 @@ namespace ProtoScript.Extensions
 				lstDiagnostics.Add(diagnostic);
 			}
 			return lstDiagnostics;
+		}
+
+		private static Diagnostic CreateCompilerExceptionDiagnostic(ProtoScriptCompilerException err)
+		{
+			string message = !string.IsNullOrWhiteSpace(err.Explanation) ? err.Explanation : err.Message;
+			return new Diagnostic
+			{
+				Type = "Compiler",
+				Message = message,
+				Info = err.Info
+			};
+		}
+
+		private static Diagnostic CreateUnhandledCompileDiagnostic(Exception err)
+		{
+			Exception root = err;
+			while (root.InnerException != null)
+			{
+				root = root.InnerException;
+			}
+
+			return new Diagnostic
+			{
+				Type = "Compiler",
+				Message = "Compilation failed: " + root.Message
+			};
 		}
 
 		private static string BuildParserDiagnosticMessage(ProtoScriptTokenizingException err)

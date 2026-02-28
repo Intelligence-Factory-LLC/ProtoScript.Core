@@ -860,26 +860,41 @@ async function CompileCode() {
 	clearErrors();
 	const projectFile = LocalSettings.Solution;
 	const code = editor.getValue();
+	const compileApi = projectFile ? ProtoScriptWorkbench.CompileCodeWithProject : ProtoScriptWorkbench.CompileCode;
+	const prevErrorHandler = compileApi.onErrorReceived;
+	let compileFailed = false;
 
-	const runCompile = (cb) => {
-		if (projectFile) {
-			ProtoScriptWorkbench.CompileCodeWithProject(code, projectFile, cb);
-		} else {
-			ProtoScriptWorkbench.CompileCode(code, cb);
-		}
-	};
+	try {
+		const res = await new Promise((resolve, reject) => {
+			compileApi.onErrorReceived = function (err) {
+				reject(err);
+			};
 
-	await new Promise(r => {
-		runCompile(res => {
-			res.forEach(err => {
-				highlightError(err);
-				appendToConsole(err.Message, "ERROR");
-			});
-			appendToConsole(`${res.length} errors`, "INFO");
-			r();
+			const callback = function (apiResult) {
+				resolve(Array.isArray(apiResult) ? apiResult : []);
+			};
+
+			if (projectFile) {
+				ProtoScriptWorkbench.CompileCodeWithProject(code, projectFile, callback);
+			} else {
+				ProtoScriptWorkbench.CompileCode(code, callback);
+			}
 		});
-	});
-	appendToConsole("Compilation finished", "INFO");
+
+		res.forEach(err => {
+			highlightError(err);
+			appendToConsole(err.Message, "ERROR");
+		});
+		appendToConsole(`${res.length} errors`, "INFO");
+	}
+	catch (err) {
+		compileFailed = true;
+		appendToConsole(`Compilation failed: ${formatErrorMessage(err)}`, "ERROR");
+	}
+	finally {
+		compileApi.onErrorReceived = prevErrorHandler;
+		appendToConsole(compileFailed ? "Compilation failed" : "Compilation finished", "INFO");
+	}
 }
 
 // ───────────────────────────────────────────────────────────

@@ -1015,6 +1015,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					//This causes every phrase[0] to fail, so let's limit it to just .net types
 					if (typeInfo is DotNetTypeInfo)
 					{
+						if (declaration.Initializer == null)
+						{
+							return null;
+						}
+
 						if (!SimpleInterpretter.IsAssignableFrom(declaration.Initializer.InferredType, typeInfo))
 						{
 							this.AddDiagnostic(new CannotConvert(declaration.Initializer.InferredType.ToString(), typeInfo.ToString()), statement, null);
@@ -1996,13 +2001,24 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					return null;
 				}
 
-				List<System.Type> lstParameterTypes = lstParams.Select(x => x.InferredType.Type).ToList();
+				if (lstParams.Any(x => x.InferredType == null && !IsNullLiteralExpression(x)))
+				{
+					this.AddDiagnostic(new Diagnostic("Cannot resolve parameter type"), null, expr);
+					return null;
+				}
 
-				System.Reflection.ConstructorInfo? constructor = ReflectionUtil.GetConstructor(type, lstParameterTypes);
+				bool isAmbiguous;
+				System.Reflection.ConstructorInfo? constructor = ResolveConstructorForNewObject(type, lstParams, out isAmbiguous);
 
 				if (null == constructor)
 				{
-					this.AddDiagnostic(new Diagnostic("No matching constructor on type: " + type.Name), null, expr);
+					string signature = BuildConstructorResolutionSignature(expr.Type?.TypeName ?? type.Name, lstParams);
+					string message = $"Cannot resolve constructor for {signature}.";
+					if (isAmbiguous)
+					{
+						message += " Multiple overloads accept the provided null arguments.";
+					}
+					this.AddDiagnostic(new Diagnostic(message), null, expr);
 					return null;
 				}
 
@@ -2011,6 +2027,126 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 			throw new NotImplementedException();
 
+		}
+
+		private static bool IsNullLiteralExpression(Compiled.Expression expression)
+		{
+			return expression is Compiled.Literal literal && literal.Value == null;
+		}
+
+		private static bool CanAssignNullToParameter(System.Type parameterType)
+		{
+			return !parameterType.IsValueType || Nullable.GetUnderlyingType(parameterType) != null;
+		}
+
+		private System.Reflection.ConstructorInfo? ResolveConstructorForNewObject(System.Type type, List<Compiled.Expression> parameters, out bool isAmbiguous)
+		{
+			isAmbiguous = false;
+
+			bool hasNullLiteral = parameters.Any(IsNullLiteralExpression);
+			if (!hasNullLiteral)
+			{
+				List<System.Type> parameterTypes = parameters.Select(x => x.InferredType.Type).ToList();
+				return ReflectionUtil.GetConstructor(type, parameterTypes);
+			}
+
+			List<System.Reflection.ConstructorInfo> matches = new List<System.Reflection.ConstructorInfo>();
+			int bestScore = int.MaxValue;
+
+			foreach (System.Reflection.ConstructorInfo candidate in ReflectionUtil.GetCandidateConstructors(type, parameters.Count))
+			{
+				ParameterInfo[] candidateParameters = candidate.GetParameters();
+				int score = 0;
+				bool compatible = true;
+
+				for (int i = 0; i < candidateParameters.Length; i++)
+				{
+					Compiled.Expression argument = parameters[i];
+					System.Type parameterType = candidateParameters[i].ParameterType;
+
+					if (IsNullLiteralExpression(argument))
+					{
+						if (!CanAssignNullToParameter(parameterType))
+						{
+							compatible = false;
+							break;
+						}
+
+						score += 1;
+						continue;
+					}
+
+					System.Type? argumentType = argument.InferredType?.Type;
+					if (argumentType == null)
+					{
+						compatible = false;
+						break;
+					}
+
+					if (argumentType == parameterType)
+					{
+						continue;
+					}
+
+					if (parameterType.IsAssignableFrom(argumentType))
+					{
+						score += 2;
+						continue;
+					}
+
+					compatible = false;
+					break;
+				}
+
+				if (!compatible)
+				{
+					continue;
+				}
+
+				if (score < bestScore)
+				{
+					matches.Clear();
+					matches.Add(candidate);
+					bestScore = score;
+				}
+				else if (score == bestScore)
+				{
+					matches.Add(candidate);
+				}
+			}
+
+			if (matches.Count > 1)
+			{
+				isAmbiguous = true;
+			}
+
+			return matches.Count == 1 ? matches[0] : null;
+		}
+
+		private static string BuildConstructorResolutionSignature(string typeName, List<Compiled.Expression> parameters)
+		{
+			List<string> parameterNames = new List<string>(parameters.Count);
+			foreach (Compiled.Expression parameter in parameters)
+			{
+				if (IsNullLiteralExpression(parameter))
+				{
+					parameterNames.Add("null");
+				}
+				else if (parameter.InferredType?.Type != null)
+				{
+					parameterNames.Add(parameter.InferredType.Type.Name);
+				}
+				else if (parameter.InferredType != null)
+				{
+					parameterNames.Add(parameter.InferredType.ToString());
+				}
+				else
+				{
+					parameterNames.Add("?");
+				}
+			}
+
+			return $"{typeName}({string.Join(", ", parameterNames)})";
 		}
 
 
