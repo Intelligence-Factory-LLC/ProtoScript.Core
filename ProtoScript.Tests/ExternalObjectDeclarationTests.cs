@@ -8,6 +8,17 @@ namespace ProtoScript.Tests
 	[TestClass]
 	public sealed class ExternalObjectDeclarationTests
 	{
+		private sealed class AsyncReceiver
+		{
+			public static string LastValue = string.Empty;
+
+			public Task<string> EchoAsync(string value)
+			{
+				LastValue = value;
+				return Task.FromResult("echo:" + value);
+			}
+		}
+
 		[TestInitialize]
 		public void Init()
 		{
@@ -90,6 +101,30 @@ function main() : string
 
 			object? result = interpretter.RunMethodAsObject(null, "main", new List<object>());
 			Assert.AreEqual("injected", result);
+		}
+
+		[TestMethod]
+		public void Runtime_DotNetAsyncInstanceMethod_UsesTargetInstance()
+		{
+			string code = @"
+function main() : void
+{
+	AsyncReceiver receiver = new AsyncReceiver();
+	receiver.EchoAsync(""ping"");
+}";
+
+			ProtoScript.File file = Files.ParseFileContents(code);
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			compiler.Symbols.InsertSymbol("AsyncReceiver", new ProtoScript.Interpretter.RuntimeInfo.DotNetTypeInfo(typeof(AsyncReceiver)));
+			ProtoScript.Interpretter.Compiled.File compiled = compiler.Compile(file);
+			AsyncReceiver.LastValue = string.Empty;
+
+			NativeInterpretter interpretter = new NativeInterpretter(compiler);
+			interpretter.Evaluate(compiled);
+			interpretter.RunMethodAsObject(null, "main", new List<object>());
+
+			Assert.AreEqual("ping", AsyncReceiver.LastValue);
 		}
 	}
 }

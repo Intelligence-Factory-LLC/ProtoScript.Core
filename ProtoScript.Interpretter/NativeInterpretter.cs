@@ -1869,7 +1869,7 @@ namespace ProtoScript.Interpretter
 				if (typeof(Task).IsAssignableFrom(oMethod.ReturnType))
 				{
 					// It's an async method
-					object taskObj = executor(this, arrParametersForInvoke);
+					object taskObj = executor(obj, arrParametersForInvoke);
 					if (taskObj == null)
 						return null;
 
