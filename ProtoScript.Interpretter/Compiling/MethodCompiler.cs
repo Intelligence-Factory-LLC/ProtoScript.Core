@@ -4,6 +4,7 @@ using ProtoScript.Diagnostics;
 using ProtoScript.Interpretter.Compiled;
 using ProtoScript.Interpretter.RuntimeInfo;
 using ProtoScript.Interpretter.Symbols;
+using System.Threading.Tasks;
 
 namespace ProtoScript.Interpretter.Compiling
 {
@@ -193,7 +194,7 @@ namespace ProtoScript.Interpretter.Compiling
 					dotNetMethodEval.Method = method;
 					dotNetMethodEval.Parameters = lstParameters;
 					dotNetMethodEval.Object = expression;
-					dotNetMethodEval.InferredType = new TypeInfo(method.ReturnType);
+					dotNetMethodEval.InferredType = new TypeInfo(GetInferredReturnType(method.ReturnType));
 					dotNetMethodEval.IsNullConditional = methodEval.IsNullConditional;
 
 					return dotNetMethodEval;
@@ -214,6 +215,21 @@ namespace ProtoScript.Interpretter.Compiling
 
 			compiler.AddDiagnostic(new Diagnostic($"Cannot find compatible method {strMethod} on object"), null, methodEval);
 			return null;
+		}
+
+		private static System.Type GetInferredReturnType(System.Type methodReturnType)
+		{
+			if (!typeof(Task).IsAssignableFrom(methodReturnType))
+			{
+				return methodReturnType;
+			}
+
+			if (methodReturnType.IsGenericType && methodReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+			{
+				return methodReturnType.GetGenericArguments()[0];
+			}
+
+			return typeof(void);
 		}
 
 		public static FunctionRuntimeInfo ResolveMethod2(Prototype prototype, string strSubObj, SymbolTable symbols)

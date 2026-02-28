@@ -19,6 +19,19 @@ namespace ProtoScript.Tests
 			}
 		}
 
+		private sealed class AsyncEnvelope
+		{
+			public string RawJson { get; set; } = string.Empty;
+		}
+
+		private sealed class AsyncEnvelopeReceiver
+		{
+			public Task<AsyncEnvelope> GetAsync(string value)
+			{
+				return Task.FromResult(new AsyncEnvelope { RawJson = value });
+			}
+		}
+
 		[TestInitialize]
 		public void Init()
 		{
@@ -125,6 +138,29 @@ function main() : void
 			interpretter.RunMethodAsObject(null, "main", new List<object>());
 
 			Assert.AreEqual("ping", AsyncReceiver.LastValue);
+		}
+
+		[TestMethod]
+		public void CompileAndRun_AsyncDotNetMethod_AllowsPropertyChainingOnUnwrappedResult()
+		{
+			string code = @"
+function main() : string
+{
+	AsyncEnvelopeReceiver receiver = new AsyncEnvelopeReceiver();
+	return receiver.GetAsync(""payload"").RawJson;
+}";
+
+			ProtoScript.File file = Files.ParseFileContents(code);
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			compiler.Symbols.InsertSymbol("AsyncEnvelopeReceiver", new ProtoScript.Interpretter.RuntimeInfo.DotNetTypeInfo(typeof(AsyncEnvelopeReceiver)));
+			ProtoScript.Interpretter.Compiled.File compiled = compiler.Compile(file);
+			Assert.AreEqual(0, compiler.Diagnostics.Count);
+
+			NativeInterpretter interpretter = new NativeInterpretter(compiler);
+			interpretter.Evaluate(compiled);
+			object? result = interpretter.RunMethodAsObject(null, "main", new List<object>());
+			Assert.AreEqual("payload", result);
 		}
 	}
 }
