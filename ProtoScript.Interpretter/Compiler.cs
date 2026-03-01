@@ -160,21 +160,29 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 			Compiler compiler = this;
 			compiler.Files = lstFiles;
+			File? currentFile = null;
+			string currentStage = "initialization";
 
-			List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
-
-			//──────────────────────────── Precompiled ────────────────────────────
-			Logs.DebugLog.CreateTimer("CompileProject.Precompiled");
-			foreach (File fileCurrent in lstFiles.Where(x => x.IsPrecompiled))
+			try
 			{
-				PreCompiler.LoadPrecompiled(fileCurrent.RawCode, this.Symbols);
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.Precompiled");
+				List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
+
+				//──────────────────────────── Precompiled ────────────────────────────
+				currentStage = "Precompiled";
+				Logs.DebugLog.CreateTimer("CompileProject.Precompiled");
+				foreach (File fileCurrent in lstFiles.Where(x => x.IsPrecompiled))
+				{
+					currentFile = fileCurrent;
+					PreCompiler.LoadPrecompiled(fileCurrent.RawCode, this.Symbols);
+				}
+				Logs.DebugLog.WriteTimer("CompileProject.Precompiled");
 
 			//──────────────────────────── Declare-Namespaces ──────────────────────
+			currentStage = "DeclareNamespaces";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareNamespaces");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					foreach (NamespaceDefinition ns in fileCurrent.Namespaces)
@@ -192,9 +200,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.WriteTimer("CompileProject.DeclareNamespaces");
 
 			//──────────────────────────── Declare-FilePrototypes ──────────────────
+			currentStage = "DeclareFilePrototypes";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareFilePrototypes");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					lstStatements.AddRange(compiler.DeclareFilePrototypes(fileCurrent));
@@ -209,9 +219,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.WriteTimer("CompileProject.DeclareFilePrototypes");
 
 			//──────────────────────────── Declare-Namespaces-2 ────────────────────
+			currentStage = "DeclareNamespaces2";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareNamespaces2");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					foreach (NamespaceDefinition ns in fileCurrent.Namespaces)
@@ -229,9 +241,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.WriteTimer("CompileProject.DeclareNamespaces2");
 
 			//──────────────────────────── Declare-FileTypeOfs ─────────────────────
+			currentStage = "DeclareFileTypeOfs";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareFileTypeOfs");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					compiler.DeclareFileTypeOfs(fileCurrent);
@@ -246,9 +260,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.WriteTimer("CompileProject.DeclareFileTypeOfs");
 
 			//──────────────────────────── Define-PrototypeFields ──────────────────
+			currentStage = "DefinePrototypeFields";
 			Logs.DebugLog.CreateTimer("CompileProject.DefinePrototypeFields");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					compiler.DefineFilePrototypeFields(fileCurrent);
@@ -263,9 +279,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.WriteTimer("CompileProject.DefinePrototypeFields");
 
 			//──────────────────────────── Declare-PrototypeFunctions ──────────────
+			currentStage = "DeclarePrototypeFunctions";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclarePrototypeFunctions");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					compiler.DeclareFilePrototypeFunctions(fileCurrent);
@@ -280,25 +298,31 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.WriteTimer("CompileProject.DeclarePrototypeFunctions");
 
 			//──────────────────────────── Declare-FileFunctions ───────────────────
+			currentStage = "DeclareFileFunctions";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareFileFunctions");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				lstStatements.AddRange(compiler.DeclareFileFunctions(fileCurrent));
 			}
 			Logs.DebugLog.WriteTimer("CompileProject.DeclareFileFunctions");
 
 			//──────────────────────────── Declare-ExternalVariables ────────────────
+			currentStage = "DeclareExternalVariables";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareExternalVariables");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				compiler.DeclareFileExternalVariables(fileCurrent);
 			}
 			Logs.DebugLog.WriteTimer("CompileProject.DeclareExternalVariables");
 
 			//──────────────────────────── Compile-FileFunctions ───────────────────
+			currentStage = "CompileFileFunctions";
 			Logs.DebugLog.CreateTimer("CompileProject.CompileFileFunctions");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					lstStatements.AddRange(compiler.CompileFileFunctions(fileCurrent));
@@ -313,9 +337,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.WriteTimer("CompileProject.CompileFileFunctions");
 
 			//──────────────────────────── Define-Namespaces ───────────────────────
+			currentStage = "DefineNamespaces";
 			Logs.DebugLog.CreateTimer("CompileProject.DefineNamespaces");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					foreach (NamespaceDefinition ns in fileCurrent.Namespaces)
@@ -333,11 +359,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.WriteTimer("CompileProject.DefineNamespaces");
 
 			//──────────────────────────── Define-Prototypes ───────────────────────
+			currentStage = "DefinePrototypes";
 			Logs.DebugLog.CreateTimer("CompileProject.DefinePrototypes");
 			//if (!AllowParallelism)
 			//{
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					lstStatements.AddRange(PrototypeCompiler.DefinePrototypes(fileCurrent, this));
@@ -376,9 +404,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.WriteTimer("CompileProject.DefinePrototypes");
 
 			//──────────────────────────── Compile-Annotations ─────────────────────
+			currentStage = "CompileAnnotations";
 			Logs.DebugLog.CreateTimer("CompileProject.CompileAnnotations");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					lstStatements.AddRange(compiler.CompileFileFunctionAnnotations(fileCurrent));
@@ -393,9 +423,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.WriteTimer("CompileProject.CompileAnnotations");
 
 			//──────────────────────────── Compile-Statements ──────────────────────
+			currentStage = "CompileStatements";
 			Logs.DebugLog.CreateTimer("CompileProject.CompileStatements");
 			foreach (File fileCurrent in lstFiles)
 			{
+				currentFile = fileCurrent;
 				try
 				{
 					lstStatements.AddRange(compiler.CompileFileStatements(fileCurrent));
@@ -411,7 +443,27 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 			Logs.DebugLog.WriteTimer("CompileProject.CompileFileList");
 
-			return lstStatements;
+				return lstStatements;
+			}
+			catch (ProtoScriptCompilerException)
+			{
+				throw;
+			}
+			catch (Exception err)
+			{
+				StatementParsingInfo info = new StatementParsingInfo
+				{
+					StartingOffset = 0,
+					Length = 1,
+					File = currentFile?.Info?.FullName
+				};
+
+				string explanation = $"Compilation failed during {currentStage}: {err.GetType().Name}: {err.Message}";
+				ProtoScriptCompilerException wrapped = new ProtoScriptCompilerException(info, explanation);
+				wrapped.File = currentFile?.Info?.FullName ?? string.Empty;
+				wrapped.m_strProtoScript = currentFile?.RawCode ?? string.Empty;
+				throw wrapped;
+			}
 		}
 
 
