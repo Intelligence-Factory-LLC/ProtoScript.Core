@@ -3004,7 +3004,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				}
 			}
 
-			string directory = Path.GetDirectoryName(fullPath) ?? string.Empty;
+			string sourceDirectory = Path.GetDirectoryName(fullPath) ?? string.Empty;
+			string shadowDirectory = PrepareShadowCopyDirectory(fullPath);
+			string shadowEntryPath = Path.Combine(shadowDirectory, Path.GetFileName(fullPath));
 			ResolveEventHandler resolver = (_, args) =>
 			{
 				AssemblyName requestedName = new AssemblyName(args.Name);
@@ -3021,19 +3023,25 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					return null;
 				}
 
-				string dependencyPath = Path.Combine(directory, requestedName.Name + ".dll");
-				if (!System.IO.File.Exists(dependencyPath))
+				string dependencySourcePath = Path.Combine(sourceDirectory, requestedName.Name + ".dll");
+				if (!System.IO.File.Exists(dependencySourcePath))
 				{
 					return null;
 				}
 
-				string dependencyFullPath = Path.GetFullPath(dependencyPath);
+				string dependencyFullPath = Path.GetFullPath(dependencySourcePath);
 				if (s_assemblyPathCache.TryGetValue(dependencyFullPath, out Assembly? depCached))
 				{
 					return depCached;
 				}
 
-				Assembly loadedDependency = Assembly.LoadFrom(dependencyFullPath);
+				string shadowDependencyPath = Path.Combine(shadowDirectory, requestedName.Name + ".dll");
+				if (!System.IO.File.Exists(shadowDependencyPath))
+				{
+					System.IO.File.Copy(dependencyFullPath, shadowDependencyPath, true);
+				}
+
+				Assembly loadedDependency = Assembly.LoadFrom(shadowDependencyPath);
 				s_assemblyPathCache.TryAdd(dependencyFullPath, loadedDependency);
 				return loadedDependency;
 			};
@@ -3041,7 +3049,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			AppDomain.CurrentDomain.AssemblyResolve += resolver;
 			try
 			{
-				Assembly loadedAssembly = Assembly.LoadFrom(fullPath);
+				Assembly loadedAssembly = Assembly.LoadFrom(shadowEntryPath);
 				s_assemblyPathCache.TryAdd(fullPath, loadedAssembly);
 				return loadedAssembly;
 			}
@@ -3049,6 +3057,42 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			{
 				AppDomain.CurrentDomain.AssemblyResolve -= resolver;
 			}
+		}
+
+		private static string PrepareShadowCopyDirectory(string sourceAssemblyPath)
+		{
+			string sourceDirectory = Path.GetDirectoryName(sourceAssemblyPath) ?? string.Empty;
+			string sourceFileName = Path.GetFileName(sourceAssemblyPath);
+			string shadowDirectory = Path.Combine(
+				Path.GetTempPath(),
+				"ProtoScriptShadow",
+				BuildShadowDirectoryKey(sourceAssemblyPath));
+
+			Directory.CreateDirectory(shadowDirectory);
+
+			if (!string.IsNullOrWhiteSpace(sourceDirectory) && Directory.Exists(sourceDirectory))
+			{
+				foreach (string sourceDllPath in Directory.GetFiles(sourceDirectory, "*.dll"))
+				{
+					string destinationDllPath = Path.Combine(shadowDirectory, Path.GetFileName(sourceDllPath));
+					System.IO.File.Copy(sourceDllPath, destinationDllPath, true);
+				}
+			}
+			else
+			{
+				string destinationPath = Path.Combine(shadowDirectory, sourceFileName);
+				System.IO.File.Copy(sourceAssemblyPath, destinationPath, true);
+			}
+
+			return shadowDirectory;
+		}
+
+		private static string BuildShadowDirectoryKey(string sourceAssemblyPath)
+		{
+			string normalized = sourceAssemblyPath.Trim().ToLowerInvariant();
+			byte[] bytes = System.Text.Encoding.UTF8.GetBytes(normalized);
+			byte[] hash = System.Security.Cryptography.SHA256.HashData(bytes);
+			return Convert.ToHexString(hash);
 		}
 
 		public void Compile(ImportStatement statement)
