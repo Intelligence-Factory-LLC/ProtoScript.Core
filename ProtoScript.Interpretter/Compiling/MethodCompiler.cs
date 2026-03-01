@@ -206,15 +206,38 @@ namespace ProtoScript.Interpretter.Compiling
 					method = receiverType.GetMethod(strMethod);
 					if (null != method)
 					{
-						compiler.AddDiagnostic(new Diagnostic($"Method {strMethod} exists but parameters don't match"), null, methodEval);
+						compiler.AddDiagnostic(
+							new Diagnostic($"Method {strMethod} exists but parameters don't match"),
+							null,
+							GetDiagnosticExpression(methodEval, expression));
 						return null;
 					}
 				}
 
 			}
 
-			compiler.AddDiagnostic(new Diagnostic($"Cannot find compatible method {strMethod} on object"), null, methodEval);
+			compiler.AddDiagnostic(
+				new Diagnostic($"Cannot find compatible method {strMethod} on object"),
+				null,
+				GetDiagnosticExpression(methodEval, expression));
 			return null;
+		}
+
+		private static global::ProtoScript.Expression GetDiagnosticExpression(MethodEvaluation methodEval, Compiled.Expression expression)
+		{
+			if (methodEval.Info != null && !string.IsNullOrWhiteSpace(methodEval.Info.File))
+			{
+				return methodEval;
+			}
+
+			if (expression?.Info != null && !string.IsNullOrWhiteSpace(expression.Info.File))
+			{
+				Identifier fallbackExpression = new Identifier("_");
+				fallbackExpression.Info = expression.Info;
+				return fallbackExpression;
+			}
+
+			return methodEval;
 		}
 
 		private static System.Type GetInferredReturnType(System.Type methodReturnType)
