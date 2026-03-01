@@ -196,14 +196,20 @@ namespace ProtoScript.Interpretter.Compiling
 			Prototype prototype = protoDef.ResolvedPrototype ?? throw new Exception("Prototype not stored on declaration");
 			PrototypeTypeInfo info = prototype.Data["TypeInfo"] as PrototypeTypeInfo ?? throw new Exception("Prototype type info doesn't exist on Prototype.Data");
 
-			lstStatements.AddRange(DefinePrototypeFunctions(protoDef, info, compiler));
+			List<Compiled.Statement>? prototypeFunctions = DefinePrototypeFunctions(protoDef, info, compiler);
+			if (prototypeFunctions != null)
+				lstStatements.AddRange(prototypeFunctions);
 
 			if (protoDef.PrototypeDefinitions.Count > 0)
 				DefineNestedPrototypes(protoDef, compiler);
 
 			//N20220726-01 - Annotate the prototype before any methods within it
-			lstStatements.AddRange(AnnotatePrototype(protoDef, compiler));
-			lstStatements.AddRange(DefinePrototypeInternalAnnotations(protoDef, info, compiler));
+			List<Compiled.Statement>? prototypeAnnotations = AnnotatePrototype(protoDef, compiler);
+			if (prototypeAnnotations != null)
+				lstStatements.AddRange(prototypeAnnotations);
+			List<Compiled.Statement>? internalAnnotations = DefinePrototypeInternalAnnotations(protoDef, info, compiler);
+			if (internalAnnotations != null)
+				lstStatements.AddRange(internalAnnotations);
 
 			compiler.Symbols.EnterScope(info.Scope);
 
@@ -212,7 +218,9 @@ namespace ProtoScript.Interpretter.Compiling
 				List<Compiled.Statement> lstInitializers = new List<Compiled.Statement>();
 				foreach (PrototypeInitializer initializer in protoDef.Initializers)
 				{
-					lstInitializers.AddRange(PrototypeInitializerCompiler.Compile(initializer, info, compiler));
+					List<Compiled.Statement>? compiledInitializer = PrototypeInitializerCompiler.Compile(initializer, info, compiler);
+					if (compiledInitializer != null)
+						lstInitializers.AddRange(compiledInitializer);
 				}
 
 				//Initializers need to run before any annotations
@@ -239,7 +247,9 @@ namespace ProtoScript.Interpretter.Compiling
 					if (functionDefinition.Annotations.Count == 0)
 						continue;
 
-					lstStatements.AddRange(CompileMethodAnnotations(functionDefinition, infoThis, compiler));
+					List<Compiled.Statement>? methodAnnotations = CompileMethodAnnotations(functionDefinition, infoThis, compiler);
+					if (methodAnnotations != null)
+						lstStatements.AddRange(methodAnnotations);
 				}
 
 				foreach (FieldDefinition fieldDefinition in protoDef.Fields)
