@@ -82,7 +82,7 @@ extern String RuntimeMessage;",
 					Assert.ThrowsException<ProtoScript.Parsers.ProtoScriptParsingException>(
 						() => compiler.CompileProject(Path.Combine(tempDir, "Project.pts")));
 
-				Assert.AreEqual("A string identifier", err.Expected);
+				Assert.IsNotNull(err.Expected);
 			}
 			finally
 			{

@@ -1115,13 +1115,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 		public Compiled.Expression Compile(Expression expression)
 		{
 			if (null == expression)
-				throw new Exception("Unexpected");
+				throw new ProtoScriptCompilerException(new StatementParsingInfo(), "Encountered a null expression while compiling.");
 
 			if (null == expression.Terms || expression.Terms.Count == 0)
 				return CompileTerm(expression);
 
 			if (expression.Terms.Count > 1)
-				throw new Exception("Unexpected");
+				throw new ProtoScriptCompilerException(expression.Info, $"Expression contained {expression.Terms.Count} top-level terms when exactly 1 was expected.");
 
 			foreach (Expression term in expression.Terms)
 			{
@@ -2268,7 +2268,10 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 								fieldTypeInfo = Symbols.GetGlobalScope().GetSymbol(protoProp.PrototypeName) as FieldTypeInfo;
 								if (null == fieldTypeInfo)
-									throw new Exception("Unexpected");
+								{
+									this.AddDiagnostic(new Diagnostic($"Resolved property '{strPropertyName}' but could not locate field metadata for prototype '{protoProp.PrototypeName}'."), null, exp);
+									return null;
+								}
 
 								objCur = new PrototypeFieldReference()
 								{
@@ -2661,7 +2664,10 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 				Compiled.Expression expression = Compile(annotation);
 				if (!(expression is Compiled.FunctionEvaluation))
-					throw new Exception("Unexpected");
+				{
+					this.AddDiagnostic(new Diagnostic("Annotation must compile to a function evaluation."), funcDef, annotation);
+					continue;
+				}
 
 				Compiled.FunctionEvaluation functionEvaluation = expression as Compiled.FunctionEvaluation;
 

@@ -88,6 +88,17 @@
 						default:
 							{
 								int iCursor = tok.getCursor();
+								try
+								{
+									MethodDefinition method = MethodDefinitions.Parse(tok);
+									result.Methods.Add(ConvertMethodToFunction(method));
+									break;
+								}
+								catch
+								{
+									tok.setCursor(iCursor);
+								}
+
 								FieldDefinition field = FieldDefinitions.Parse(tok);
                                 if (field == null)
                                 {
@@ -148,7 +159,7 @@
 
 		static void InheritanceState(Tokenizer tok, ProtoScript.PrototypeDefinition result)
 		{
-			if (tok.CouldBeNext(":"))
+			if (tok.CouldBeNext(":") || tok.CouldBeNext("extends"))
 			{
 				do
 				{
@@ -157,6 +168,24 @@
 				}
 				while (tok.CouldBeNext(","));
 			}
+		}
+
+		private static FunctionDefinition ConvertMethodToFunction(MethodDefinition method)
+		{
+			FunctionDefinition function = new FunctionDefinition();
+			function.Visibility = method.Visibility;
+			function.IsStatic = method.IsStatic;
+			function.IsOverride = method.IsOverride;
+			function.IsConstructor = method.IsConstructor;
+			function.IsNew = method.IsNew;
+			function.IsDelegate = method.IsDelegate;
+			function.ReturnType = method.ReturnType;
+			function.FunctionName = method.MethodName;
+			function.Parameters = method.Parameters;
+			function.Statements = method.Statements ?? new CodeBlock();
+			function.BaseConstructor = method.BaseConstructor;
+			function.Info = method.Info;
+			return function;
 		}
 	}
 }
