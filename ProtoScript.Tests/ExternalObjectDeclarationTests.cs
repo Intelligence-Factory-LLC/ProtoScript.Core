@@ -117,6 +117,52 @@ function main() : string
 		}
 
 		[TestMethod]
+		public void Runtime_ExternDotNetObject_NullCheckUsesInjectedValue()
+		{
+			string code = @"
+extern AsyncReceiver ext;
+function main() : string
+{
+	if (ext != null)
+		return ""bound"";
+	return ""null"";
+}";
+
+			ProtoScript.File file = Files.ParseFileContents(code);
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			compiler.Symbols.InsertSymbol("AsyncReceiver", new ProtoScript.Interpretter.RuntimeInfo.DotNetTypeInfo(typeof(AsyncReceiver)));
+			ProtoScript.Interpretter.Compiled.File compiled = compiler.Compile(file);
+			NativeInterpretter interpretter = new NativeInterpretter(compiler);
+
+			interpretter.InsertGlobalObject("ext", new AsyncReceiver());
+			interpretter.Evaluate(compiled);
+
+			object? result = interpretter.RunMethodAsObject(null, "main", new List<object>());
+			Assert.AreEqual("bound", ValueConversions.GetAs(result, typeof(string)));
+		}
+
+		[TestMethod]
+		public void RuntimeInjection_TryInsertDeclaredGlobalObject_RequiresDeclaration()
+		{
+			string code = @"
+extern String ext;";
+
+			ProtoScript.File file = Files.ParseFileContents(code);
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			compiler.Compile(file);
+			NativeInterpretter interpretter = new NativeInterpretter(compiler);
+
+			bool insertedKnown = interpretter.TryInsertDeclaredGlobalObject("ext", new StringWrapper("ok"), out string knownError);
+			bool insertedUnknown = interpretter.TryInsertDeclaredGlobalObject("missing", new StringWrapper("nope"), out string missingError);
+
+			Assert.IsTrue(insertedKnown, knownError);
+			Assert.IsFalse(insertedUnknown);
+			Assert.IsTrue(missingError.Contains("not predeclared", StringComparison.OrdinalIgnoreCase), missingError);
+		}
+
+		[TestMethod]
 		public void Runtime_DotNetAsyncInstanceMethod_UsesTargetInstance()
 		{
 			string code = @"

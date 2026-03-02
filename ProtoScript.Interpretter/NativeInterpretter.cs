@@ -187,6 +187,54 @@ namespace ProtoScript.Interpretter
 			globalScope.InsertSymbol(strName, valueRuntimeInfo);
 		}
 
+		public bool TryInsertDeclaredGlobalObject(string strName, object obj, out string error)
+		{
+			error = string.Empty;
+
+			if (string.IsNullOrWhiteSpace(strName))
+			{
+				error = "Global object name is required.";
+				return false;
+			}
+
+			if (obj == null)
+			{
+				error = $"Global object '{strName}' cannot be null.";
+				return false;
+			}
+
+			Scope globalScope = Compiler.Symbols.GetGlobalScope();
+			if (!globalScope.TryGetSymbol(strName, out object existing) || existing is not ValueRuntimeInfo existingInfo)
+			{
+				error = $"Global symbol '{strName}' is not predeclared.";
+				return false;
+			}
+
+			TypeInfo sourceType = new TypeInfo(obj.GetType());
+			if (!SimpleInterpretter.IsAssignableFrom(sourceType, existingInfo.Type))
+			{
+				error = $"Cannot inject object of type {obj.GetType().FullName} into {strName} declared as {existingInfo.Type}";
+				return false;
+			}
+
+			existingInfo.Value = obj;
+			if (existingInfo.Index >= 0 && existingInfo.Index < Compiler.Symbols.GlobalStack.Count)
+			{
+				object existingStackEntry = Compiler.Symbols.GlobalStack[existingInfo.Index];
+				if (existingStackEntry is ValueRuntimeInfo existingStackInfo)
+				{
+					existingStackInfo.Value = obj;
+				}
+				else
+				{
+					Compiler.Symbols.GlobalStack[existingInfo.Index] = existingInfo;
+				}
+			}
+
+			globalScope.InsertSymbol(strName, existingInfo);
+			return true;
+		}
+
 		public void InsertLocalPrototype(string strName, Prototype prototype)
 		{
 			PrototypeTypeInfo? typeInfo = GetPrototypeTypeInfo(prototype);
@@ -878,6 +926,11 @@ namespace ProtoScript.Interpretter
 			object left = Evaluate(exp.Left);
 			object right = Evaluate(exp.Right);
 
+			if (left is ValueRuntimeInfo leftValueRuntimeInfo)
+				left = leftValueRuntimeInfo.Value;
+			if (right is ValueRuntimeInfo rightValueRuntimeInfo)
+				right = rightValueRuntimeInfo.Value;
+
 			//TODO: This needs to be abstracted and made flexible. Also
 			//compilation should check that the types can be compared
 			if (left?.GetType() == typeof(int) && right?.GetType() == typeof(int))
@@ -899,7 +952,12 @@ namespace ProtoScript.Interpretter
 			Prototype protoRight = GetAsPrototype(right);
 
 			if (protoLeft == null || protoRight == null)
-				return (protoLeft == null && protoRight == null);
+			{
+				if (protoLeft != null || protoRight != null)
+					return false;
+
+				return Equals(left, right);
+			}
 
 			//Note: Define separate operators for other equivalence
 			//=== could be for AreEquivalentCircular

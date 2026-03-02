@@ -70,6 +70,48 @@ namespace ProtoScript.Tests
 			}
 		}
 
+		[TestMethod]
+		public void CompileFile_WithOpsAgentExternAndRuntimeHostImport_Compiles()
+		{
+			const string code =
+@"reference Ontology Ontology;
+reference Ontology.Simulation Ontology.Simulation;
+reference ProtoScript.Interpretter ProtoScript.Interpretter;
+reference BasicUtilities BasicUtilities;
+reference Ontology.Agents Ontology.Agents;
+
+import Ontology.Simulation Ontology.Simulation.StringWrapper String;
+import Ontology.Agents Ontology.Agents.IOpsAgentRuntimeHost IOpsAgentRuntimeHost;
+
+extern IOpsAgentRuntimeHost _opsAgent;
+
+prototype ProtoScriptAction : BaseObject;
+
+prototype MetaActionSkill : ProtoScriptAction
+{
+	String PromptPath = new String();
+
+	function Execute() : string
+	{
+		if (_opsAgent != null)
+			return _opsAgent.LoadTrustedPromptText(PromptPath);
+		return ""Error"";
+	}
+}";
+
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+
+			try
+			{
+				compiler.Compile(Files.ParseFileContents(code));
+			}
+			catch (ProtoScriptCompilerException ex)
+			{
+				Assert.Fail("Compilation failed. Explanation: " + ex.Explanation);
+			}
+		}
+
 		private static void WriteProjectFiles(string tempDir, bool malformedImportAlias)
 		{
 			string importLine = malformedImportAlias
