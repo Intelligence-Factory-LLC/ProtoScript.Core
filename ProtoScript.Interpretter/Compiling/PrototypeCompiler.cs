@@ -283,12 +283,8 @@ namespace ProtoScript.Interpretter.Compiling
 					annotation.IsExpanded = true;
 				}
 			
-				Compiled.Expression expression = compiler.Compile(annotation);
-				Compiled.FunctionEvaluation? functionEvaluation = expression as Compiled.FunctionEvaluation;
-				if (null == functionEvaluation)
-				{
-					throw new Exception("Unexpected");
-				}
+				if (!TryCompileAnnotationFunction(annotation, compiler, out Compiled.FunctionEvaluation? functionEvaluation))
+					continue;
 
 				lstStatements.Add(new Compiled.PrototypeAnnotation { AnnotationFunction = functionEvaluation, Info = annotation.Info });
 			}
@@ -313,12 +309,8 @@ namespace ProtoScript.Interpretter.Compiling
 				MethodEvaluation method = compiler.GetAnnotationMethodEvaluation(annotation);
 				method.Parameters.Insert(0, new Identifier(infoThis.Prototype.PrototypeName + "." + funcDef.FunctionName));
 
-				Compiled.Expression expression = compiler.Compile(annotation);
-				Compiled.FunctionEvaluation ? functionEvaluation = expression as Compiled.FunctionEvaluation;
-				if (null == functionEvaluation)
-				{
-					throw new Exception("Unexpected");
-				}
+				if (!TryCompileAnnotationFunction(annotation, compiler, out Compiled.FunctionEvaluation? functionEvaluation))
+					continue;
 
 				lstStatements.Add(new Compiled.PrototypeAnnotation { AnnotationFunction = functionEvaluation, Info = annotation.Info });
 			}
@@ -361,12 +353,8 @@ namespace ProtoScript.Interpretter.Compiling
 					annotation.IsExpanded = true;
 				}
 
-				Compiled.Expression expression = compiler.Compile(annotation);
-				Compiled.FunctionEvaluation? functionEvaluation = expression as Compiled.FunctionEvaluation;
-				if (null == functionEvaluation)
-				{
-					throw new Exception("Unexpected");
-				}
+				if (!TryCompileAnnotationFunction(annotation, compiler, out Compiled.FunctionEvaluation? functionEvaluation))
+					continue;
 
 				//If the type and the field name are the same it will use the field name for both values. Manually 
 				//get the field's type. 
@@ -386,6 +374,24 @@ namespace ProtoScript.Interpretter.Compiling
 
 
 			return lstStatements;
+		}
+
+		private static bool TryCompileAnnotationFunction(AnnotationExpression annotation, Compiler compiler, out Compiled.FunctionEvaluation? functionEvaluation)
+		{
+			functionEvaluation = null;
+
+			Compiled.Expression? expression = compiler.Compile(annotation);
+			if (expression is Compiled.FunctionEvaluation evaluation)
+			{
+				functionEvaluation = evaluation;
+				return true;
+			}
+
+			compiler.AddDiagnostic(
+				new Diagnostic("Annotation must be a method call, for example [MyAnnotation(...)]"),
+				null,
+				annotation);
+			return false;
 		}
 
 		static public List<Compiled.Statement> DefinePrototypeFunctions(PrototypeDefinition protoDef, PrototypeTypeInfo infoThis, Compiler compiler)
