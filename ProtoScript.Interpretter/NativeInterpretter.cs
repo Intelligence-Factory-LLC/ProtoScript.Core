@@ -235,6 +235,181 @@ namespace ProtoScript.Interpretter
 			return true;
 		}
 
+		public bool TryResolvePrototypeReference(object? rawValue, TypeInfo? expectedType, out Prototype? prototype, out string error)
+		{
+			prototype = null;
+			error = string.Empty;
+
+			if (rawValue == null)
+			{
+				error = "Prototype reference cannot be null.";
+				return false;
+			}
+
+			Prototype? resolved = SimpleInterpretter.GetAsPrototype(rawValue);
+			string sourceText = string.Empty;
+
+			if (resolved == null)
+			{
+				if (rawValue is not string textValue)
+				{
+					error = $"Prototype reference must be a prototype or prototype name string, but was {rawValue.GetType().Name}.";
+					return false;
+				}
+
+				string prototypeName = textValue.Trim();
+				sourceText = prototypeName;
+				if (string.IsNullOrWhiteSpace(prototypeName))
+				{
+					error = "Prototype reference name cannot be empty.";
+					return false;
+				}
+
+				object? symbol = Symbols.GetGlobalScope().GetSymbol(prototypeName);
+				if (symbol is PrototypeTypeInfo prototypeTypeInfoFromScope && prototypeTypeInfoFromScope.Prototype != null)
+				{
+					resolved = prototypeTypeInfoFromScope.Prototype;
+				}
+				else
+				{
+					try
+					{
+						resolved = Prototypes.GetPrototypeByPrototypeName(prototypeName);
+					}
+					catch
+					{
+						resolved = null;
+					}
+				}
+
+				if (resolved == null)
+				{
+					error = $"Prototype not found: {prototypeName}";
+					return false;
+				}
+			}
+			else
+			{
+				sourceText = resolved.PrototypeName ?? string.Empty;
+			}
+
+			if (IsPrototypeReferenceParameterType(expectedType) && expectedType is PrototypeTypeInfo expectedPrototypeTypeInfo)
+			{
+				Prototype? expectedPrototype = expectedPrototypeTypeInfo.Prototype;
+				if (expectedPrototype != null && !Prototypes.TypeOf(resolved, expectedPrototype))
+				{
+					error = $"Expected prototype type '{expectedPrototype.PrototypeName}' but got '{resolved.PrototypeName}' from '{sourceText}'.";
+					return false;
+				}
+			}
+
+			prototype = resolved;
+			return true;
+		}
+
+		public bool TryBindMethodCall(
+			Prototype? protoInstance,
+			string methodName,
+			IDictionary<string, object?> rawParameters,
+			out FunctionRuntimeInfo? method,
+			out Dictionary<string, object> boundParameters,
+			out string error)
+		{
+			method = null;
+			boundParameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+			error = string.Empty;
+
+			if (string.IsNullOrWhiteSpace(methodName))
+			{
+				error = "Method name is required.";
+				return false;
+			}
+
+			if (rawParameters == null)
+			{
+				error = "Raw parameter dictionary is required.";
+				return false;
+			}
+
+			if (protoInstance == null)
+			{
+				method = this.Symbols.GetSymbol(methodName) as FunctionRuntimeInfo;
+				if (method == null)
+				{
+					error = "Could not find global method: " + methodName;
+					return false;
+				}
+			}
+			else
+			{
+				method = this.FindOverriddenMethod(protoInstance, methodName);
+				if (method == null)
+				{
+					error = "Could not find method: " + methodName + ", on prototype: " + protoInstance.PrototypeName;
+					return false;
+				}
+			}
+
+			foreach (ParameterRuntimeInfo parameterInfo in method.Parameters)
+			{
+				string parameterName = parameterInfo.ParameterName;
+				if (!rawParameters.TryGetValue(parameterName, out object? rawValue))
+				{
+					error = "Missing parameter: " + parameterName;
+					return false;
+				}
+
+				TypeInfo? parameterType = parameterInfo.OriginalType ?? parameterInfo.Type;
+				if (IsPrototypeReferenceParameterType(parameterType))
+				{
+					if (!TryResolvePrototypeReference(rawValue, parameterType, out Prototype? resolvedPrototype, out string resolveError))
+					{
+						error = $"Invalid prototype parameter '{parameterName}': {resolveError}";
+						return false;
+					}
+
+					boundParameters[parameterName] = resolvedPrototype!;
+				}
+				else
+				{
+					if (rawValue == null)
+					{
+						error = "Parameter cannot be null: " + parameterName;
+						return false;
+					}
+
+					boundParameters[parameterName] = rawValue;
+				}
+			}
+
+			return true;
+		}
+
+		private static bool IsPrototypeReferenceParameterType(TypeInfo? parameterType)
+		{
+			if (parameterType is PrototypeTypeInfo prototypeTypeInfo)
+			{
+				Prototype? prototype = prototypeTypeInfo.Prototype;
+				if (prototype == null)
+					return true;
+
+				try
+				{
+					return !NativeValuePrototypes.IsBaseType(prototype.PrototypeID);
+				}
+				catch
+				{
+					return true;
+				}
+			}
+
+			System.Type? dotNetType = parameterType?.Type;
+			if (dotNetType != null && typeof(Prototype).IsAssignableFrom(dotNetType))
+				return true;
+
+			return false;
+		}
+
 		public void InsertLocalPrototype(string strName, Prototype prototype)
 		{
 			PrototypeTypeInfo? typeInfo = GetPrototypeTypeInfo(prototype);
