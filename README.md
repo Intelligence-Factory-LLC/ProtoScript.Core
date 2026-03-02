@@ -83,6 +83,9 @@ Integration tests load sample project files from the Buffaly portal project dire
 - Shared binaries are resolved from local `lib\` and `Deploy\`.
 - `Scripts\update_dlls.bat` refreshes DLLs from sibling split repos.
 
+## 📝 Release notes
+- [Release Notes (since split-repo move, through 2026-03-02)](docs/release-notes-2026-03-02-since-split-repo.md)
+
 ## Related repositories
 - Ontology core: https://github.com/Intelligence-Factory-LLC/Ontology.Core
 - ProtoScript core: https://github.com/Intelligence-Factory-LLC/ProtoScript.Core
