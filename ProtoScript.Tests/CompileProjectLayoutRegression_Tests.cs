@@ -50,7 +50,7 @@ extern String RuntimeMessage;",
 		}
 
 		[TestMethod]
-		public void CompileProject_WithMalformedPrototypeAnnotation_ReportsDiagnosticInsteadOfUnexpectedException()
+		public void CompileProject_WithMalformedImportPath_ThrowsHelpfulParseError()
 		{
 			string tempDir = CreateTempDirectory();
 			try
@@ -58,7 +58,8 @@ extern String RuntimeMessage;",
 				WriteProjectFiles(
 					tempDir,
 					projectContents:
-@"include ""Imports.pts"";
+@"import Invalid Path/Skill.pts;
+include ""Imports.pts"";
 include ""Skill.pts"";",
 					importsContents:
 @"reference Ontology.Simulation Ontology.Simulation;
@@ -66,13 +67,7 @@ import Ontology.Simulation Ontology.Simulation.StringWrapper String;
 extern prototype ExternalThing;
 extern String RuntimeMessage;",
 					skillContents:
-@"prototype ExternalThingData
-{
-	String Name = """";
-}
-
-[ExternalThingData.Name]
-prototype Skill
+@"prototype Skill
 {
 	function Echo() : String
 	{
@@ -83,11 +78,11 @@ prototype Skill
 				Compiler compiler = new Compiler();
 				compiler.Initialize();
 
-				compiler.CompileProject(Path.Combine(tempDir, "Project.pts"));
+				ProtoScript.Parsers.ProtoScriptParsingException err =
+					Assert.ThrowsException<ProtoScript.Parsers.ProtoScriptParsingException>(
+						() => compiler.CompileProject(Path.Combine(tempDir, "Project.pts")));
 
-				Assert.IsTrue(
-					compiler.Diagnostics.Any(x => x.Diagnostic.Message.Contains("Annotation", StringComparison.OrdinalIgnoreCase)),
-					"Expected a compiler diagnostic for malformed annotation.");
+				Assert.AreEqual("A string identifier", err.Expected);
 			}
 			finally
 			{
