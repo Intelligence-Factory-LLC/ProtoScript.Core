@@ -6,7 +6,7 @@ namespace ProtoScript.Tests
 	public sealed class CompileProjectResetBoundaryCrashRepro_Tests
 	{
 		[TestMethod]
-		public void CompileTwice_WithInitializerResetBetweenPasses_ReproducesStackOverflow()
+		public void CompileTwice_WithInitializerResetBetweenPasses_Succeeds()
 		{
 			string tempDir = Path.Combine(Path.GetTempPath(), "ProtoScript_ResetBoundaryCrash_" + Guid.NewGuid().ToString("N"));
 			Directory.CreateDirectory(tempDir);
@@ -15,21 +15,10 @@ namespace ProtoScript.Tests
 				WriteReproFiles(tempDir);
 				ChildRunResult run = RunCompileResetCompileInChild(Path.Combine(tempDir, "Project.pts"));
 
-				string combinedOutput = (run.StdOut ?? string.Empty) + "\n" + (run.StdErr ?? string.Empty);
-				bool hasStackOverflow = combinedOutput.Contains("Stack overflow", StringComparison.OrdinalIgnoreCase);
-				bool hasSelfParentError =
-					combinedOutput.Contains("cannot be a type-of itself", StringComparison.OrdinalIgnoreCase)
-					|| combinedOutput.Contains("cannot add a prototype to itself", StringComparison.OrdinalIgnoreCase)
-					|| combinedOutput.Contains("prototype as a parent of itself", StringComparison.OrdinalIgnoreCase);
-
-				Assert.AreNotEqual(
+				Assert.AreEqual(
 					0,
 					run.ExitCode,
-					"Expected child process to crash while reproducing reset-boundary compile issue.\nSTDOUT:\n"
-					+ run.StdOut + "\nSTDERR:\n" + run.StdErr);
-				Assert.IsTrue(
-					hasStackOverflow || hasSelfParentError,
-					"Expected stack overflow or self-parent type-of failure signature in child process output.\nSTDOUT:\n"
+					"Expected child process to compile successfully across reset boundary.\nSTDOUT:\n"
 					+ run.StdOut + "\nSTDERR:\n" + run.StdErr);
 			}
 			finally
