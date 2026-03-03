@@ -28,6 +28,29 @@ namespace ProtoScript.Tests
 			}
 		}
 
+		[TestMethod]
+		public void CompileAndEvaluateSingleFileProjectTwiceInSameProcess_DoesNotCrash()
+		{
+			string tempDir = Path.Combine(Path.GetTempPath(), "ProtoScript_DoubleCompileEval_" + Guid.NewGuid().ToString("N"));
+			Directory.CreateDirectory(tempDir);
+			try
+			{
+				WriteReproFiles(tempDir);
+				ChildRunResult run = RunCompileAndEvaluateTwiceInChild(Path.Combine(tempDir, "Project.pts"));
+
+				Assert.AreEqual(
+					0,
+					run.ExitCode,
+					"Child process failed while compiling+evaluating same project twice.\nSTDOUT:\n"
+					+ run.StdOut + "\nSTDERR:\n" + run.StdErr);
+			}
+			finally
+			{
+				if (Directory.Exists(tempDir))
+					Directory.Delete(tempDir, true);
+			}
+		}
+
 		private static void WriteReproFiles(string dir)
 		{
 			const string singleFile = """
@@ -99,6 +122,50 @@ prototype ToExecuteCommandLineOperation : OpsAction
 				"$c2 = New-Object ProtoScript.Interpretter.Compiler",
 				"$c2.Initialize()",
 				"$null = $c2.CompileProject($project)",
+				"Write-Output 'ok'");
+
+			ProcessStartInfo psi = new ProcessStartInfo
+			{
+				FileName = GetPowerShellExecutable(),
+				Arguments = "-NoProfile -NonInteractive -Command \"" + script.Replace("\"", "\\\"") + "\"",
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				CreateNoWindow = true
+			};
+
+			using Process process = Process.Start(psi)!;
+			bool exited = process.WaitForExit(30000);
+			if (!exited)
+			{
+				try { process.Kill(true); } catch { }
+				return new ChildRunResult(-1, string.Empty, "Timed out after 30 seconds.");
+			}
+
+			string stdout = process.StandardOutput.ReadToEnd();
+			string stderr = process.StandardError.ReadToEnd();
+			return new ChildRunResult(process.ExitCode, stdout, stderr);
+		}
+
+		private static ChildRunResult RunCompileAndEvaluateTwiceInChild(string projectPath)
+		{
+			string testBinDir = AppContext.BaseDirectory.TrimEnd('\\');
+			string script = string.Join("; ",
+				"$ErrorActionPreference='Stop'",
+				$"$project='{EscapeForSingleQuotedPowerShell(projectPath)}'",
+				$"Get-ChildItem '{EscapeForSingleQuotedPowerShell(testBinDir)}\\*.dll' | ForEach-Object {{ try {{ [System.Reflection.Assembly]::LoadFrom($_.FullName) | Out-Null }} catch {{}} }}",
+				"[Ontology.Initializer]::Initialize()",
+				"$c1 = New-Object ProtoScript.Interpretter.Compiler",
+				"$c1.Initialize()",
+				"$s1 = $c1.CompileProject($project)",
+				"$i1 = New-Object ProtoScript.Interpretter.NativeInterpretter($c1)",
+				"foreach ($stmt in $s1) { $null = $i1.Evaluate($stmt) }",
+				"$i1 = $null; $s1 = $null; $c1 = $null; [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()",
+				"$c2 = New-Object ProtoScript.Interpretter.Compiler",
+				"$c2.Initialize()",
+				"$s2 = $c2.CompileProject($project)",
+				"$i2 = New-Object ProtoScript.Interpretter.NativeInterpretter($c2)",
+				"foreach ($stmt in $s2) { $null = $i2.Evaluate($stmt) }",
 				"Write-Output 'ok'");
 
 			ProcessStartInfo psi = new ProcessStartInfo
