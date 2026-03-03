@@ -132,6 +132,10 @@ namespace ProtoScript.Interpretter.Compiling
 				// Re-inserting an existing direct type-of edge can trigger deep cache
 				// invalidation in Ontology internals, so skip direct no-op links.
 				// Keep this check cheap (direct edge only) for large compile batches.
+				// PERF NOTE: this guard was added to avoid reload recursion crashes. A prior
+				// version used Prototypes.TypeOf(...) and was flagged as a hot-path slowdown
+				// risk at scale; we intentionally keep this as direct-edge Contains(...) only.
+				// Revisit if compile throughput regresses under very large prototype counts.
 				if (prototype.GetTypeOfs().Contains(protoTypeOf.PrototypeID))
 				{
 					if (null == info.PrimaryParent)
