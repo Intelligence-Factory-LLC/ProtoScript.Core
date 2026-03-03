@@ -1847,6 +1847,40 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				return CompileNotOperator(exp);
 			}
 
+			if (exp.Value == "+" || exp.Value == "-")
+			{
+				Compiled.Expression compiledRight = Compile(exp.Right);
+				if (compiledRight is Compiled.Literal literal)
+				{
+					if (exp.Value == "+")
+					{
+						return literal;
+					}
+
+					if (literal.Value is int intValue)
+					{
+						return new Compiled.Literal
+						{
+							Value = -intValue,
+							InferredType = new TypeInfo(typeof(int)),
+							Info = exp.Info
+						};
+					}
+
+					if (literal.Value is double doubleValue)
+					{
+						return new Compiled.Literal
+						{
+							Value = -doubleValue,
+							InferredType = new TypeInfo(typeof(double)),
+							Info = exp.Info
+						};
+					}
+				}
+
+				throw new ProtoScriptCompilerException(exp.Info, "Unary +/- currently supports numeric literals only");
+			}
+
 			else if (exp is IsInitializedOperator)
 			{
 				return Compile(exp as IsInitializedOperator);
