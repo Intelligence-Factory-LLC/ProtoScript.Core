@@ -33,6 +33,7 @@
 		<ProjectReference Include="..\ProtoScript\ProtoScript.csproj" />
 		<ProjectReference Include="..\ProtoScript.Parsers\ProtoScript.Parsers.csproj" />
 		<ProjectReference Include="..\ProtoScript.Interpretter\ProtoScript.Interpretter.csproj" />
+		<ProjectReference Include="..\ProtoScript.Workbench.Api\ProtoScript.Workbench.Api.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
