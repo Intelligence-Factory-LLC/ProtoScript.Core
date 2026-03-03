@@ -127,6 +127,17 @@ namespace ProtoScript.Interpretter.Compiling
 					return;
 				}
 
+				// Re-compiling the same project in-process can hit this path with existing
+				// inheritance already established on persistent ontology prototypes.
+				// Re-inserting an existing type-of edge can trigger deep cache invalidation
+				// in Ontology internals, so skip no-op inheritance links.
+				if (Prototypes.TypeOf(prototype, protoTypeOf))
+				{
+					if (null == info.PrimaryParent)
+						info.PrimaryParent = protoTypeOf;
+					continue;
+				}
+
 				if (protoTypeOf.GetTypeOfs().Contains(prototype.PrototypeID))
 				{
 					compiler.AddDiagnostic("Cicular inheritance detected: " + typeOf.TypeName, protoDef, null);
