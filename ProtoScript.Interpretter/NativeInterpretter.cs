@@ -1290,10 +1290,33 @@ namespace ProtoScript.Interpretter
 
 		public Prototype? GetOrConvertToPrototype(object? oValue)
 		{
-			if (oValue is System.Collections.IEnumerable && oValue is not string && oValue is not Prototype)
-				throw new NotImplementedException();
+			if (oValue is ValueRuntimeInfo valueRuntimeInfo)
+				oValue = valueRuntimeInfo.Value;
+
+			if (oValue is System.Collections.IEnumerable enumerableValue && oValue is not string && oValue is not Prototype)
+				return ConvertEnumerableToCollection(enumerableValue);
 
 			return ValueConversions.ToPrototype(oValue);
+		}
+
+		private Collection ConvertEnumerableToCollection(System.Collections.IEnumerable enumerableValue)
+		{
+			Collection collection = new Collection();
+
+			foreach (object? childValue in enumerableValue)
+			{
+				Prototype? childPrototype = GetOrConvertToPrototype(childValue);
+				if (childPrototype != null)
+				{
+					collection.Children.Add(childPrototype);
+				}
+				else if (childValue != null)
+				{
+					collection.Children.Add(StringWrapper.ToPrototype(childValue.ToString() ?? string.Empty));
+				}
+			}
+
+			return collection;
 		}
 
 
