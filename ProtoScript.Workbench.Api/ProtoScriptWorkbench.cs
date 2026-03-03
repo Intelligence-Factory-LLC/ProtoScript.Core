@@ -73,7 +73,7 @@ namespace ProtoScript.Extensions
 			ObjectCacheManager.UseAsyncLocal = true;
 			TemporaryPrototypes.Cache.InsertLogFrequency = 10000;
 			session.Enter();
-			TemporaryPrototypes.ReloadCache();
+			Ontology.Initializer.ReloadCache();
 		}
 
 		static private SessionObject CreateSession(string strSessionKey)
