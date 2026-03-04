@@ -277,6 +277,7 @@ namespace ProtoScript.Extensions
 			return null;
 		}
 
+		[JsonWsSerialize(JsonWs.SerializeResultsOptions.Full)]
 		static public List<Diagnostic> CompileCode(string strCode)
 		{
 			List<Diagnostic> lstDiagnostics = new List<Diagnostic>();
@@ -311,6 +312,7 @@ namespace ProtoScript.Extensions
 			return lstDiagnostics;
 		}
 
+		[JsonWsSerialize(JsonWs.SerializeResultsOptions.Full)]
 		static public List<Diagnostic> CompileCodeWithProject(string strCode, string strProjectName)
 		{
 			strProjectName = EnsureAbsolutePath(strProjectName);
@@ -605,6 +607,7 @@ namespace ProtoScript.Extensions
 			return bResume;
 		}
 
+		[JsonWsSerialize(JsonWs.SerializeResultsOptions.Full)]
 		static public TagImmediateResult InterpretImmediate(string strProject, string strImmediate, TaggingSettings taggingSettings)
 		{
 			JsonSerializers.RegisterSerializer(typeof(TagImmediateResult), new NestedJsonSerializer<TagImmediateResult>());
@@ -768,6 +771,7 @@ namespace ProtoScript.Extensions
 			return jsonObject;
 		}
 
+		[JsonWsSerialize(JsonWs.SerializeResultsOptions.Full)]
 		static public TagImmediateResult TagImmediate(string strFragment, string strProject, TaggingSettings settings)
 		{
 			return InterpretImmediate(strProject, strFragment, settings);
