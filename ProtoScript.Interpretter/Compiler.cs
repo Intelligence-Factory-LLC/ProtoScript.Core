@@ -36,6 +36,8 @@ namespace ProtoScript.Interpretter
 		public bool AllowParallelism = false;
 		private static readonly ConcurrentDictionary<string, Assembly> s_assemblyPathCache =
 			new ConcurrentDictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+		private static readonly ConcurrentDictionary<string, object> s_shadowCopyLocks =
+			new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
 		public void AddDiagnostic(Diagnostic diagnostic, Statement? statement, Expression? expression)
 		{
@@ -3078,7 +3080,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				string shadowDependencyPath = Path.Combine(shadowDirectory, requestedName.Name + ".dll");
 				if (!System.IO.File.Exists(shadowDependencyPath))
 				{
-					System.IO.File.Copy(dependencyFullPath, shadowDependencyPath, true);
+					CopyFileWithRetry(dependencyFullPath, shadowDependencyPath);
 				}
 
 				Assembly loadedDependency = Assembly.LoadFrom(shadowDependencyPath);
@@ -3102,29 +3104,57 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 		private static string PrepareShadowCopyDirectory(string sourceAssemblyPath)
 		{
 			string sourceDirectory = Path.GetDirectoryName(sourceAssemblyPath) ?? string.Empty;
-			string sourceFileName = Path.GetFileName(sourceAssemblyPath);
 			string shadowDirectory = Path.Combine(
 				Path.GetTempPath(),
 				"ProtoScriptShadow",
+				"p" + Environment.ProcessId,
 				BuildShadowDirectoryKey(sourceAssemblyPath));
 
-			Directory.CreateDirectory(shadowDirectory);
+			object copyLock = s_shadowCopyLocks.GetOrAdd(shadowDirectory, _ => new object());
+			lock (copyLock)
+			{
+				Directory.CreateDirectory(shadowDirectory);
 
-			if (!string.IsNullOrWhiteSpace(sourceDirectory) && Directory.Exists(sourceDirectory))
-			{
-				foreach (string sourceDllPath in Directory.GetFiles(sourceDirectory, "*.dll"))
+				if (!string.IsNullOrWhiteSpace(sourceDirectory) && Directory.Exists(sourceDirectory))
 				{
-					string destinationDllPath = Path.Combine(shadowDirectory, Path.GetFileName(sourceDllPath));
-					System.IO.File.Copy(sourceDllPath, destinationDllPath, true);
+					foreach (string sourceDllPath in Directory.GetFiles(sourceDirectory, "*.dll"))
+					{
+						string destinationDllPath = Path.Combine(shadowDirectory, Path.GetFileName(sourceDllPath));
+						CopyFileWithRetry(sourceDllPath, destinationDllPath);
+					}
 				}
-			}
-			else
-			{
-				string destinationPath = Path.Combine(shadowDirectory, sourceFileName);
-				System.IO.File.Copy(sourceAssemblyPath, destinationPath, true);
+				else
+				{
+					string destinationPath = Path.Combine(shadowDirectory, Path.GetFileName(sourceAssemblyPath));
+					CopyFileWithRetry(sourceAssemblyPath, destinationPath);
+				}
 			}
 
 			return shadowDirectory;
+		}
+
+		private static void CopyFileWithRetry(string sourcePath, string destinationPath)
+		{
+			const int maxAttempts = 5;
+			for (int attempt = 1; attempt <= maxAttempts; attempt++)
+			{
+				try
+				{
+					System.IO.File.Copy(sourcePath, destinationPath, true);
+					return;
+				}
+				catch (IOException) when (attempt < maxAttempts)
+				{
+					System.Threading.Thread.Sleep(50 * attempt);
+				}
+				catch (UnauthorizedAccessException) when (attempt < maxAttempts)
+				{
+					System.Threading.Thread.Sleep(50 * attempt);
+				}
+			}
+
+			// Final attempt: let the real exception bubble.
+			System.IO.File.Copy(sourcePath, destinationPath, true);
 		}
 
 		private static string BuildShadowDirectoryKey(string sourceAssemblyPath)
