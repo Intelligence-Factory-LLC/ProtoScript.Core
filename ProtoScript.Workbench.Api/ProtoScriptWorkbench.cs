@@ -623,6 +623,12 @@ namespace ProtoScript.Extensions
 				{
 					LoadProjectInternal(session);
 					PrepareSessionCompiler(session);
+
+					if (session.Interpretter != null)
+					{
+						session.Interpretter.InterpretStatements(session.Statements);
+						session.IsInterpretted = true;
+					}
 				}
 
 				if (session.Context.Compiler == null || session.Interpretter == null)
@@ -648,7 +654,6 @@ namespace ProtoScript.Extensions
 				if (!taggingSettings.Debug)
 				{
 					obj = session.Interpretter.Evaluate(compiledImmediate);
-					session.IsInterpretted = true;
 				}
 				else
 				{
@@ -664,7 +669,6 @@ namespace ProtoScript.Extensions
 
 					debugger.StartDebugging(compiledImmediate);
 					obj = debugger.WaitForEndOfExecution();
-					session.IsInterpretted = true;
 				}
 
 				if (obj == null)

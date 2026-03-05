@@ -496,6 +496,43 @@ namespace ProtoScript.Interpretter
 			return false;
 		}
 
+		public void InterpretProject(string strProjectFile)
+		{
+			List<Compiled.Statement> statements = Compiler.CompileProject(strProjectFile);
+			InterpretStatements(statements);
+		}
+
+		public void InterpretStatements(List<Compiled.Statement> statements)
+		{
+			Source = Compiler.Source;
+
+			foreach (Compiled.Statement statement in statements)
+			{
+				try
+				{
+					Evaluate(statement);
+				}
+				catch (RuntimeException)
+				{
+					throw;
+				}
+				catch (Exception err)
+				{
+					if (statement.Info != null)
+					{
+						File? file = Compiler.Files.FirstOrDefault(x => x.Info?.FullName == statement.Info?.File);
+						if (file != null)
+						{
+							string strStatement = file.RawCode.Substring(statement.Info.StartingOffset, statement.Info.Length);
+							throw new RuntimeException(strStatement, statement.Info, err);
+						}
+					}
+
+					throw new RuntimeException("Interpretter Error", err);
+				}
+			}
+		}
+
 		virtual public bool Evaluate(Compiled.Statement statement)
 		{
 			try
