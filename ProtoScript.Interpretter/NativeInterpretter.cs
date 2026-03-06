@@ -590,7 +590,7 @@ namespace ProtoScript.Interpretter
 				else if (statement is Compiled.ThrowStatement)
 					return TryInterpretter.Evaluate(statement as Compiled.ThrowStatement, this);
 
-				throw new NotImplementedException();
+				throw new NotImplementedException($"Unhandled compiled statement type: {statement.GetType().FullName}");
 			}
 			catch (NotImplementedException)
 			{
@@ -1288,7 +1288,7 @@ namespace ProtoScript.Interpretter
 			if (exp is Compiled.IsInitializedOperator)
 				return Evaluate(exp as Compiled.IsInitializedOperator);
 
-			throw new NotImplementedException();
+			throw new NotImplementedException($"Unhandled unary expression type: {exp.GetType().FullName}");
 		}
 
 		public object Evaluate(Compiled.IsInitializedOperator exp)
@@ -1411,7 +1411,7 @@ namespace ProtoScript.Interpretter
 
 			else if (left is FunctionRuntimeInfo && right is FunctionRuntimeInfo)
 			{
-				throw new NotImplementedException();
+				throw new RuntimeException("Function-to-function assignment is not supported.", exp.Info);
 
 			}
 
@@ -1425,7 +1425,7 @@ namespace ProtoScript.Interpretter
 				indexSetterInfo.Collection.Children[indexSetterInfo.Index] = protoRight;
 			}
 			else
-				throw new RuntimeException("Not implemented", exp.Info);
+				throw new RuntimeException($"Unsupported assignment target type: {left?.GetType().FullName ?? "null"}", exp.Info);
 
 
 			return null;

@@ -402,7 +402,7 @@ namespace ProtoScript.Interpretter
 				DotNetTypeInfo dotNetTypeInfo = obj as DotNetTypeInfo;
 				Prototype prototype = Prototypes.GetPrototypeByPrototypeName(dotNetTypeInfo.Type.FullName);
 				if (null == prototype)
-					throw new NotImplementedException();
+					throw new NotImplementedException("No prototype mapping exists for .NET type: " + dotNetTypeInfo.Type.FullName);
 				protoResult = prototype;
 			}
 

@@ -1109,7 +1109,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			}
 
 			else
-				throw new NotImplementedException();
+				throw new ProtoScriptCompilerException(
+					statement.Info,
+					$"Unsupported variable declaration type category for '{statement.VariableName}': {typeInfo.GetType().FullName}.");
 
 			return declaration;
 		}
@@ -1130,7 +1132,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				return CompileTerm(term);
 			}
 
-			throw new NotImplementedException();
+			throw new ProtoScriptCompilerException(
+				expression.Info,
+				"Failed to compile expression: no term produced a compiled result.");
 		}
 
 		public Compiled.Expression CompileTerm(Expression term)
@@ -1234,7 +1238,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 		public Compiled.Expression Compile(ExpressionList exp)
 		{
 			if (exp.Expressions.Count != 1)
-				throw new NotImplementedException();
+				throw new ProtoScriptCompilerException(
+					exp.Info,
+					$"Expression list must contain exactly one expression, but found {exp.Expressions.Count}.");
 
 			return Compile(exp.Expressions.First());
 		}
@@ -2113,7 +2119,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				return new DotNetNewInstance() { Constructor = constructor, Parameters = lstParams, InferredType = new TypeInfo(type) };
 			}
 
-			throw new NotImplementedException();
+			throw new ProtoScriptCompilerException(
+				expr.Info,
+				$"Unsupported new object target type '{expr.Type?.TypeName ?? "(unknown)"}' with resolved symbol type '{typeInfo.GetType().FullName}'.");
 
 		}
 
@@ -2669,7 +2677,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				}
 
 				else
-					throw new NotImplementedException();
+					throw new ProtoScriptCompilerException(
+						paramDec.Info ?? funcDef.Info,
+						$"Unsupported parameter type category for '{paramDec.ParameterName}' in function '{funcDef.FunctionName}': {paramType.GetType().FullName}.");
 
 			}
 
