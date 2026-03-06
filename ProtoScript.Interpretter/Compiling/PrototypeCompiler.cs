@@ -549,8 +549,11 @@ namespace ProtoScript.Interpretter.Compiling
 					}
 					else
 					{
-						compiler.AddDiagnostic(new Diagnostic("Fields of this type are not yet supported"), fieldDefinition, fieldDefinition.Type);
-						throw new NotImplementedException();
+						compiler.AddDiagnostic(
+							new Diagnostic(BuildUnsupportedFieldTypeDiagnostic(infoType, fieldDefinition)),
+							fieldDefinition,
+							fieldDefinition.Type);
+						continue;
 					}
 
 
@@ -563,6 +566,35 @@ namespace ProtoScript.Interpretter.Compiling
 			}
 
 			return lstStatements;
+		}
+
+		private static string BuildUnsupportedFieldTypeDiagnostic(TypeInfo infoType, FieldDefinition fieldDefinition)
+		{
+			string declaredTypeName = fieldDefinition.Type?.TypeName ?? infoType.Type?.Name ?? "unknown";
+			string message = "Fields of this type are not yet supported: " + declaredTypeName;
+
+			string normalized = declaredTypeName.Trim().ToLowerInvariant();
+			if (normalized == "string")
+			{
+				return message + ". For prototype fields, use 'String' instead of 'string'.";
+			}
+
+			if (normalized == "int")
+			{
+				return message + ". For prototype fields, use 'Int' or 'Integer' instead of 'int'.";
+			}
+
+			if (normalized == "bool" || normalized == "boolean")
+			{
+				return message + ". For prototype fields, use 'Bool' or 'Boolean' instead of '" + declaredTypeName + "'.";
+			}
+
+			if (normalized == "double")
+			{
+				return message + ". For prototype fields, use 'Double' instead of 'double'.";
+			}
+
+			return message;
 		}
 
 
