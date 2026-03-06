@@ -71,7 +71,23 @@ namespace ProtoScript.Interpretter
 			if (argType == destinationType)
 				return true;
 
+			System.Type? nullableUnderlying = Nullable.GetUnderlyingType(destinationType);
+			if (nullableUnderlying != null)
+			{
+				if (argType == nullableUnderlying || nullableUnderlying.IsAssignableFrom(argType))
+				{
+					score = 1;
+					return true;
+				}
+			}
+
 			if (originalArgType != null && IsWrapperFor(originalArgType, destinationType))
+			{
+				score = 1;
+				return true;
+			}
+
+			if (originalArgType != null && nullableUnderlying != null && IsWrapperFor(originalArgType, nullableUnderlying))
 			{
 				score = 1;
 				return true;

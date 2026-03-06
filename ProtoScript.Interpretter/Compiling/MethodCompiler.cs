@@ -311,6 +311,16 @@ namespace ProtoScript.Interpretter.Compiling
 						continue;
 					}
 
+					System.Type? nullableUnderlying = Nullable.GetUnderlyingType(parameterType);
+					if (nullableUnderlying != null &&
+						(argumentType == nullableUnderlying || nullableUnderlying.IsAssignableFrom(argumentType)))
+					{
+						score += 2;
+						if (isExpandedParamArrayElement)
+							score += 1;
+						continue;
+					}
+
 					// Allow runtime bridge from Prototype-typed expressions to CLR parameters.
 					if (typeof(Prototype).IsAssignableFrom(argumentType))
 					{

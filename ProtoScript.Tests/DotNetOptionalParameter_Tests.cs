@@ -19,6 +19,13 @@ namespace ProtoScript.Tests
 
 				return head + separator + string.Join(separator, tail);
 			}
+
+			public static string WithNullable(int? maxResults = null, bool? includeSpamTrash = null)
+			{
+				string left = maxResults.HasValue ? maxResults.Value.ToString() : "null";
+				string right = includeSpamTrash.HasValue ? includeSpamTrash.Value.ToString().ToLowerInvariant() : "null";
+				return left + "|" + right;
+			}
 		}
 
 		[TestInitialize]
@@ -65,6 +72,20 @@ namespace ProtoScript.Tests
 			object? result = RunGlobalFunction(code, "main", out Compiler compiler);
 			Assert.AreEqual(0, compiler.Diagnostics.Count);
 			Assert.AreEqual("root", result);
+		}
+
+		[TestMethod]
+		public void OptionalNullableParameters_AcceptPrimitiveArguments()
+		{
+			string code =
+"function main() : string\r\n" +
+"{\r\n" +
+"	return OptionalTarget.WithNullable(5, false);\r\n" +
+"}\r\n";
+
+			object? result = RunGlobalFunction(code, "main", out Compiler compiler);
+			Assert.AreEqual(0, compiler.Diagnostics.Count);
+			Assert.AreEqual("5|false", result);
 		}
 
 		[TestMethod]
