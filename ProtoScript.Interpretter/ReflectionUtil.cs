@@ -36,6 +36,19 @@ namespace ProtoScript.Interpretter
 			return lastParameter.IsDefined(typeof(ParamArrayAttribute), inherit: false);
 		}
 
+		private static int GetRequiredParameterCount(ParameterInfo[] parameters, bool isParamArray)
+		{
+			int limit = isParamArray ? parameters.Length - 1 : parameters.Length;
+			int required = 0;
+			for (int i = 0; i < limit; i++)
+			{
+				if (!parameters[i].IsOptional)
+					required++;
+			}
+
+			return required;
+		}
+
 		private static bool TryScoreTypeMatch(
 			System.Type? argType,
 			System.Type? originalArgType,
@@ -134,10 +147,10 @@ namespace ProtoScript.Interpretter
 			{
 				ParameterInfo[] pars = candidate.GetParameters();
 				bool isParamArray = IsParamArray(pars);
-				int minArity = isParamArray ? pars.Length - 1 : pars.Length;
-				if (normalised.Length < minArity)
+				int requiredCount = GetRequiredParameterCount(pars, isParamArray);
+				if (normalised.Length < requiredCount)
 					continue;
-				if (!isParamArray && normalised.Length != pars.Length)
+				if (!isParamArray && normalised.Length > pars.Length)
 					continue;
 
 				bool passArrayAsSingleParam = false;
@@ -182,6 +195,24 @@ namespace ProtoScript.Interpretter
 					score += parameterScore;
 					if (isExpandedParamArrayElement)
 						score += 1;
+				}
+
+				if (compatible && normalised.Length < pars.Length)
+				{
+					for (int i = normalised.Length; i < pars.Length; i++)
+					{
+						if (isParamArray && i == pars.Length - 1)
+							continue;
+
+						if (!pars[i].IsOptional)
+						{
+							compatible = false;
+							break;
+						}
+
+						// Prefer overloads that don't require omitted optional parameters.
+						score += 1;
+					}
 				}
 
 				if (compatible && score < bestScore)

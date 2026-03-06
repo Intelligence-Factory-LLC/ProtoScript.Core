@@ -256,14 +256,37 @@ namespace ProtoScript.Interpretter.Compiling
 			{
 				System.Reflection.MethodInfo candidate = candidates[i];
 				System.Reflection.ParameterInfo[] parameters = candidate.GetParameters();
-				if (parameters.Length != argumentTypes.Count)
+				bool hasParamArray = parameters.Length > 0 &&
+					parameters[parameters.Length - 1].IsDefined(typeof(ParamArrayAttribute), inherit: false);
+				int requiredCount = GetRequiredParameterCount(parameters, hasParamArray);
+				if (argumentTypes.Count < requiredCount)
+					continue;
+				if (!hasParamArray && argumentTypes.Count > parameters.Length)
 					continue;
 
 				int score = 0;
 				bool compatible = true;
-				for (int j = 0; j < parameters.Length; j++)
+				for (int j = 0; j < argumentTypes.Count; j++)
 				{
-					System.Type parameterType = parameters[j].ParameterType;
+					System.Type parameterType;
+					bool isExpandedParamArrayElement = false;
+					if (hasParamArray && j >= parameters.Length - 1)
+					{
+						System.Type? elementType = parameters[parameters.Length - 1].ParameterType.GetElementType();
+						if (elementType == null)
+						{
+							compatible = false;
+							break;
+						}
+
+						parameterType = elementType;
+						isExpandedParamArrayElement = true;
+					}
+					else
+					{
+						parameterType = parameters[j].ParameterType;
+					}
+
 					System.Type? argumentType = argumentTypes[j];
 
 					if (argumentType == null)
@@ -275,12 +298,16 @@ namespace ProtoScript.Interpretter.Compiling
 						}
 
 						score += 1;
+						if (isExpandedParamArrayElement)
+							score += 1;
 						continue;
 					}
 
 					if (parameterType.IsAssignableFrom(argumentType))
 					{
 						score += 3;
+						if (isExpandedParamArrayElement)
+							score += 1;
 						continue;
 					}
 
@@ -288,11 +315,30 @@ namespace ProtoScript.Interpretter.Compiling
 					if (typeof(Prototype).IsAssignableFrom(argumentType))
 					{
 						score += 1;
+						if (isExpandedParamArrayElement)
+							score += 1;
 						continue;
 					}
 
 					compatible = false;
 					break;
+				}
+
+				if (compatible && argumentTypes.Count < parameters.Length)
+				{
+					for (int j = argumentTypes.Count; j < parameters.Length; j++)
+					{
+						if (hasParamArray && j == parameters.Length - 1)
+							continue;
+
+						if (!parameters[j].IsOptional)
+						{
+							compatible = false;
+							break;
+						}
+
+						score += 1;
+					}
 				}
 
 				if (!compatible)
@@ -306,6 +352,19 @@ namespace ProtoScript.Interpretter.Compiling
 			}
 
 			return bestMethod;
+		}
+
+		private static int GetRequiredParameterCount(System.Reflection.ParameterInfo[] parameters, bool hasParamArray)
+		{
+			int limit = hasParamArray ? parameters.Length - 1 : parameters.Length;
+			int required = 0;
+			for (int i = 0; i < limit; i++)
+			{
+				if (!parameters[i].IsOptional)
+					required++;
+			}
+
+			return required;
 		}
 
 		private static System.Type GetInferredReturnType(System.Type methodReturnType)

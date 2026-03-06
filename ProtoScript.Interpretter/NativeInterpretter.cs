@@ -2232,7 +2232,27 @@ namespace ProtoScript.Interpretter
 		private static object[] PrepareDotNetMethodArguments(System.Reflection.ParameterInfo[] infoParams, List<object> providedParameters, bool hasParamArray)
 		{
 			if (!hasParamArray)
-				return providedParameters.ToArray();
+			{
+				List<object> finalParametersNoParams = new List<object>(infoParams.Length);
+				for (int i = 0; i < infoParams.Length; i++)
+				{
+					if (i < providedParameters.Count)
+					{
+						finalParametersNoParams.Add(providedParameters[i]);
+						continue;
+					}
+
+					if (infoParams[i].IsOptional)
+					{
+						finalParametersNoParams.Add(GetOptionalParameterValue(infoParams[i]));
+						continue;
+					}
+
+					throw new ArgumentException($"Missing required parameter '{infoParams[i].Name ?? i.ToString()}' for method invocation.");
+				}
+
+				return finalParametersNoParams.ToArray();
+			}
 
 			int fixedCount = infoParams.Length - 1;
 			System.Type paramArrayType = infoParams[fixedCount].ParameterType;
@@ -2246,7 +2266,18 @@ namespace ProtoScript.Interpretter
 			List<object> finalParameters = new List<object>(infoParams.Length);
 			for (int i = 0; i < fixedCount; i++)
 			{
-				finalParameters.Add(providedParameters[i]);
+				if (i < providedParameters.Count)
+				{
+					finalParameters.Add(providedParameters[i]);
+				}
+				else if (infoParams[i].IsOptional)
+				{
+					finalParameters.Add(GetOptionalParameterValue(infoParams[i]));
+				}
+				else
+				{
+					throw new ArgumentException($"Missing required parameter '{infoParams[i].Name ?? i.ToString()}' for method invocation.");
+				}
 			}
 
 			int paramsValueCount = Math.Max(0, providedParameters.Count - fixedCount);
@@ -2268,6 +2299,18 @@ namespace ProtoScript.Interpretter
 
 			finalParameters.Add(paramsArray);
 			return finalParameters.ToArray();
+		}
+
+		private static object? GetOptionalParameterValue(System.Reflection.ParameterInfo parameterInfo)
+		{
+			object? defaultValue = parameterInfo.DefaultValue;
+			if (defaultValue == DBNull.Value)
+				return null;
+
+			if (defaultValue == System.Reflection.Missing.Value)
+				return System.Type.Missing;
+
+			return defaultValue;
 		}
 
 
