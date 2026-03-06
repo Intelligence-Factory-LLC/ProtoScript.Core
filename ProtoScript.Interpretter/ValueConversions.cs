@@ -86,6 +86,17 @@ namespace ProtoScript.Interpretter
 			if (unwrapped is bool b)
 				return BoolWrapper.ToPrototype(b);
 
+			if (unwrapped is not System.Collections.IEnumerable || unwrapped is string)
+			{
+				try
+				{
+					return NativeValuePrototypes.ToPrototype(unwrapped);
+				}
+				catch
+				{
+				}
+			}
+
 			return null;
 		}
 
@@ -375,6 +386,24 @@ namespace ProtoScript.Interpretter
 			{
 				if (TryConvertPrototype(prototype, targetTypeInfo, effectiveType, out converted))
 					return true;
+			}
+			else if (typeof(Prototype).IsAssignableFrom(effectiveType))
+			{
+				Prototype? boxedPrototype = ToPrototype(value);
+				if (boxedPrototype != null && effectiveType.IsAssignableFrom(boxedPrototype.GetType()))
+				{
+					converted = boxedPrototype;
+					return true;
+				}
+			}
+			else if (targetTypeInfo is PrototypeTypeInfo targetPrototypeTypeInfo)
+			{
+				Prototype? boxedPrototype = ToPrototype(value);
+				if (boxedPrototype != null && Prototypes.TypeOf(boxedPrototype, targetPrototypeTypeInfo.Prototype))
+				{
+					converted = boxedPrototype;
+					return true;
+				}
 			}
 
 			if (value is string str)

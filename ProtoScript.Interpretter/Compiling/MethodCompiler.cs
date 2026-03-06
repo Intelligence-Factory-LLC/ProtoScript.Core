@@ -180,6 +180,8 @@ namespace ProtoScript.Interpretter.Compiling
 				{
 					System.Type receiverType = receiverTypes[i];
 					method = ReflectionUtil.GetMethod(receiverType, strMethod, lstParameterTypes);
+					if (method == null)
+						method = TryResolveRuntimeCompatibleMethod(receiverType, strMethod, lstParameterTypes);
 					if (method != null)
 						break;
 				}
@@ -238,6 +240,72 @@ namespace ProtoScript.Interpretter.Compiling
 			}
 
 			return methodEval;
+		}
+
+		private static System.Reflection.MethodInfo? TryResolveRuntimeCompatibleMethod(System.Type receiverType, string methodName, List<System.Type> argumentTypes)
+		{
+			System.Reflection.MethodInfo[] candidates = receiverType
+				.GetMethods()
+				.Where(m => m.Name == methodName)
+				.ToArray();
+
+			System.Reflection.MethodInfo? bestMethod = null;
+			int bestScore = int.MinValue;
+
+			for (int i = 0; i < candidates.Length; i++)
+			{
+				System.Reflection.MethodInfo candidate = candidates[i];
+				System.Reflection.ParameterInfo[] parameters = candidate.GetParameters();
+				if (parameters.Length != argumentTypes.Count)
+					continue;
+
+				int score = 0;
+				bool compatible = true;
+				for (int j = 0; j < parameters.Length; j++)
+				{
+					System.Type parameterType = parameters[j].ParameterType;
+					System.Type? argumentType = argumentTypes[j];
+
+					if (argumentType == null)
+					{
+						if (parameterType.IsValueType && Nullable.GetUnderlyingType(parameterType) == null)
+						{
+							compatible = false;
+							break;
+						}
+
+						score += 1;
+						continue;
+					}
+
+					if (parameterType.IsAssignableFrom(argumentType))
+					{
+						score += 3;
+						continue;
+					}
+
+					// Allow runtime bridge from Prototype-typed expressions to CLR parameters.
+					if (typeof(Prototype).IsAssignableFrom(argumentType))
+					{
+						score += 1;
+						continue;
+					}
+
+					compatible = false;
+					break;
+				}
+
+				if (!compatible)
+					continue;
+
+				if (score > bestScore)
+				{
+					bestScore = score;
+					bestMethod = candidate;
+				}
+			}
+
+			return bestMethod;
 		}
 
 		private static System.Type GetInferredReturnType(System.Type methodReturnType)
