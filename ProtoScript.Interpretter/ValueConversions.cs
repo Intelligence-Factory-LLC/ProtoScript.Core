@@ -86,7 +86,7 @@ namespace ProtoScript.Interpretter
 			if (unwrapped is bool b)
 				return BoolWrapper.ToPrototype(b);
 
-			if (unwrapped is not System.Collections.IEnumerable || unwrapped is string)
+			if (unwrapped != null)
 			{
 				try
 				{

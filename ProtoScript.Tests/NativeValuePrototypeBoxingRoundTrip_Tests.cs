@@ -1,6 +1,7 @@
 using Ontology.BaseTypes;
 using Ontology.Simulation;
 using ProtoScript.Interpretter;
+using BasicUtilities;
 
 namespace ProtoScript.Tests
 {
@@ -30,6 +31,33 @@ namespace ProtoScript.Tests
 			{
 				LastSeenType = value?.GetType();
 				return value.Id + ":" + value.Distance;
+			}
+
+			public Dictionary<string, int> CreateMap()
+			{
+				return new Dictionary<string, int>
+				{
+					["alpha"] = 7
+				};
+			}
+
+			public string ConsumeMap(Dictionary<string, int> value)
+			{
+				LastSeenType = value?.GetType();
+				return "alpha:" + value["alpha"];
+			}
+
+			public JsonObject CreateJson()
+			{
+				JsonObject json = new JsonObject();
+				json["kind"] = "agent";
+				return json;
+			}
+
+			public string ConsumeJson(JsonObject value)
+			{
+				LastSeenType = value?.GetType();
+				return value["kind"].ToString();
 			}
 		}
 
@@ -96,6 +124,58 @@ function main() : string
 			object? result = interpretter.RunMethodAsObject(null, "main", new List<object>());
 			Assert.AreEqual("B22:3", result);
 			Assert.AreEqual(typeof(Payload), host.LastSeenType);
+		}
+
+		[TestMethod]
+		public void TypedUnboxing_WorksForEnumerableClrObject()
+		{
+			const string code = @"
+extern PayloadHost host;
+
+function BuildMapBoxed() : Prototype
+{
+	return host.CreateMap();
+}
+
+function main() : string
+{
+	Prototype boxed = BuildMapBoxed();
+	return host.ConsumeMap(boxed);
+}";
+
+			(Compiler compiler, NativeInterpretter interpretter) = BuildInterpreter(code);
+			PayloadHost host = new PayloadHost();
+			interpretter.InsertGlobalObject("host", host);
+
+			object? result = interpretter.RunMethodAsObject(null, "main", new List<object>());
+			Assert.AreEqual("alpha:7", result);
+			Assert.AreEqual(typeof(Dictionary<string, int>), host.LastSeenType);
+		}
+
+		[TestMethod]
+		public void TypedUnboxing_WorksForJsonObject()
+		{
+			const string code = @"
+extern PayloadHost host;
+
+function BuildJsonBoxed() : Prototype
+{
+	return host.CreateJson();
+}
+
+function main() : string
+{
+	Prototype boxed = BuildJsonBoxed();
+	return host.ConsumeJson(boxed);
+}";
+
+			(Compiler compiler, NativeInterpretter interpretter) = BuildInterpreter(code);
+			PayloadHost host = new PayloadHost();
+			interpretter.InsertGlobalObject("host", host);
+
+			object? result = interpretter.RunMethodAsObject(null, "main", new List<object>());
+			Assert.AreEqual("agent", result);
+			Assert.AreEqual(typeof(JsonObject), host.LastSeenType);
 		}
 
 		private static (Compiler compiler, NativeInterpretter interpretter) BuildInterpreter(string code)

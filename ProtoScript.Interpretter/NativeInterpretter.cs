@@ -1334,29 +1334,52 @@ namespace ProtoScript.Interpretter
 				oValue = valueRuntimeInfo.Value;
 
 			if (oValue is System.Collections.IEnumerable enumerableValue && oValue is not string && oValue is not Prototype)
-				return ConvertEnumerableToCollection(enumerableValue);
+			{
+				if (TryConvertEnumerableToPrototypeCollection(enumerableValue, out Collection? collection))
+					return collection;
+			}
 
 			return ValueConversions.ToPrototype(oValue);
 		}
 
-		private Collection ConvertEnumerableToCollection(System.Collections.IEnumerable enumerableValue)
+		private bool TryConvertEnumerableToPrototypeCollection(System.Collections.IEnumerable enumerableValue, out Collection? collection)
 		{
-			Collection collection = new Collection();
+			List<object?> items = new List<object?>();
+			foreach (object? item in enumerableValue)
+			{
+				items.Add(item);
+				if (!IsPrototypeLikeElement(item))
+				{
+					collection = null;
+					return false;
+				}
+			}
 
-			foreach (object? childValue in enumerableValue)
+			collection = new Collection();
+
+			foreach (object? childValue in items)
 			{
 				Prototype? childPrototype = GetOrConvertToPrototype(childValue);
 				if (childPrototype != null)
 				{
 					collection.Children.Add(childPrototype);
 				}
-				else if (childValue != null)
-				{
-					collection.Children.Add(StringWrapper.ToPrototype(childValue.ToString() ?? string.Empty));
-				}
 			}
 
-			return collection;
+			return true;
+		}
+
+		private static bool IsPrototypeLikeElement(object? value)
+		{
+			object? current = value;
+
+			if (current is ValueRuntimeInfo valueRuntimeInfo)
+				current = valueRuntimeInfo.Value;
+
+			if (current is PrototypeTypeInfo prototypeTypeInfo)
+				current = prototypeTypeInfo.Prototype;
+
+			return current == null || current is Prototype;
 		}
 
 

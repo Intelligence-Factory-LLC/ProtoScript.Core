@@ -1,5 +1,6 @@
 using Ontology;
 using Ontology.BaseTypes;
+using Ontology.Simulation;
 using ProtoScript.Interpretter;
 
 namespace ProtoScript.Tests
@@ -31,7 +32,7 @@ prototype CoreSkill : CoreAction;
 		}
 
 		[TestMethod]
-		public void ImmediatePrimitiveEnumerableMethods_ReturnInspectableCollection()
+		public void ImmediatePrimitiveEnumerableMethods_ReturnNativeValuePrototype()
 		{
 			(NativeInterpretter interpretter, Compiler compiler) setup = BuildInterpreter(@"
 prototype CoreAction : ProtoScriptAction;
@@ -41,12 +42,7 @@ prototype CoreSkill : CoreAction;
 			Prototype? typeOfs = EvaluateExpressionAsPrototype(setup.interpretter, setup.compiler, "CoreSkill.GetTypeOfs()");
 
 			Assert.IsNotNull(typeOfs);
-			Assert.IsInstanceOfType(typeOfs, typeof(Collection));
-
-			foreach (Prototype child in ((Collection)typeOfs).Children)
-			{
-				IntWrapper.ToInteger(child);
-			}
+			Assert.IsInstanceOfType(typeOfs, typeof(NativeValuePrototype));
 		}
 
 		private static (NativeInterpretter interpretter, Compiler compiler) BuildInterpreter(string code)
