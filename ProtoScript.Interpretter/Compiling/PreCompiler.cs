@@ -18,7 +18,7 @@ namespace ProtoScript.Interpretter.Compiling
 
 			PrototypeDefinition ? protoDef = file.PrototypeDefinitions.FirstOrDefault(x => x.Methods.Any());
 			if (null != protoDef)
-				throw new Exception(strFile + " not a candidate for precompiling due to " + protoDef.PrototypeName.TypeName);
+				throw new InvalidOperationException($"'{strFile}' is not a candidate for precompiling because prototype '{protoDef.PrototypeName.TypeName}' declares methods.");
 
 			List<Prototype> lstPrototypes = new List<Prototype>();
 			foreach (PrototypeDefinition statement in file.PrototypeDefinitions)

@@ -113,8 +113,8 @@ namespace ProtoScript.Interpretter.Compiling
 		//uses Scope instead of ResolvePrototype
 		static public void DeclarePrototypeTypeOfs(PrototypeDefinition protoDef, Compiler compiler)
 		{
-			Prototype prototype = protoDef.ResolvedPrototype ?? throw new Exception("Prototype not stored on declaration");
-			PrototypeTypeInfo info = prototype.Data["TypeInfo"] as PrototypeTypeInfo ?? throw new Exception("Prototype type info doesn't exist on Prototype.Data");
+			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
 
 			foreach (ProtoScript.Type typeOf in protoDef.Inherits)
 			{				
@@ -168,8 +168,8 @@ namespace ProtoScript.Interpretter.Compiling
 		{
 			List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
 
-			Prototype prototype = protoDef.ResolvedPrototype ?? throw new Exception("Prototype not stored on declaration");
-			PrototypeTypeInfo info = prototype.Data["TypeInfo"] as PrototypeTypeInfo ?? throw new Exception("Prototype type info doesn't exist on Prototype.Data");
+			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
 
 			compiler.Symbols.EnterScope(info.Scope);
 
@@ -209,8 +209,8 @@ namespace ProtoScript.Interpretter.Compiling
 			//Ignore the ElementTypes here. If we have 
 			//prototype Converts<T>;
 			//then ignore the T until the Declaration. 
-			Prototype prototype = protoDef.ResolvedPrototype ?? throw new Exception("Prototype not stored on declaration");
-			PrototypeTypeInfo info = prototype.Data["TypeInfo"] as PrototypeTypeInfo ?? throw new Exception("Prototype type info doesn't exist on Prototype.Data");
+			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
 
 			List<Compiled.Statement>? prototypeFunctions = DefinePrototypeFunctions(protoDef, info, compiler);
 			if (prototypeFunctions != null)
@@ -436,8 +436,8 @@ namespace ProtoScript.Interpretter.Compiling
 		{
 			List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
 
-			Prototype prototype = protoDef.ResolvedPrototype ?? throw new Exception("Prototype not stored on declaration");
-			PrototypeTypeInfo info = prototype.Data["TypeInfo"] as PrototypeTypeInfo ?? throw new Exception("Prototype type info doesn't exist on Prototype.Data");
+			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
 
 			compiler.Symbols.EnterScope(info.Scope);
 			Scope scopeGlobal = compiler.Symbols.GetGlobalScope();
@@ -601,8 +601,8 @@ namespace ProtoScript.Interpretter.Compiling
 		//Nested Prototypes
 		public static void DeclareNestedPrototypes(PrototypeDefinition protoDef, Compiler compiler)
 		{
-			Prototype prototype = protoDef.ResolvedPrototype ?? throw new Exception("Prototype not stored on declaration");
-			PrototypeTypeInfo info = prototype.Data["TypeInfo"] as PrototypeTypeInfo ?? throw new Exception("Prototype type info doesn't exist on Prototype.Data");
+			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
 
 			try
 			{
@@ -632,8 +632,8 @@ namespace ProtoScript.Interpretter.Compiling
 		{
 			List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
 
-			Prototype prototype = protoDef.ResolvedPrototype ?? throw new Exception("Prototype not stored on declaration");
-			PrototypeTypeInfo info = prototype.Data["TypeInfo"] as PrototypeTypeInfo ?? throw new Exception("Prototype type info doesn't exist on Prototype.Data");
+			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
 
 			try
 			{
@@ -662,6 +662,18 @@ namespace ProtoScript.Interpretter.Compiling
 			}
 
 			return lstStatements;
+		}
+
+		private static Prototype GetResolvedPrototypeOrThrow(PrototypeDefinition protoDef)
+		{
+			return protoDef.ResolvedPrototype
+				?? throw new InvalidOperationException($"Prototype '{protoDef.PrototypeName?.TypeName ?? "(unknown)"}' was not resolved during declaration.");
+		}
+
+		private static PrototypeTypeInfo GetPrototypeTypeInfoOrThrow(Prototype prototype, PrototypeDefinition protoDef)
+		{
+			return prototype.Data["TypeInfo"] as PrototypeTypeInfo
+				?? throw new InvalidOperationException($"Prototype '{protoDef.PrototypeName?.TypeName ?? prototype.PrototypeName}' is missing TypeInfo metadata in Prototype.Data.");
 		}
 	}
 }

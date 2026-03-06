@@ -633,7 +633,7 @@ namespace ProtoScript.Extensions
 
 				if (session.Context.Compiler == null || session.Interpretter == null)
 				{
-					throw new Exception("Could not initialize interpreter session");
+					throw new InvalidOperationException($"Could not initialize interpreter session for project '{taggingSettings.SessionKey ?? strProject}'.");
 				}
 
 				if (bResume)

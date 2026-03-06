@@ -219,7 +219,7 @@ namespace ProtoScript.Interpretter
 			if (op.Value == "=") //Assignment operator 
 			{
 				if (!(op.Left is Identifier))
-					throw new Exception("Not supported");
+					throw new NotSupportedException($"Assignment target must be an identifier. Found '{op.Left?.GetType().FullName ?? "null"}'.");
 
 				AssignmentExpressionToString(op.Left as Identifier, op.Right);
 			}

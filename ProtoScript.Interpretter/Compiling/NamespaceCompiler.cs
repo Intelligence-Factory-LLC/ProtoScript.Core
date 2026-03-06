@@ -103,7 +103,7 @@ namespace ProtoScript.Interpretter.Compiling
 
 					//N20231010-01 - Adding a namespace short form format
 					if (nsCurrent == null && i > 0)
-						throw new Exception("Can't create a namespace within a prototype"); 
+						throw new InvalidOperationException($"Cannot create namespace segment '{strNamespace}' after entering a prototype scope.");
 
 					ns.ParentNamespace = nsCurrent;
 					ns.Scope.Name = ns.NamespaceName;
@@ -123,7 +123,7 @@ namespace ProtoScript.Interpretter.Compiling
 				}
 
 				else if (!(obj is Namespace))
-					throw new Exception("Namespace expected: " + strNamespace + " " + obj.GetType().Name);
+					throw new InvalidOperationException($"Expected namespace '{strNamespace}', but found symbol type '{obj.GetType().Name}'.");
 
 				else
 				{

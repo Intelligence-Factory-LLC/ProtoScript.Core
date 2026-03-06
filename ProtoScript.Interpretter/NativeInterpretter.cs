@@ -155,7 +155,7 @@ namespace ProtoScript.Interpretter
 				TypeInfo sourceType = new TypeInfo(obj.GetType());
 				if (!SimpleInterpretter.IsAssignableFrom(sourceType, existingInfo.Type))
 				{
-					throw new Exception($"Cannot inject object of type {obj.GetType().FullName} into {strName} declared as {existingInfo.Type}");
+					throw new InvalidOperationException($"Cannot inject object of type '{obj.GetType().FullName}' into '{strName}' declared as '{existingInfo.Type}'.");
 				}
 
 				existingInfo.Value = obj;
@@ -699,7 +699,10 @@ namespace ProtoScript.Interpretter
 						return false;
 					}
 					else
-						throw new Exception("Not implemented");
+					{
+						string actualType = oRes?.GetType().FullName ?? "null";
+						throw new RuntimeException($"For-each expected a prototype with children or an IEnumerable value, but got '{actualType}'.", statement.Info);
+					}
 				}
 
 				for (int i = 0; i < protoValue.Children.Count; i++)
@@ -1464,7 +1467,10 @@ namespace ProtoScript.Interpretter
 				protoProp = infoProp.Prototype;
 			}
 			else
-				throw new Exception("Unexpected");
+			{
+				string rightType = oRight?.GetType().FullName ?? "null";
+				throw new RuntimeException($"Expected a prototype field reference on the right side, but got '{rightType}'.", exp.Right.Info);
+			}
 
 			if (null == prototype)
 			{
@@ -1853,7 +1859,7 @@ namespace ProtoScript.Interpretter
 			{
 				infoFunction = this.Symbols.GetSymbol(strMethodName) as FunctionRuntimeInfo;
 				if (null == infoFunction)
-					throw new Exception("Could not find global method: " + strMethodName);
+					throw new MissingMethodException($"Could not find global method '{strMethodName}' with {lstParameters.Count} argument(s).");
 			}
 
 			else
@@ -1861,7 +1867,7 @@ namespace ProtoScript.Interpretter
 				infoFunction = this.FindOverriddenMethod(protoInstance, strMethodName);
 
 				if (null == infoFunction)
-					throw new Exception("Could not find method: " + strMethodName + ", on prototype: " + protoInstance.PrototypeName);
+					throw new MissingMethodException($"Could not find method '{strMethodName}' on prototype '{protoInstance.PrototypeName}' with {lstParameters.Count} argument(s).");
 			}
 
 			return this.RunMethod(infoFunction, protoInstance, lstParameters);
@@ -1883,7 +1889,7 @@ namespace ProtoScript.Interpretter
 			{
 				infoFunction = this.Symbols.GetSymbol(strMethodName) as FunctionRuntimeInfo;
 				if (null == infoFunction)
-					throw new Exception("Could not find global method: " + strMethodName);
+					throw new MissingMethodException($"Could not find global method '{strMethodName}' for named-argument invocation.");
 			}
 
 			else
@@ -1891,7 +1897,7 @@ namespace ProtoScript.Interpretter
 				infoFunction = this.FindOverriddenMethod(protoInstance, strMethodName);
 
 				if (null == infoFunction)
-					throw new Exception("Could not find method: " + strMethodName + ", on prototype: " + protoInstance.PrototypeName);
+					throw new MissingMethodException($"Could not find method '{strMethodName}' on prototype '{protoInstance.PrototypeName}' for named-argument invocation.");
 			}
 
 			List<object> lstParameters = new List<object>();
@@ -1900,7 +1906,10 @@ namespace ProtoScript.Interpretter
 			{
 				object oValue;
 				if (!dictParameters.TryGetValue(infoParam.ParameterName, out oValue))
-					throw new Exception("Missing parameter: " + infoParam.ParameterName);
+				{
+					string provided = dictParameters.Count == 0 ? "(none)" : string.Join(", ", dictParameters.Keys);
+					throw new ArgumentException($"Missing parameter '{infoParam.ParameterName}' for method '{strMethodName}'. Provided keys: {provided}", nameof(dictParameters));
+				}
 				lstParameters.Add(oValue);
 			}
 
@@ -2206,7 +2215,10 @@ namespace ProtoScript.Interpretter
 			System.Type paramArrayType = infoParams[fixedCount].ParameterType;
 			System.Type? elementType = paramArrayType.GetElementType();
 			if (elementType == null)
-				throw new Exception("Invalid params method signature");
+			{
+				string parameterName = infoParams[fixedCount].Name ?? "(unknown)";
+				throw new InvalidOperationException($"Invalid params signature. Parameter '{parameterName}' was expected to be an array but was '{paramArrayType.FullName}'.");
+			}
 
 			List<object> finalParameters = new List<object>(infoParams.Length);
 			for (int i = 0; i < fixedCount; i++)

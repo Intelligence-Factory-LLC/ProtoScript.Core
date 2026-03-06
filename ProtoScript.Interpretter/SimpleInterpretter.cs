@@ -21,7 +21,7 @@ namespace ProtoScript.Interpretter
 			Prototype? prototype = TemporaryPrototypes.GetTemporaryPrototypeOrNull(strParent);
 			
 			if (null == prototype)
-				throw new Exception("Cannot create instance of prototype: " + strParent);
+				throw new InvalidOperationException($"Cannot create instance of prototype '{strParent}' because it is not declared.");
 
 			return NewInstance(prototype);
 		}

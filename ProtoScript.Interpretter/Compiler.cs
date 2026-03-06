@@ -2348,7 +2348,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 					else if (objCur.InferredType is Namespace)
 					{
-						throw new Exception("This code shouldn't reachable");
+						throw new ProtoScriptCompilerException(exp.Info, $"Unexpected namespace in member-access chain while resolving '{strPath}' at segment '{strPropertyName}'.");
 					}
 
 					//Try as a .NET property 
@@ -2407,7 +2407,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 			if (literal is CharacterLiteral)
 			{
-				char cValue = ParseCharacterLiteralValue(literal.Value);
+				char cValue = ParseCharacterLiteralValue(literal.Value, literal.Info);
 				return new Compiled.Literal() { Value = cValue, InferredType = new TypeInfo(typeof(char)) };
 			}
 
@@ -2466,20 +2466,20 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			return strBetweenQuotes.Replace("\"\"", "\"");
 		}
 
-		private static char ParseCharacterLiteralValue(string rawLiteralValue)
+		private static char ParseCharacterLiteralValue(string rawLiteralValue, StatementParsingInfo info)
 		{
 			if (string.IsNullOrEmpty(rawLiteralValue) || rawLiteralValue.Length < 3)
-				throw new Exception("Invalid character literal");
+				throw new ProtoScriptCompilerException(info, $"Invalid character literal '{rawLiteralValue}'.");
 
 			string strBetweenQuotes = rawLiteralValue.Substring(1, rawLiteralValue.Length - 2);
 			if (strBetweenQuotes.Length == 1)
 				return strBetweenQuotes[0];
 
 			if (strBetweenQuotes[0] != '\\')
-				throw new Exception("Invalid character literal");
+				throw new ProtoScriptCompilerException(info, $"Invalid character literal '{rawLiteralValue}'.");
 
 			if (strBetweenQuotes.Length < 2)
-				throw new Exception("Invalid character literal");
+				throw new ProtoScriptCompilerException(info, $"Invalid character literal '{rawLiteralValue}'.");
 
 			char escape = strBetweenQuotes[1];
 			switch (escape)
@@ -2512,7 +2512,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					break;
 			}
 
-			throw new Exception("Invalid character literal");
+			throw new ProtoScriptCompilerException(info, $"Invalid character literal '{rawLiteralValue}'.");
 		}
 
 		public FunctionRuntimeInfo DeclareFunction(FunctionDefinition funcDef)

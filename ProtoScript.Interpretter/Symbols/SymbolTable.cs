@@ -99,7 +99,7 @@ namespace ProtoScript.Interpretter.Symbols
 				foreach (Scope oScope in oCopy.m_stackActivationRecords)
 				{
 					if (null == oScope)
-						throw new Exception("Cannot copy a null scope");
+						throw new InvalidOperationException("Cannot clone SymbolTable: activation record scope was null.");
 
 					this.m_stackActivationRecords.Add(oScope);
 				}
@@ -107,7 +107,7 @@ namespace ProtoScript.Interpretter.Symbols
 				foreach (Scope oScope in oCopy.m_stackActiveScopes)
 				{
 					if (null == oScope)
-						throw new Exception("Cannot copy a null scope");
+						throw new InvalidOperationException("Cannot clone SymbolTable: active scope was null.");
 
 					this.m_stackActiveScopes.Add(oScope);
 				}
@@ -119,7 +119,7 @@ namespace ProtoScript.Interpretter.Symbols
 		public void AddUsing(Scope scope)
 		{
 			if (null == scope)
-				throw new Exception("Cannot add a null scope");
+				throw new ArgumentNullException(nameof(scope), "Cannot add a null scope to using directives.");
 
 			lock (m_syncRoot)
 			{
@@ -140,7 +140,7 @@ namespace ProtoScript.Interpretter.Symbols
 			{
 				if (m_stackActivationRecords.Count != 0 ||
 					m_stackActiveScopes.Count != 0)
-					throw new Exception("Cannot enter global scope. A scope already exists");
+					throw new InvalidOperationException($"Cannot enter global scope because scopes already exist. ActivationRecords={m_stackActivationRecords.Count}, ActiveScopes={m_stackActiveScopes.Count}.");
 
 				m_stackActivationRecords.Add(new Scope() { Name = "(global)" });
 				m_pActiveScope = m_stackActivationRecords.Back();
@@ -153,12 +153,12 @@ namespace ProtoScript.Interpretter.Symbols
 			{
 				if (m_stackActiveScopes.Count != 0)
 				{
-					throw new Exception("Cannot exit global scope. At least one scope is still active.");
+					throw new InvalidOperationException($"Cannot exit global scope while {m_stackActiveScopes.Count} active scope(s) remain.");
 				}
 
 				if (m_stackActivationRecords.Count > 1)
 				{
-					throw new Exception("Cannot exit global scope. More than one activation record is still active.");
+					throw new InvalidOperationException($"Cannot exit global scope while {m_stackActivationRecords.Count} activation record(s) remain.");
 				}
 
 				m_stackActivationRecords.Clear();
@@ -178,12 +178,12 @@ namespace ProtoScript.Interpretter.Symbols
 		public void EnterScope(Scope pAct)
 		{
 			if (null == pAct)
-				throw new Exception("Cannot enter a null scope");
+				throw new ArgumentNullException(nameof(pAct), "Cannot enter a null scope.");
 
 			lock (m_syncRoot)
 			{
 				if (null == m_pActiveScope)
-					throw new Exception("No active scope to enter from.");
+					throw new InvalidOperationException("Cannot enter a new scope because there is no current active scope.");
 
 				m_stackActiveScopes.Add(m_pActiveScope);
 				m_pActiveScope = pAct;
@@ -222,7 +222,7 @@ namespace ProtoScript.Interpretter.Symbols
 			lock (m_syncRoot)
 			{
 				if (null == m_pActiveScope)
-					throw new Exception("No active scope to get symbol from.");
+					throw new InvalidOperationException($"Cannot resolve symbol '{in_strSymbol}' because there is no active scope.");
 
 				bool bResult = false;
 				oObj = null;
@@ -273,7 +273,7 @@ namespace ProtoScript.Interpretter.Symbols
 			lock (m_syncRoot)
 			{
 				if (null == m_pActiveScope)
-					throw new Exception("No active scope to get symbol from.");
+					throw new InvalidOperationException($"Cannot resolve symbol '{in_strSymbol}' with scope because there is no active scope.");
 
 				bool bResult = false;
 				oObj = null;
@@ -325,10 +325,10 @@ namespace ProtoScript.Interpretter.Symbols
 			lock (m_syncRoot)
 			{
 				if (m_stackActivationRecords.Count == 0)
-					throw new Exception("No Activation Records");
+					throw new InvalidOperationException("No activation records exist in the symbol table.");
 
 				if (m_pActiveScope == null)
-					throw new Exception("A symbol must be inserted into a scope.");
+					throw new InvalidOperationException("No active scope exists to insert or resolve symbols.");
 
 				return m_pActiveScope;
 			}
@@ -389,7 +389,7 @@ namespace ProtoScript.Interpretter.Symbols
 				DotNetTypeInfo dotNetTypeInfo = (DotNetTypeInfo)typeInfo;
 				if (dotNetTypeInfo.Type.IsGenericTypeDefinition)
 				{
-					System.Type[] typeElements = type.ElementTypes.Select(t => GetTypeInfo(t)?.Type ?? throw new Exception("Could not get TypeInfo:" + t.TypeName)).ToArray();
+					System.Type[] typeElements = type.ElementTypes.Select(t => GetTypeInfo(t)?.Type ?? throw new InvalidOperationException($"Could not resolve type info for generic argument '{t.TypeName}' while binding '{type.TypeName}'.")).ToArray();
 
 					dotNetTypeInfo.Type = dotNetTypeInfo.Type.MakeGenericType(typeElements);
 				}
@@ -420,7 +420,7 @@ namespace ProtoScript.Interpretter.Symbols
 						{
 						}
 						//N20240929-02 - See notes on extending this to allow a variable type to be passed in
-						throw new Exception("Element Type not found, cannot use variables");
+						throw new InvalidOperationException($"Generic element type '{type.TypeName}' was not found while creating '{typeOf.TypeName}'. Variable-based generic inference is not supported here.");
 					}
 				}
 
