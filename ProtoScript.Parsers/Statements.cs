@@ -146,14 +146,99 @@
 				{
 					tok.setCursor(iCursor);
 
-					if (null != savedException)
-						err2.Explanation = savedException.Explanation + ", " + err2.Explanation;
+					err2.Explanation = BuildCombinedParseExplanation(savedException, err2, tok.getString(), iCursor);
 
 					throw err2;
 				}
 			}
 
 			return statement;
+		}
+
+		private static string BuildCombinedParseExplanation(
+			ProtoScriptTokenizingException? declarationError,
+			ProtoScriptTokenizingException expressionError,
+			string source,
+			int cursor)
+		{
+			string left = declarationError?.Explanation?.Trim() ?? string.Empty;
+			string right = expressionError.Explanation?.Trim() ?? string.Empty;
+
+			if (!string.IsNullOrWhiteSpace(left) && !string.IsNullOrWhiteSpace(right))
+				return left + ", " + right;
+			if (!string.IsNullOrWhiteSpace(left))
+				return left;
+			if (!string.IsNullOrWhiteSpace(right))
+				return right;
+
+			if (LooksLikeMissingPrototypeDeclaration(source, cursor))
+			{
+				return "Invalid top-level declaration. If this is a project/entity instance, use `prototype Name : BaseType { ... }`.";
+			}
+
+			string expected = expressionError?.Expected?.Trim();
+			if (!string.IsNullOrWhiteSpace(expected))
+				return "Could not parse statement. Expected: " + expected;
+
+			return "Could not parse statement.";
+		}
+
+		private static bool LooksLikeMissingPrototypeDeclaration(string source, int cursor)
+		{
+			if (string.IsNullOrEmpty(source) || cursor < 0 || cursor >= source.Length)
+				return false;
+
+			List<string> nearbyLines = GetNearbyNonEmptyLines(source, cursor, 4);
+			foreach (string line in nearbyLines)
+			{
+				if (line.StartsWith("prototype ", StringComparison.Ordinal))
+					continue;
+
+				int hashIndex = line.IndexOf('#');
+				if (hashIndex <= 0 || hashIndex >= line.Length - 1)
+					continue;
+
+				bool allAllowed = true;
+				for (int i = 0; i < line.Length; i++)
+				{
+					char c = line[i];
+					if (!(char.IsLetterOrDigit(c) || c == '_' || c == '#'))
+					{
+						allAllowed = false;
+						break;
+					}
+				}
+
+				if (allAllowed)
+					return true;
+			}
+
+			return false;
+		}
+
+		private static List<string> GetNearbyNonEmptyLines(string source, int cursor, int maxLines)
+		{
+			List<string> lines = new List<string>();
+			if (maxLines <= 0)
+				return lines;
+
+			int pos = Math.Min(cursor, source.Length - 1);
+			while (pos >= 0 && lines.Count < maxLines)
+			{
+				int lineStart = source.LastIndexOf('\n', pos);
+				lineStart = lineStart < 0 ? 0 : lineStart + 1;
+				int lineEnd = source.IndexOf('\n', lineStart);
+				if (lineEnd < 0)
+					lineEnd = source.Length;
+
+				string line = source.Substring(lineStart, Math.Max(0, lineEnd - lineStart)).Trim();
+				if (!string.IsNullOrWhiteSpace(line))
+					lines.Add(line);
+
+				pos = lineStart - 2;
+			}
+
+			return lines;
 		}
 	}
 
