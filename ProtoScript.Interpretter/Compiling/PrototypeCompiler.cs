@@ -313,7 +313,15 @@ namespace ProtoScript.Interpretter.Compiling
 
 			foreach (AnnotationExpression annotation in protoDef.Annotations)
 			{
-				MethodEvaluation method = annotation.GetAnnotationMethodEvaluation();
+				MethodEvaluation? method = annotation.GetAnnotationMethodEvaluation();
+				if (method == null)
+				{
+					compiler.AddDiagnostic(
+						new Diagnostic("Annotation must be a method call, for example [MyAnnotation(...)]"),
+						protoDef,
+						annotation);
+					continue;
+				}
 				if (!annotation.IsExpanded)
 				{
 					method.Parameters.Insert(0, new Identifier(protoDef.PrototypeName.TypeName));
@@ -343,7 +351,15 @@ namespace ProtoScript.Interpretter.Compiling
 
 			foreach (AnnotationExpression annotation in funcDef.Annotations)
 			{
-				MethodEvaluation method = compiler.GetAnnotationMethodEvaluation(annotation);
+				MethodEvaluation? method = compiler.GetAnnotationMethodEvaluation(annotation);
+				if (method == null)
+				{
+					compiler.AddDiagnostic(
+						new Diagnostic("Annotation must be a method call, for example [MyAnnotation(...)]"),
+						funcDef,
+						annotation);
+					continue;
+				}
 				method.Parameters.Insert(0, new Identifier(infoThis.Prototype.PrototypeName + "." + funcDef.FunctionName));
 
 				if (!TryCompileAnnotationFunction(annotation, compiler, out Compiled.FunctionEvaluation? functionEvaluation))
@@ -380,7 +396,15 @@ namespace ProtoScript.Interpretter.Compiling
 					strFieldType = info.FieldInfo.Type.Name;
 					
 
-				MethodEvaluation method = annotation.GetAnnotationMethodEvaluation();
+				MethodEvaluation? method = annotation.GetAnnotationMethodEvaluation();
+				if (method == null)
+				{
+					compiler.AddDiagnostic(
+						new Diagnostic("Annotation must be a method call, for example [MyAnnotation(...)]"),
+						fieldDef,
+						annotation);
+					continue;
+				}
 				if (!annotation.IsExpanded)
 				{
 					method.Parameters.Insert(0, new Identifier(infoThis.Prototype.PrototypeName));
