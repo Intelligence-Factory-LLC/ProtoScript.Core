@@ -1548,6 +1548,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			if (SimpleInterpretter.IsAssignableFrom(typeInfo, new TypeInfo(typeof(int))))
 				return true;
 
+			if (SimpleInterpretter.IsAssignableFrom(typeInfo, new TypeInfo(typeof(bool))))
+				return true;
+
 			return false;
 		}
 
@@ -1555,6 +1558,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 		{
 			Compiled.Expression compiledLeft = Compile(op.Left);
 			Compiled.Expression compiledRight = Compile(op.Right);
+			if (compiledLeft == null || compiledRight == null)
+			{
+				this.AddDiagnostic(new Diagnostic("Could not compile one side of string concatenation"), null, op);
+				return null;
+			}
 
 			if (!IsSupportedStringConcatenationOperand(compiledLeft.InferredType))
 			{

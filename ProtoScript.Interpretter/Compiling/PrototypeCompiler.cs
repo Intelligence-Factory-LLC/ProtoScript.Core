@@ -210,9 +210,13 @@ namespace ProtoScript.Interpretter.Compiling
 				catch (Exception ex)
 				{
 					StatementParsingInfo info = protoDef.Info ?? new StatementParsingInfo { StartingOffset = 0, Length = 1 };
+					string stackFrame = ex.StackTrace?
+						.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+						.FirstOrDefault()?.Trim() ?? string.Empty;
+					string detail = string.IsNullOrWhiteSpace(stackFrame) ? ex.Message : ex.Message + " @ " + stackFrame;
 					throw new ProtoScriptCompilerException(
 						info,
-						$"Failed to define prototype '{protoDef.PrototypeName?.TypeName ?? "(unknown)"}': {ex.GetType().Name}: {ex.Message}");
+						$"Failed to define prototype '{protoDef.PrototypeName?.TypeName ?? "(unknown)"}': {ex.GetType().Name}: {detail}");
 				}
 			}
 
