@@ -5,6 +5,7 @@ using ProtoScript.Diagnostics;
 using ProtoScript.Interpretter.RuntimeInfo;
 using ProtoScript.Interpretter.Compiled;
 using ProtoScript.Interpretter.Symbols;
+using ProtoScript.Parsers;
 
 namespace ProtoScript.Interpretter.Compiling
 {
@@ -196,7 +197,23 @@ namespace ProtoScript.Interpretter.Compiling
 
 			foreach (PrototypeDefinition protoDef in file.PrototypeDefinitions)
 			{
-				lstStatements.AddRange(DefinePrototype(protoDef, compiler));
+				try
+				{
+					List<Compiled.Statement>? prototypeStatements = DefinePrototype(protoDef, compiler);
+					if (prototypeStatements != null)
+						lstStatements.AddRange(prototypeStatements);
+				}
+				catch (ProtoScriptCompilerException)
+				{
+					throw;
+				}
+				catch (Exception ex)
+				{
+					StatementParsingInfo info = protoDef.Info ?? new StatementParsingInfo { StartingOffset = 0, Length = 1 };
+					throw new ProtoScriptCompilerException(
+						info,
+						$"Failed to define prototype '{protoDef.PrototypeName?.TypeName ?? "(unknown)"}': {ex.GetType().Name}: {ex.Message}");
+				}
 			}
 
 			return lstStatements;
@@ -217,7 +234,11 @@ namespace ProtoScript.Interpretter.Compiling
 				lstStatements.AddRange(prototypeFunctions);
 
 			if (protoDef.PrototypeDefinitions.Count > 0)
-				DefineNestedPrototypes(protoDef, compiler);
+			{
+				List<Compiled.Statement>? nestedStatements = DefineNestedPrototypes(protoDef, compiler);
+				if (nestedStatements != null)
+					lstStatements.AddRange(nestedStatements);
+			}
 
 			//N20220726-01 - Annotate the prototype before any methods within it
 			List<Compiled.Statement>? prototypeAnnotations = AnnotatePrototype(protoDef, compiler);
@@ -382,6 +403,14 @@ namespace ProtoScript.Interpretter.Compiling
 				}
 
 				TypeInfo infoFieldType = compiler.Symbols.GetGlobalScope().GetSymbol(strFieldType) as TypeInfo;
+				if (infoFieldType == null)
+				{
+					compiler.AddDiagnostic(
+						new Diagnostic("Could not resolve annotation field type symbol: " + strFieldType),
+						fieldDef,
+						null);
+					continue;
+				}
 				op.Index = infoFieldType.Index;
 				op.InferredType = infoFieldType;
 
@@ -612,7 +641,15 @@ namespace ProtoScript.Interpretter.Compiling
 				{
 					string strOriginalName = prototypeDefinition.PrototypeName.TypeName;
 					prototypeDefinition.PrototypeName.TypeName = protoDef.PrototypeName.TypeName + "." + strOriginalName;
-					PrototypeDeclaration declaration = PrototypeCompiler.DeclarePrototype(prototypeDefinition, compiler);
+					PrototypeDeclaration? declaration = PrototypeCompiler.DeclarePrototype(prototypeDefinition, compiler);
+					if (declaration?.TypeInfo == null)
+					{
+						compiler.AddDiagnostic(
+							new Diagnostic("Could not declare nested prototype: " + prototypeDefinition.PrototypeName.TypeName),
+							prototypeDefinition,
+							null);
+						continue;
+					}
 					info.Scope.InsertSymbol(strOriginalName, declaration.TypeInfo);
 				}
 
@@ -653,7 +690,9 @@ namespace ProtoScript.Interpretter.Compiling
 
 				foreach (PrototypeDefinition prototypeDefinition in protoDef.PrototypeDefinitions)
 				{
-					lstStatements.AddRange(PrototypeCompiler.AnnotatePrototype(prototypeDefinition, compiler));
+					List<Compiled.Statement>? annotations = PrototypeCompiler.AnnotatePrototype(prototypeDefinition, compiler);
+					if (annotations != null)
+						lstStatements.AddRange(annotations);
 				}
 			}
 			finally
