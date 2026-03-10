@@ -1617,16 +1617,39 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 		{
 			Compiled.Expression compiledLeft = Compile(op.Left);
 			Compiled.Expression compiledRight = Compile(op.Right);
+			if (compiledLeft == null || compiledRight == null)
+			{
+				this.AddDiagnostic(new Diagnostic("Could not compile one side of comparison"), null, op);
+				return null;
+			}
+
+			if (compiledLeft.InferredType == null || compiledRight.InferredType == null)
+			{
+				this.AddDiagnostic(
+					new Diagnostic(
+						$"Comparison operator '{op.Value}' requires typed operands, but got left={DescribeType(compiledLeft.InferredType)} right={DescribeType(compiledRight.InferredType)}"),
+					null,
+					op);
+				return null;
+			}
 
 			if (!SimpleInterpretter.IsAssignableFrom(compiledLeft.InferredType, new TypeInfo(typeof(int))))
 			{
-				this.AddDiagnostic(new Diagnostic("Only integer comparisons supported"), null, op);
+				this.AddDiagnostic(
+					new Diagnostic(
+						$"Only integer comparisons supported for operator '{op.Value}', but left operand type is {DescribeType(compiledLeft.InferredType)}"),
+					null,
+					op);
 				return null;
 			}
 
 			if (!SimpleInterpretter.IsAssignableFrom(compiledRight.InferredType, new TypeInfo(typeof(int))))
 			{
-				this.AddDiagnostic(new Diagnostic("Only integer comparisons supported"), null, op);
+				this.AddDiagnostic(
+					new Diagnostic(
+						$"Only integer comparisons supported for operator '{op.Value}', but right operand type is {DescribeType(compiledRight.InferredType)}"),
+					null,
+					op);
 				return null;
 			}
 
@@ -1638,6 +1661,17 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				InferredType = new TypeInfo(typeof(bool)),
 				Info = op.Info
 			};
+		}
+
+		private static string DescribeType(TypeInfo? typeInfo)
+		{
+			if (typeInfo == null)
+				return "(null)";
+
+			if (typeInfo.Type != null)
+				return typeInfo.Type.Name;
+
+			return typeInfo.ToString();
 		}
 
 		public Compiled.Expression CompileConditionalOperator(BinaryOperator op)
