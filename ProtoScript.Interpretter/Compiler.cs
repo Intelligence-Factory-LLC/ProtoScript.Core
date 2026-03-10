@@ -27,13 +27,21 @@ namespace ProtoScript.Interpretter
 	}
 	public class Compiler
 	{
+		public enum CompilationMode
+		{
+			Strict,
+			BestEffort
+		}
+
 		public SymbolTable Symbols = new SymbolTable();
 		public Map<string, object> References = new Map<string, object>();
 
 		public List<CompilerDiagnostic> Diagnostics = new List<CompilerDiagnostic>();
+		public List<string> DisabledFiles = new List<string>();
 		public string Source = string.Empty;
 		public List<File> Files = new List<File>();
 		public bool AllowParallelism = false;
+		public CompilationMode ProjectCompilationMode { get; set; } = CompilationMode.Strict;
 		private static readonly ConcurrentDictionary<string, Assembly> s_assemblyPathCache =
 			new ConcurrentDictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
 		private static readonly ConcurrentDictionary<string, object> s_shadowCopyLocks =
@@ -168,6 +176,8 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			try
 			{
 				List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
+				List<File> activeFiles = lstFiles;
+				DisabledFiles.Clear();
 
 				//──────────────────────────── Precompiled ────────────────────────────
 				currentStage = "Precompiled";
@@ -179,10 +189,43 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				}
 				Logs.DebugLog.WriteTimer("CompileProject.Precompiled");
 
+				if (ProjectCompilationMode == CompilationMode.BestEffort)
+				{
+					currentStage = "ValidateReferencesImports";
+					Logs.DebugLog.CreateTimer("CompileProject.ValidateReferencesImports");
+					HashSet<File> disabled = new HashSet<File>();
+					foreach (File fileCurrent in lstFiles)
+					{
+						currentFile = fileCurrent;
+						int diagnosticStart = Diagnostics.Count;
+
+						foreach (ReferenceStatement statement in fileCurrent.References)
+						{
+							compiler.Compile(statement);
+						}
+
+						foreach (ImportStatement statement in fileCurrent.Imports)
+						{
+							compiler.Compile(statement);
+						}
+
+						if (HasFatalReferenceOrImportDiagnostics(fileCurrent, diagnosticStart))
+						{
+							disabled.Add(fileCurrent);
+							string filePath = fileCurrent.Info?.FullName ?? "(unknown)";
+							DisabledFiles.Add(filePath);
+							this.AddDiagnostic($"Skipping file due to unresolved references/imports: {filePath}", null, null);
+						}
+					}
+
+					activeFiles = lstFiles.Where(x => !disabled.Contains(x)).ToList();
+					Logs.DebugLog.WriteTimer("CompileProject.ValidateReferencesImports");
+				}
+
 			//──────────────────────────── Declare-Namespaces ──────────────────────
 			currentStage = "DeclareNamespaces";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareNamespaces");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
@@ -204,12 +247,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Declare-FilePrototypes ──────────────────
 			currentStage = "DeclareFilePrototypes";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareFilePrototypes");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
 				{
-					lstStatements.AddRange(compiler.DeclareFilePrototypes(fileCurrent));
+					bool compileHeaders = ProjectCompilationMode != CompilationMode.BestEffort;
+					lstStatements.AddRange(compiler.DeclareFilePrototypes(fileCurrent, compileHeaders));
 				}
 				catch (ProtoScriptCompilerException ex)
 				{
@@ -223,7 +267,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Declare-Namespaces-2 ────────────────────
 			currentStage = "DeclareNamespaces2";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareNamespaces2");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
@@ -245,7 +289,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Declare-FileTypeOfs ─────────────────────
 			currentStage = "DeclareFileTypeOfs";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareFileTypeOfs");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
@@ -264,7 +308,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Define-PrototypeFields ──────────────────
 			currentStage = "DefinePrototypeFields";
 			Logs.DebugLog.CreateTimer("CompileProject.DefinePrototypeFields");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
@@ -283,7 +327,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Declare-PrototypeFunctions ──────────────
 			currentStage = "DeclarePrototypeFunctions";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclarePrototypeFunctions");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
@@ -302,7 +346,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Declare-FileFunctions ───────────────────
 			currentStage = "DeclareFileFunctions";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareFileFunctions");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				lstStatements.AddRange(compiler.DeclareFileFunctions(fileCurrent));
@@ -312,7 +356,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Declare-ExternalVariables ────────────────
 			currentStage = "DeclareExternalVariables";
 			Logs.DebugLog.CreateTimer("CompileProject.DeclareExternalVariables");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				compiler.DeclareFileExternalVariables(fileCurrent);
@@ -322,7 +366,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Compile-FileFunctions ───────────────────
 			currentStage = "CompileFileFunctions";
 			Logs.DebugLog.CreateTimer("CompileProject.CompileFileFunctions");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
@@ -341,7 +385,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Define-Namespaces ───────────────────────
 			currentStage = "DefineNamespaces";
 			Logs.DebugLog.CreateTimer("CompileProject.DefineNamespaces");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
@@ -365,7 +409,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Logs.DebugLog.CreateTimer("CompileProject.DefinePrototypes");
 			//if (!AllowParallelism)
 			//{
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
@@ -408,7 +452,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Compile-Annotations ─────────────────────
 			currentStage = "CompileAnnotations";
 			Logs.DebugLog.CreateTimer("CompileProject.CompileAnnotations");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
@@ -427,7 +471,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			//──────────────────────────── Compile-Statements ──────────────────────
 			currentStage = "CompileStatements";
 			Logs.DebugLog.CreateTimer("CompileProject.CompileStatements");
-			foreach (File fileCurrent in lstFiles)
+			foreach (File fileCurrent in activeFiles)
 			{
 				currentFile = fileCurrent;
 				try
@@ -674,19 +718,27 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 		public List<Compiled.Statement> DeclareFilePrototypes(ProtoScript.File file)
 		{
+			return DeclareFilePrototypes(file, true);
+		}
+
+		public List<Compiled.Statement> DeclareFilePrototypes(ProtoScript.File file, bool compileReferencesAndImports)
+		{
 			Compiler compiler = this;
 			compiler.Source = file.RawCode;
 
 			List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
 
-			foreach (ReferenceStatement statement in file.References)
+			if (compileReferencesAndImports)
 			{
-				compiler.Compile(statement);
-			}
+				foreach (ReferenceStatement statement in file.References)
+				{
+					compiler.Compile(statement);
+				}
 
-			foreach (ImportStatement statement in file.Imports)
-			{
-				compiler.Compile(statement);
+				foreach (ImportStatement statement in file.Imports)
+				{
+					compiler.Compile(statement);
+				}
 			}
 
 			foreach (PrototypeDefinition protoDef in file.PrototypeDefinitions)
@@ -704,6 +756,29 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 
 			return lstStatements;
+		}
+
+		private bool HasFatalReferenceOrImportDiagnostics(File fileCurrent, int diagnosticStart)
+		{
+			string currentFile = fileCurrent.Info?.FullName ?? string.Empty;
+			for (int i = diagnosticStart; i < Diagnostics.Count; i++)
+			{
+				CompilerDiagnostic diagnostic = Diagnostics[i];
+				string diagnosticFile = diagnostic.Statement?.Info?.File ?? diagnostic.Expression?.Info?.File ?? string.Empty;
+				if (!StringUtil.EqualNoCase(diagnosticFile, currentFile))
+					continue;
+
+				string message = diagnostic.Diagnostic?.Message ?? string.Empty;
+				if (message.StartsWith("Reference DLL not found", StringComparison.OrdinalIgnoreCase)
+					|| message.StartsWith("Could not load assembly", StringComparison.OrdinalIgnoreCase)
+					|| message.StartsWith("Assembly not referenced", StringComparison.OrdinalIgnoreCase)
+					|| (message.StartsWith("Type ", StringComparison.OrdinalIgnoreCase) && message.Contains(" not found in Assembly:", StringComparison.OrdinalIgnoreCase)))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		public MethodEvaluation GetAnnotationMethodEvaluation(AnnotationExpression annotation)
