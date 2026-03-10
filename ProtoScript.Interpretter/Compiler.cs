@@ -1451,6 +1451,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 		internal static Compiled.Expression? GetDotNetMemberReference(StatementParsingInfo info, string strPropertyName, Compiled.Expression objCur)
 		{
+			// Some symbols can carry an inferred type shell without a bound CLR type.
+			// Treat these as non-.NET members instead of crashing during lookup.
+			if (objCur?.InferredType?.Type == null)
+				return null;
+
 			System.Reflection.FieldInfo fieldInfo = objCur.InferredType.Type.GetField(strPropertyName);
 			if (null != fieldInfo)
 			{
