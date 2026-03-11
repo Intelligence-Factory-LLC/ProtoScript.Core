@@ -216,6 +216,7 @@ namespace ProtoScript.Extensions
 			session.SessionKey = strProjectName;
 
 			Compiler compiler = new Compiler();
+			compiler.ProjectCompilationMode = Compiler.CompilationMode.BestEffort;
 			compiler.Initialize();
 			List<ProtoScript.Interpretter.Compiled.Statement> statements = compiler.CompileProject(strProjectName);
 
