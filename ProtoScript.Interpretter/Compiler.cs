@@ -42,8 +42,9 @@ namespace ProtoScript.Interpretter
 		public List<File> Files = new List<File>();
 		public bool AllowParallelism = false;
 		public CompilationMode ProjectCompilationMode { get; set; } = CompilationMode.Strict;
-		private static readonly ConcurrentDictionary<string, Assembly> s_assemblyPathCache =
-			new ConcurrentDictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+		private static readonly Dictionary<string, Assembly> s_assemblyPathCache =
+			new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+		private static readonly object s_assemblyPathCacheLock = new object();
 		private static readonly ConcurrentDictionary<string, object> s_shadowCopyLocks =
 			new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
@@ -2922,43 +2923,42 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 		private static Assembly LoadAssemblyFromResolvedPath(string fullPath)
 		{
-			if (s_assemblyPathCache.TryGetValue(fullPath, out Assembly? cached))
+			lock (s_assemblyPathCacheLock)
+			{
+				return LoadAssemblyFromResolvedPath(fullPath, s_assemblyPathCache);
+			}
+		}
+
+		private static Assembly LoadAssemblyFromResolvedPath(string path, Dictionary<string, Assembly> loadedAssemblies)
+		{
+			string fullPath = Path.GetFullPath(path);
+			string fingerprint = BuildShadowDirectoryKey(fullPath);
+
+			Logs.DebugLog.WriteEvent("AssemblyLoad.RequestedPath", fullPath);
+
+			if (loadedAssemblies.TryGetValue(fingerprint, out Assembly? cached))
+			{
+				Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=fingerprint");
 				return cached;
-
-			foreach (Assembly loaded in AppDomain.CurrentDomain.GetAssemblies())
-			{
-				if (!string.IsNullOrWhiteSpace(loaded.Location)
-					&& StringUtil.EqualNoCase(loaded.Location, fullPath))
-				{
-					s_assemblyPathCache.TryAdd(fullPath, loaded);
-					return loaded;
-				}
 			}
 
-			AssemblyName assemblyIdentity = AssemblyName.GetAssemblyName(fullPath);
-			foreach (Assembly loaded in AppDomain.CurrentDomain.GetAssemblies())
+			if (TryGetLoadedAssemblyByLocation(fullPath, out Assembly? loadedFromLocation))
 			{
-				if (StringUtil.EqualNoCase(loaded.GetName().Name, assemblyIdentity.Name))
-				{
-					s_assemblyPathCache.TryAdd(fullPath, loaded);
-					return loaded;
-				}
+				loadedAssemblies[fingerprint] = loadedFromLocation;
+				Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=exact-location");
+				return loadedFromLocation;
 			}
+
+			if (!System.IO.File.Exists(fullPath))
+				throw new FileNotFoundException("Assembly path not found.", fullPath);
 
 			string sourceDirectory = Path.GetDirectoryName(fullPath) ?? string.Empty;
 			string shadowDirectory = PrepareShadowCopyDirectory(fullPath);
 			string shadowEntryPath = Path.Combine(shadowDirectory, Path.GetFileName(fullPath));
+			Logs.DebugLog.WriteEvent("AssemblyLoad.ShadowPath", shadowEntryPath);
 			ResolveEventHandler resolver = (_, args) =>
 			{
 				AssemblyName requestedName = new AssemblyName(args.Name);
-				foreach (Assembly loaded in AppDomain.CurrentDomain.GetAssemblies())
-				{
-					if (StringUtil.EqualNoCase(loaded.GetName().Name, requestedName.Name))
-					{
-						return loaded;
-					}
-				}
-
 				if (string.IsNullOrWhiteSpace(requestedName.Name))
 				{
 					return null;
@@ -2971,9 +2971,18 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				}
 
 				string dependencyFullPath = Path.GetFullPath(dependencySourcePath);
-				if (s_assemblyPathCache.TryGetValue(dependencyFullPath, out Assembly? depCached))
+				string dependencyFingerprint = BuildShadowDirectoryKey(dependencyFullPath);
+				if (loadedAssemblies.TryGetValue(dependencyFingerprint, out Assembly? depCached))
 				{
+					Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=fingerprint");
 					return depCached;
+				}
+
+				if (TryGetLoadedAssemblyByLocation(dependencyFullPath, out Assembly? loadedDependencyByLocation))
+				{
+					loadedAssemblies[dependencyFingerprint] = loadedDependencyByLocation;
+					Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=exact-location");
+					return loadedDependencyByLocation;
 				}
 
 				string shadowDependencyPath = Path.Combine(shadowDirectory, requestedName.Name + ".dll");
@@ -2983,7 +2992,8 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				}
 
 				Assembly loadedDependency = Assembly.LoadFrom(shadowDependencyPath);
-				s_assemblyPathCache.TryAdd(dependencyFullPath, loadedDependency);
+				loadedAssemblies[dependencyFingerprint] = loadedDependency;
+				Logs.DebugLog.WriteEvent("AssemblyLoad.LoadedLocation", loadedDependency.Location);
 				return loadedDependency;
 			};
 
@@ -2991,7 +3001,8 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			try
 			{
 				Assembly loadedAssembly = Assembly.LoadFrom(shadowEntryPath);
-				s_assemblyPathCache.TryAdd(fullPath, loadedAssembly);
+				loadedAssemblies[fingerprint] = loadedAssembly;
+				Logs.DebugLog.WriteEvent("AssemblyLoad.LoadedLocation", loadedAssembly.Location);
 				return loadedAssembly;
 			}
 			finally
@@ -3058,10 +3069,42 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 		private static string BuildShadowDirectoryKey(string sourceAssemblyPath)
 		{
-			string normalized = sourceAssemblyPath.Trim().ToLowerInvariant();
-			byte[] bytes = System.Text.Encoding.UTF8.GetBytes(normalized);
+			string normalizedPath = Path.GetFullPath(sourceAssemblyPath).Trim().ToLowerInvariant();
+			FileInfo fileInfo = new FileInfo(normalizedPath);
+			long length = fileInfo.Exists ? fileInfo.Length : 0L;
+			long lastWriteUtcTicks = fileInfo.Exists ? fileInfo.LastWriteTimeUtc.Ticks : 0L;
+			string seed = $"{normalizedPath}|{length}|{lastWriteUtcTicks}";
+			byte[] bytes = System.Text.Encoding.UTF8.GetBytes(seed);
 			byte[] hash = System.Security.Cryptography.SHA256.HashData(bytes);
 			return Convert.ToHexString(hash);
+		}
+
+		private static bool TryGetLoadedAssemblyByLocation(string requestedFullPath, out Assembly? assembly)
+		{
+			foreach (Assembly loaded in AppDomain.CurrentDomain.GetAssemblies())
+			{
+				if (string.IsNullOrWhiteSpace(loaded.Location))
+					continue;
+
+				string loadedPath;
+				try
+				{
+					loadedPath = Path.GetFullPath(loaded.Location);
+				}
+				catch
+				{
+					continue;
+				}
+
+				if (StringUtil.EqualNoCase(loadedPath, requestedFullPath))
+				{
+					assembly = loaded;
+					return true;
+				}
+			}
+
+			assembly = null;
+			return false;
 		}
 
 		public void Compile(ImportStatement statement)
