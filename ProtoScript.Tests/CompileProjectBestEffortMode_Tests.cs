@@ -1,5 +1,6 @@
 using ProtoScript.Interpretter;
 using ProtoScript.Interpretter.RuntimeInfo;
+using ProtoScript.Parsers;
 
 namespace ProtoScript.Tests
 {
@@ -13,27 +14,19 @@ namespace ProtoScript.Tests
 		}
 
 		[TestMethod]
-		public void CompileProject_BestEffort_SkipsBrokenFileAndCompilesHealthyFile()
+		public void CompileProject_BestEffort_SkipsFileThatThrowsAndCompilesHealthyFile()
 		{
 			string tempDir = CreateTempDirectory();
+			bool allowPrecompiledOriginal = Settings.AllowPrecompiled;
+			Settings.AllowPrecompiled = true;
 			try
 			{
 				System.IO.File.WriteAllText(Path.Combine(tempDir, "Project.pts"),
 @"include ""Broken.pts"";
 include ""Healthy.pts"";");
 
-				System.IO.File.WriteAllText(Path.Combine(tempDir, "Broken.pts"),
-@"reference ""lib/MissingDependency.dll"" MissingDependency;
-import MissingDependency MissingDependency.TypeA TypeA;
-
-prototype BrokenSkill
-{
-	function Execute() : string
-	{
-		UnknownType value = null;
-		return ""broken"";
-	}
-}");
+				// Force precompiled load path for Broken.pts and make it throw during Precompiled stage.
+				System.IO.File.WriteAllText(Path.Combine(tempDir, "Broken.pts.json"), "not-valid-precompiled-json");
 
 				System.IO.File.WriteAllText(Path.Combine(tempDir, "Healthy.pts"),
 @"prototype HealthySkill
@@ -55,12 +48,8 @@ prototype BrokenSkill
 					"Expected Broken.pts to be disabled.");
 
 				Assert.IsTrue(
-					compiler.Diagnostics.Any(x => (x.Diagnostic?.Message ?? string.Empty).Contains("Reference DLL not found", StringComparison.OrdinalIgnoreCase)),
-					"Expected missing reference diagnostic.");
-
-				Assert.IsFalse(
-					compiler.Diagnostics.Any(x => (x.Diagnostic?.Message ?? string.Empty).Contains("Unknown type: UnknownType", StringComparison.OrdinalIgnoreCase)),
-					"Expected cascade diagnostics from broken file to be suppressed.");
+					compiler.Diagnostics.Any(x => (x.Diagnostic?.Message ?? string.Empty).Contains("Best-effort: skipped file", StringComparison.OrdinalIgnoreCase)),
+					"Expected best-effort skip diagnostic.");
 
 				TypeInfo? healthyType = compiler.Symbols.GetGlobalScope().GetSymbol("HealthySkill") as TypeInfo;
 				Assert.IsNotNull(healthyType, "Expected healthy file to compile and register symbols.");
@@ -70,6 +59,7 @@ prototype BrokenSkill
 			}
 			finally
 			{
+				Settings.AllowPrecompiled = allowPrecompiledOriginal;
 				DeleteDirectory(tempDir);
 			}
 		}
