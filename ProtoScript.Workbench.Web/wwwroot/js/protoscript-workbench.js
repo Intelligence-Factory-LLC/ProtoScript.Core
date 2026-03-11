@@ -388,9 +388,96 @@ function AddFileToHistory(sFile) {
 	return fCurrent;
 }
 
+let sLastSymbolFileMismatchDiagnosticKey = null;
+
+function NormalizePathForSymbolMatch(sPath) {
+	return (sPath || "").replace(/\//g, "\\").replace(/\\+/g, "\\").trim().toLowerCase();
+}
+
+function GetFileNameFromPathForSymbolMatch(sPath) {
+	let sNormalized = NormalizePathForSymbolMatch(sPath);
+	let i = sNormalized.lastIndexOf("\\");
+	if (i < 0)
+		return sNormalized;
+
+	return sNormalized.substring(i + 1);
+}
+
+function IsEquivalentFilePathForSymbolMatch(sCandidate, sSelected) {
+	if (StringUtil.IsEmpty(sCandidate) || StringUtil.IsEmpty(sSelected))
+		return false;
+
+	if (sCandidate === sSelected)
+		return true;
+
+	return sCandidate.endsWith("\\" + sSelected) || sSelected.endsWith("\\" + sCandidate);
+}
+
+function GetSymbolsForCurrentFile(oSymbols, sSelectedFile) {
+	let sSelectedNormalized = NormalizePathForSymbolMatch(sSelectedFile);
+	if (StringUtil.IsEmpty(sSelectedNormalized))
+		return [];
+
+	let oSymbolsWithFile = oSymbols.filter(x => x && x.Info && !StringUtil.IsEmpty(x.Info.File));
+
+	// 1) Exact normalized path match
+	let oExact = oSymbolsWithFile.filter(x => NormalizePathForSymbolMatch(x.Info.File) === sSelectedNormalized);
+	if (oExact.length > 0)
+		return oExact;
+
+	// 2) Suffix path equivalence (absolute vs relative path variants)
+	let oSuffix = oSymbolsWithFile.filter(x => IsEquivalentFilePathForSymbolMatch(NormalizePathForSymbolMatch(x.Info.File), sSelectedNormalized));
+	if (oSuffix.length > 0)
+		return oSuffix;
+
+	// 3) Filename fallback only when filename maps to exactly one symbol file path
+	let sSelectedFileName = GetFileNameFromPathForSymbolMatch(sSelectedNormalized);
+	if (StringUtil.IsEmpty(sSelectedFileName))
+		return [];
+
+	let oDistinctSymbolFiles = [...new Set(oSymbolsWithFile.map(x => NormalizePathForSymbolMatch(x.Info.File)))];
+	let oFileNameMatches = oDistinctSymbolFiles.filter(x => GetFileNameFromPathForSymbolMatch(x) === sSelectedFileName);
+	if (oFileNameMatches.length !== 1)
+		return [];
+
+	let sMatchedFile = oFileNameMatches[0];
+	return oSymbolsWithFile.filter(x => NormalizePathForSymbolMatch(x.Info.File) === sMatchedFile);
+}
+
+function OutputSymbolFileMismatchDiagnostics(oSymbols, sSelectedFile) {
+	let oSymbolsWithFile = oSymbols.filter(x => x && x.Info && !StringUtil.IsEmpty(x.Info.File));
+	let oSampleFiles = [...new Set(oSymbolsWithFile.map(x => x.Info.File))].slice(0, 10);
+	let sKey = [
+		sSelectedFile || "",
+		oSymbols.length,
+		oSymbolsWithFile.length,
+		oSampleFiles.join("|")
+	].join("||");
+
+	if (sKey === sLastSymbolFileMismatchDiagnosticKey)
+		return;
+
+	sLastSymbolFileMismatchDiagnosticKey = sKey;
+
+	Output(
+		"[Symbols] No file-path match for selected file. " +
+		"Total symbols: " + oSymbols.length + ", " +
+		"Symbols with Info.File: " + oSymbolsWithFile.length + ", " +
+		"Selected file: " + (sSelectedFile || "(empty)") + ", " +
+		"Sample symbol files: " + (oSampleFiles.length > 0 ? oSampleFiles.join(" | ") : "(none)")
+	);
+}
+
 function OnBindFileSymbols() {
 	let sFile = Page.LocalSettings.File;
-	let oFileSymbols = Symbols.filter(x => StringUtil.EqualNoCase(x.Info.File, sFile));
+	let oFileSymbols = GetSymbolsForCurrentFile(Symbols, sFile);
+	if (oFileSymbols.length > 0) {
+		sLastSymbolFileMismatchDiagnosticKey = null;
+	}
+	else if (Symbols && Symbols.length > 0) {
+		OutputSymbolFileMismatchDiagnostics(Symbols, sFile);
+	}
+
 	OnBindSymbols(oFileSymbols);
 }
 
