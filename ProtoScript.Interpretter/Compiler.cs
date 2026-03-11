@@ -176,316 +176,114 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			try
 			{
 				List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
-				List<File> activeFiles = lstFiles;
+				List<File> activeFiles = new List<File>(lstFiles);
 				DisabledFiles.Clear();
 
-				//──────────────────────────── Precompiled ────────────────────────────
-				currentStage = "Precompiled";
-				Logs.DebugLog.CreateTimer("CompileProject.Precompiled");
-				foreach (File fileCurrent in lstFiles.Where(x => x.IsPrecompiled))
+				bool TrySkipFailedFile(File fileCurrent, Exception err)
 				{
-					currentFile = fileCurrent;
-					PreCompiler.LoadPrecompiled(fileCurrent.RawCode, this.Symbols);
+					if (ProjectCompilationMode != CompilationMode.BestEffort)
+						return false;
+
+					string filePath = fileCurrent.Info?.FullName ?? "(unknown)";
+					if (!DisabledFiles.Any(x => StringUtil.EqualNoCase(x, filePath)))
+						DisabledFiles.Add(filePath);
+
+					activeFiles.Remove(fileCurrent);
+					string explanation = err is ProtoScriptCompilerException exCompiler
+						? (string.IsNullOrWhiteSpace(exCompiler.Explanation) ? exCompiler.Message : exCompiler.Explanation)
+						: $"{err.GetType().Name}: {err.Message}";
+
+					this.AddDiagnostic(
+						$"Best-effort: skipped file after failure during {currentStage}: {filePath}. {explanation}",
+						null,
+						null);
+					return true;
 				}
-				Logs.DebugLog.WriteTimer("CompileProject.Precompiled");
 
-				if (ProjectCompilationMode == CompilationMode.BestEffort)
+				void RunStage(string stageName, Action<File> action, Func<File, bool>? filter = null)
 				{
-					currentStage = "ValidateReferencesImports";
-					Logs.DebugLog.CreateTimer("CompileProject.ValidateReferencesImports");
-					HashSet<File> disabled = new HashSet<File>();
-					foreach (File fileCurrent in lstFiles)
+					currentStage = stageName;
+					Logs.DebugLog.CreateTimer("CompileProject." + stageName);
+					foreach (File fileCurrent in activeFiles.ToList())
 					{
+						if (filter != null && !filter(fileCurrent))
+							continue;
+
 						currentFile = fileCurrent;
-						int diagnosticStart = Diagnostics.Count;
-
-						foreach (ReferenceStatement statement in fileCurrent.References)
+						try
 						{
-							compiler.Compile(statement);
+							action(fileCurrent);
 						}
-
-						foreach (ImportStatement statement in fileCurrent.Imports)
+						catch (ProtoScriptCompilerException ex)
 						{
-							compiler.Compile(statement);
+							if (TrySkipFailedFile(fileCurrent, ex))
+								continue;
+							ex.m_strProtoScript = fileCurrent.RawCode;
+							ex.File = fileCurrent.Info?.FullName;
+							throw;
 						}
-
-						if (HasFatalReferenceOrImportDiagnostics(fileCurrent, diagnosticStart))
+						catch (Exception err)
 						{
-							disabled.Add(fileCurrent);
-							string filePath = fileCurrent.Info?.FullName ?? "(unknown)";
-							DisabledFiles.Add(filePath);
-							this.AddDiagnostic($"Skipping file due to unresolved references/imports: {filePath}", null, null);
+							if (TrySkipFailedFile(fileCurrent, err))
+								continue;
+							throw;
 						}
 					}
-
-					activeFiles = lstFiles.Where(x => !disabled.Contains(x)).ToList();
-					Logs.DebugLog.WriteTimer("CompileProject.ValidateReferencesImports");
+					Logs.DebugLog.WriteTimer("CompileProject." + stageName);
 				}
 
-			//──────────────────────────── Declare-Namespaces ──────────────────────
-			currentStage = "DeclareNamespaces";
-			Logs.DebugLog.CreateTimer("CompileProject.DeclareNamespaces");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
+				RunStage("Precompiled", fileCurrent => PreCompiler.LoadPrecompiled(fileCurrent.RawCode, this.Symbols), x => x.IsPrecompiled);
+
+				RunStage("DeclareNamespaces", fileCurrent =>
 				{
 					foreach (NamespaceDefinition ns in fileCurrent.Namespaces)
 					{
 						lstStatements.AddRange(NamespaceCompiler.DeclarePrototypes(ns, this));
 					}
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.DeclareNamespaces");
+				});
 
-			//──────────────────────────── Declare-FilePrototypes ──────────────────
-			currentStage = "DeclareFilePrototypes";
-			Logs.DebugLog.CreateTimer("CompileProject.DeclareFilePrototypes");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
+				RunStage("DeclareFilePrototypes", fileCurrent =>
 				{
-					bool compileHeaders = ProjectCompilationMode != CompilationMode.BestEffort;
-					lstStatements.AddRange(compiler.DeclareFilePrototypes(fileCurrent, compileHeaders));
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.DeclareFilePrototypes");
+					lstStatements.AddRange(compiler.DeclareFilePrototypes(fileCurrent));
+				});
 
-			//──────────────────────────── Declare-Namespaces-2 ────────────────────
-			currentStage = "DeclareNamespaces2";
-			Logs.DebugLog.CreateTimer("CompileProject.DeclareNamespaces2");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
+				RunStage("DeclareNamespaces2", fileCurrent =>
 				{
 					foreach (NamespaceDefinition ns in fileCurrent.Namespaces)
 					{
 						NamespaceCompiler.Declare(ns, this);
 					}
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.DeclareNamespaces2");
+				});
 
-			//──────────────────────────── Declare-FileTypeOfs ─────────────────────
-			currentStage = "DeclareFileTypeOfs";
-			Logs.DebugLog.CreateTimer("CompileProject.DeclareFileTypeOfs");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
-				{
-					compiler.DeclareFileTypeOfs(fileCurrent);
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.DeclareFileTypeOfs");
+				RunStage("DeclareFileTypeOfs", fileCurrent => compiler.DeclareFileTypeOfs(fileCurrent));
+				RunStage("DefinePrototypeFields", fileCurrent => compiler.DefineFilePrototypeFields(fileCurrent));
+				RunStage("DeclarePrototypeFunctions", fileCurrent => compiler.DeclareFilePrototypeFunctions(fileCurrent));
+				RunStage("DeclareFileFunctions", fileCurrent => lstStatements.AddRange(compiler.DeclareFileFunctions(fileCurrent)));
+				RunStage("DeclareExternalVariables", fileCurrent => compiler.DeclareFileExternalVariables(fileCurrent));
+				RunStage("CompileFileFunctions", fileCurrent => lstStatements.AddRange(compiler.CompileFileFunctions(fileCurrent)));
 
-			//──────────────────────────── Define-PrototypeFields ──────────────────
-			currentStage = "DefinePrototypeFields";
-			Logs.DebugLog.CreateTimer("CompileProject.DefinePrototypeFields");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
-				{
-					compiler.DefineFilePrototypeFields(fileCurrent);
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.DefinePrototypeFields");
-
-			//──────────────────────────── Declare-PrototypeFunctions ──────────────
-			currentStage = "DeclarePrototypeFunctions";
-			Logs.DebugLog.CreateTimer("CompileProject.DeclarePrototypeFunctions");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
-				{
-					compiler.DeclareFilePrototypeFunctions(fileCurrent);
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.DeclarePrototypeFunctions");
-
-			//──────────────────────────── Declare-FileFunctions ───────────────────
-			currentStage = "DeclareFileFunctions";
-			Logs.DebugLog.CreateTimer("CompileProject.DeclareFileFunctions");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				lstStatements.AddRange(compiler.DeclareFileFunctions(fileCurrent));
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.DeclareFileFunctions");
-
-			//──────────────────────────── Declare-ExternalVariables ────────────────
-			currentStage = "DeclareExternalVariables";
-			Logs.DebugLog.CreateTimer("CompileProject.DeclareExternalVariables");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				compiler.DeclareFileExternalVariables(fileCurrent);
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.DeclareExternalVariables");
-
-			//──────────────────────────── Compile-FileFunctions ───────────────────
-			currentStage = "CompileFileFunctions";
-			Logs.DebugLog.CreateTimer("CompileProject.CompileFileFunctions");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
-				{
-					lstStatements.AddRange(compiler.CompileFileFunctions(fileCurrent));
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.CompileFileFunctions");
-
-			//──────────────────────────── Define-Namespaces ───────────────────────
-			currentStage = "DefineNamespaces";
-			Logs.DebugLog.CreateTimer("CompileProject.DefineNamespaces");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
+				RunStage("DefineNamespaces", fileCurrent =>
 				{
 					foreach (NamespaceDefinition ns in fileCurrent.Namespaces)
 					{
 						lstStatements.AddRange(NamespaceCompiler.Define(ns, this));
 					}
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.DefineNamespaces");
+				});
 
-			//──────────────────────────── Define-Prototypes ───────────────────────
-			currentStage = "DefinePrototypes";
-			Logs.DebugLog.CreateTimer("CompileProject.DefinePrototypes");
-			//if (!AllowParallelism)
-			//{
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
+				RunStage("DefinePrototypes", fileCurrent =>
 				{
 					lstStatements.AddRange(PrototypeCompiler.DefinePrototypes(fileCurrent, this));
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			//}
-			//else
-			//{
-			//	//This doesn't work because of ActiveScope
-			//	ConcurrentBag<Compiled.Statement> bagPrototypes = new ConcurrentBag<Compiled.Statement>();
+				});
 
-			//	Parallel.ForEach(lstFiles, fileCurrent =>
-			//	{
-			//		try
-			//		{
-			//			foreach (Compiled.Statement stmt in PrototypeCompiler.DefinePrototypes(fileCurrent, this))
-			//				bagPrototypes.Add(stmt);
-			//		}
-			//		catch (ProtoScriptCompilerException ex)
-			//		{
-			//			ex.m_strProtoScript = fileCurrent.RawCode;
-			//			ex.File = fileCurrent.Info?.FullName;
-			//			throw;
-			//		}
-			//	});
-
-			//	lstStatements.AddRange(bagPrototypes);
-			//}
-
-			Logs.DebugLog.WriteTimer("CompileProject.DefinePrototypes");
-
-			//──────────────────────────── Compile-Annotations ─────────────────────
-			currentStage = "CompileAnnotations";
-			Logs.DebugLog.CreateTimer("CompileProject.CompileAnnotations");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
+				RunStage("CompileAnnotations", fileCurrent =>
 				{
 					lstStatements.AddRange(compiler.CompileFileFunctionAnnotations(fileCurrent));
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.CompileAnnotations");
+				});
 
-			//──────────────────────────── Compile-Statements ──────────────────────
-			currentStage = "CompileStatements";
-			Logs.DebugLog.CreateTimer("CompileProject.CompileStatements");
-			foreach (File fileCurrent in activeFiles)
-			{
-				currentFile = fileCurrent;
-				try
+				RunStage("CompileStatements", fileCurrent =>
 				{
 					lstStatements.AddRange(compiler.CompileFileStatements(fileCurrent));
-				}
-				catch (ProtoScriptCompilerException ex)
-				{
-					ex.m_strProtoScript = fileCurrent.RawCode;
-					ex.File = fileCurrent.Info?.FullName;
-					throw;
-				}
-			}
-			Logs.DebugLog.WriteTimer("CompileProject.CompileStatements");
+				});
 
 			Logs.DebugLog.WriteTimer("CompileProject.CompileFileList");
 
@@ -718,27 +516,19 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 		public List<Compiled.Statement> DeclareFilePrototypes(ProtoScript.File file)
 		{
-			return DeclareFilePrototypes(file, true);
-		}
-
-		public List<Compiled.Statement> DeclareFilePrototypes(ProtoScript.File file, bool compileReferencesAndImports)
-		{
 			Compiler compiler = this;
 			compiler.Source = file.RawCode;
 
 			List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
 
-			if (compileReferencesAndImports)
+			foreach (ReferenceStatement statement in file.References)
 			{
-				foreach (ReferenceStatement statement in file.References)
-				{
-					compiler.Compile(statement);
-				}
+				compiler.Compile(statement);
+			}
 
-				foreach (ImportStatement statement in file.Imports)
-				{
-					compiler.Compile(statement);
-				}
+			foreach (ImportStatement statement in file.Imports)
+			{
+				compiler.Compile(statement);
 			}
 
 			foreach (PrototypeDefinition protoDef in file.PrototypeDefinitions)
@@ -756,29 +546,6 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 
 			return lstStatements;
-		}
-
-		private bool HasFatalReferenceOrImportDiagnostics(File fileCurrent, int diagnosticStart)
-		{
-			string currentFile = fileCurrent.Info?.FullName ?? string.Empty;
-			for (int i = diagnosticStart; i < Diagnostics.Count; i++)
-			{
-				CompilerDiagnostic diagnostic = Diagnostics[i];
-				string diagnosticFile = diagnostic.Statement?.Info?.File ?? diagnostic.Expression?.Info?.File ?? string.Empty;
-				if (!StringUtil.EqualNoCase(diagnosticFile, currentFile))
-					continue;
-
-				string message = diagnostic.Diagnostic?.Message ?? string.Empty;
-				if (message.StartsWith("Reference DLL not found", StringComparison.OrdinalIgnoreCase)
-					|| message.StartsWith("Could not load assembly", StringComparison.OrdinalIgnoreCase)
-					|| message.StartsWith("Assembly not referenced", StringComparison.OrdinalIgnoreCase)
-					|| (message.StartsWith("Type ", StringComparison.OrdinalIgnoreCase) && message.Contains(" not found in Assembly:", StringComparison.OrdinalIgnoreCase)))
-				{
-					return true;
-				}
-			}
-
-			return false;
 		}
 
 		public MethodEvaluation GetAnnotationMethodEvaluation(AnnotationExpression annotation)
