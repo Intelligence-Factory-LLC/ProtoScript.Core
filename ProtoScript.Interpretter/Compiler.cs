@@ -180,7 +180,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				List<File> activeFiles = new List<File>(lstFiles);
 				DisabledFiles.Clear();
 
-				bool TrySkipFailedFile(File fileCurrent, Exception err)
+				bool TrySkipFailedFile(File fileCurrent, string explanation)
 				{
 					if (ProjectCompilationMode != CompilationMode.BestEffort)
 						return false;
@@ -190,15 +190,24 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 						DisabledFiles.Add(filePath);
 
 					activeFiles.Remove(fileCurrent);
-					string explanation = err is ProtoScriptCompilerException exCompiler
-						? (string.IsNullOrWhiteSpace(exCompiler.Explanation) ? exCompiler.Message : exCompiler.Explanation)
-						: $"{err.GetType().Name}: {err.Message}";
-
 					this.AddDiagnostic(
 						$"Best-effort: skipped file after failure during {currentStage}: {filePath}. {explanation}",
 						null,
 						null);
 					return true;
+				}
+
+				bool TrySkipFailedFileFromException(File fileCurrent, Exception err)
+				{
+					string explanation = err is ProtoScriptCompilerException exCompiler
+						? (string.IsNullOrWhiteSpace(exCompiler.Explanation) ? exCompiler.Message : exCompiler.Explanation)
+						: $"{err.GetType().Name}: {err.Message}";
+					return TrySkipFailedFile(fileCurrent, explanation);
+				}
+
+				static string? GetDiagnosticFilePath(CompilerDiagnostic diagnostic)
+				{
+					return diagnostic.Statement?.Info?.File ?? diagnostic.Expression?.Info?.File;
 				}
 
 				void RunStage(string stageName, Action<File> action, Func<File, bool>? filter = null)
@@ -211,13 +220,14 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 							continue;
 
 						currentFile = fileCurrent;
+						int diagnosticsBefore = this.Diagnostics.Count;
 						try
 						{
 							action(fileCurrent);
 						}
 						catch (ProtoScriptCompilerException ex)
 						{
-							if (TrySkipFailedFile(fileCurrent, ex))
+							if (TrySkipFailedFileFromException(fileCurrent, ex))
 								continue;
 							ex.m_strProtoScript = fileCurrent.RawCode;
 							ex.File = fileCurrent.Info?.FullName;
@@ -225,9 +235,27 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 						}
 						catch (Exception err)
 						{
-							if (TrySkipFailedFile(fileCurrent, err))
+							if (TrySkipFailedFileFromException(fileCurrent, err))
 								continue;
 							throw;
+						}
+
+						if (ProjectCompilationMode == CompilationMode.BestEffort)
+						{
+							string filePath = fileCurrent.Info?.FullName ?? string.Empty;
+							for (int i = diagnosticsBefore; i < this.Diagnostics.Count; i++)
+							{
+								CompilerDiagnostic diagnostic = this.Diagnostics[i];
+								string? diagnosticFilePath = GetDiagnosticFilePath(diagnostic);
+								if (string.IsNullOrWhiteSpace(diagnosticFilePath))
+									continue;
+								if (!StringUtil.EqualNoCase(diagnosticFilePath, filePath))
+									continue;
+
+								string diagnosticMessage = diagnostic.Diagnostic?.Message ?? "Compiler diagnostic generated.";
+								TrySkipFailedFile(fileCurrent, "Compiler diagnostic: " + diagnosticMessage);
+								break;
+							}
 						}
 					}
 					Logs.DebugLog.WriteTimer("CompileProject." + stageName);
@@ -383,7 +411,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 						foreach (string path in paths)
 						{
-							File? sub = TryParse(path, bIgnoreErrors);
+							File? sub = TryParse(path, bIgnoreErrors, inc, fileCurrent);
 							if (sub != null)
 							{
 								if (seen.TryAdd(sub.Info.FullName, 0))
@@ -423,7 +451,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				{
 					foreach (string strFile in Directory.GetFiles(strRootDir, include.FileName, include.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
 					{
-						File? fileSub = TryParse(strFile, bIgnoreErrors);
+						File? fileSub = TryParse(strFile, bIgnoreErrors, include, file);
 						if (fileSub != null)
 						{
 							if (!lstFiles.Any(x => StringUtil.EqualNoCase(x.Info.FullName, fileSub.Info.FullName)))
@@ -449,7 +477,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				else
 				{
 					string path = FileUtil.BuildPath(strRootDir, include.FileName);
-					File? fileSub = TryParse(path, bIgnoreErrors);
+					File? fileSub = TryParse(path, bIgnoreErrors, include, file);
 					if (fileSub != null)
 					{
 						if (!lstFiles.Any(x => StringUtil.EqualNoCase(x.Info.FullName, fileSub.Info.FullName)))
@@ -476,7 +504,8 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 
 
-		static private ProtoScript.File ? TryParse(string strFile, bool bIgnoreErrors)
+		// Parse one include target and preserve include-site source location for missing-file diagnostics.
+		static private ProtoScript.File ? TryParse(string strFile, bool bIgnoreErrors, IncludeStatement? includeStatement = null, File? sourceFile = null)
 		{
 			try
 			{
@@ -491,10 +520,20 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			{
 				if (bIgnoreErrors)
 					return null;
-				Parsers.ProtoScriptParsingException ex = new Parsers.ProtoScriptParsingException("", 0, "");
-				ex.Explanation = "File does not exist: " + err.Message;
-				ex.File = strFile;
-				throw;
+
+				StatementParsingInfo info = includeStatement?.Info ?? new StatementParsingInfo
+				{
+					StartingOffset = 0,
+					Length = 1,
+					File = sourceFile?.Info?.FullName ?? strFile
+				};
+
+				string includePath = includeStatement?.FileName ?? strFile;
+				string explanation = "Included file does not exist: " + strFile + " (from include: " + includePath + ")";
+				ProtoScriptCompilerException wrapped = new ProtoScriptCompilerException(info, explanation);
+				wrapped.File = info.File ?? string.Empty;
+				wrapped.m_strProtoScript = sourceFile?.RawCode ?? string.Empty;
+				throw wrapped;
 			}
 			catch (Exception)
 			{
@@ -730,7 +769,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 						continue;
 					}
 
-					lstStatements.Add(compiler.Compile(statement));
+					Compiled.Statement? compiled = compiler.Compile(statement);
+					if (compiled != null)
+						lstStatements.Add(compiled);
 				}
 			}
 			finally
@@ -2463,7 +2504,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 				foreach (Statement statement in funcDef.Statements)
 				{
-					funcInfo.Statements.Add(Compile(statement));
+					Compiled.Statement? compiled = Compile(statement);
+					if (compiled != null)
+						funcInfo.Statements.Add(compiled);
 				}
 
 
@@ -2949,6 +2992,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				return loadedFromLocation;
 			}
 
+			if (TryGetLoadedAssemblyByIdentity(fullPath, out Assembly? loadedByIdentity))
+			{
+				loadedAssemblies[fingerprint] = loadedByIdentity;
+				Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=assembly-identity");
+				return loadedByIdentity;
+			}
+
 			if (!System.IO.File.Exists(fullPath))
 				throw new FileNotFoundException("Assembly path not found.", fullPath);
 
@@ -2983,6 +3033,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					loadedAssemblies[dependencyFingerprint] = loadedDependencyByLocation;
 					Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=exact-location");
 					return loadedDependencyByLocation;
+				}
+
+				if (TryGetLoadedAssemblyByIdentity(requestedName, out Assembly? loadedDependencyByIdentity))
+				{
+					loadedAssemblies[dependencyFingerprint] = loadedDependencyByIdentity;
+					Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=assembly-identity");
+					return loadedDependencyByIdentity;
 				}
 
 				string shadowDependencyPath = Path.Combine(shadowDirectory, requestedName.Name + ".dll");
@@ -3107,6 +3164,43 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			return false;
 		}
 
+		private static bool TryGetLoadedAssemblyByIdentity(string requestedFullPath, out Assembly? assembly)
+		{
+			try
+			{
+				AssemblyName requestedName = AssemblyName.GetAssemblyName(requestedFullPath);
+				return TryGetLoadedAssemblyByIdentity(requestedName, out assembly);
+			}
+			catch
+			{
+				assembly = null;
+				return false;
+			}
+		}
+
+		private static bool TryGetLoadedAssemblyByIdentity(AssemblyName requestedName, out Assembly? assembly)
+		{
+			foreach (Assembly loaded in AppDomain.CurrentDomain.GetAssemblies())
+			{
+				try
+				{
+					AssemblyName loadedName = loaded.GetName();
+					if (AssemblyName.ReferenceMatchesDefinition(requestedName, loadedName))
+					{
+						assembly = loaded;
+						return true;
+					}
+				}
+				catch
+				{
+					// Ignore dynamic or inaccessible assemblies and continue scanning.
+				}
+			}
+
+			assembly = null;
+			return false;
+		}
+
 		public void Compile(ImportStatement statement)
 		{
 			System.Reflection.Assembly ? assembly;
@@ -3179,7 +3273,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 				foreach (Statement statement in statements)
 				{
-					compiled.Add(Compile(statement));
+					Compiled.Statement? compiledStatement = Compile(statement);
+					if (compiledStatement != null)
+						compiled.Add(compiledStatement);
 				}
 			}
 			finally
@@ -3201,7 +3297,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 				foreach (Statement statement in statements.Statements)
 				{
-					compiled.Add(Compile(statement));
+					Compiled.Statement? compiledStatement = Compile(statement);
+					if (compiledStatement != null)
+						compiled.Add(compiledStatement);
 				}
 			}
 			finally

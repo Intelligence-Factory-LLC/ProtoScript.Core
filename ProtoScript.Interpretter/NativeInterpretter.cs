@@ -508,6 +508,9 @@ namespace ProtoScript.Interpretter
 
 			foreach (Compiled.Statement statement in statements)
 			{
+				if (statement == null)
+					continue;
+
 				try
 				{
 					Evaluate(statement);
@@ -535,6 +538,9 @@ namespace ProtoScript.Interpretter
 
 		virtual public bool Evaluate(Compiled.Statement statement)
 		{
+			if (statement == null)
+				return false;
+
 			try
 			{
 				if (statement is Compiled.VariableDeclaration)

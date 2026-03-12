@@ -94,5 +94,36 @@ reference ""{parsersAssemblyPath}"" AliasB;
 			Assert.IsTrue(compiler.References.ContainsKey("ParsersAsm"));
 			Assert.AreEqual(Path.GetFullPath(parsersAssemblyFullPath), statement.ResolvedAssemblyPath);
 		}
+
+		[TestMethod]
+		public void CompileReferencePath_UsesAlreadyLoadedAssemblyByIdentity()
+		{
+			string sourceAssemblyPath = typeof(Files).Assembly.Location;
+			string tempDir = Path.Combine(Path.GetTempPath(), "ProtoScriptRefIdentity_" + Guid.NewGuid().ToString("N"));
+			Directory.CreateDirectory(tempDir);
+			try
+			{
+				string copiedAssemblyPath = Path.Combine(tempDir, Path.GetFileName(sourceAssemblyPath));
+				System.IO.File.Copy(sourceAssemblyPath, copiedAssemblyPath, true);
+
+				string code = $@"
+reference ""{copiedAssemblyPath.Replace("\\", "/")}"" CopiedAsm;
+import CopiedAsm ProtoScript.Parsers.Files FilesParser;
+";
+				ProtoScript.File file = Files.ParseFileContents(code);
+				Compiler compiler = new Compiler();
+				compiler.Initialize();
+				compiler.Compile(file);
+
+				Assert.AreEqual(0, compiler.Diagnostics.Count);
+				Assert.IsTrue(compiler.References.TryGetValue("CopiedAsm", out object? loadedObj));
+				Assert.AreSame(typeof(Files).Assembly, loadedObj as Assembly);
+			}
+			finally
+			{
+				if (Directory.Exists(tempDir))
+					Directory.Delete(tempDir, true);
+			}
+		}
 	}
 }
