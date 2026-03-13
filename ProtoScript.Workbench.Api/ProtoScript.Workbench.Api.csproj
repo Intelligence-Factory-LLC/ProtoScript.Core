@@ -40,5 +40,6 @@
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' != 'Release'">
 		<Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(MSBuildProjectDirectory)\..\Deploy\$(ProjectName).dll&quot;" />
+		<Exec Command="call &quot;$(MSBuildProjectDirectory)\..\Scripts\update_dlls.bat&quot;" />
 	</Target>
 </Project>
