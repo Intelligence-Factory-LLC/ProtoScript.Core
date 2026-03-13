@@ -101,7 +101,12 @@ namespace ProtoScript.Parsers
 							int saveCursor = tok.getCursor();
 							if (ProtoScript.Parsers.IncludeStatements.TryParseImportAsInclude(tok, out ProtoScript.IncludeStatement includeStatement))
 							{
-								result.Includes.Add(includeStatement);
+								// File-path imports are intentionally rejected to keep import/include contracts explicit.
+								throw new ProtoScriptParsingException(
+									tok.getString(),
+									saveCursor,
+									"assembly alias",
+									$"Import statements cannot target files. Use include \"{includeStatement.FileName}\"; instead.");
 							}
 							else
 							{
