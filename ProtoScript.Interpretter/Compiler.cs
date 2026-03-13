@@ -2661,6 +2661,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 		public Compiled.Expression Compile(MethodEvaluation methodEval)
 		{
+			// Guard malformed method-evaluation nodes so we produce diagnostics instead of runtime null-reference failures.
+			if (methodEval == null || string.IsNullOrWhiteSpace(methodEval.MethodName))
+			{
+				this.AddDiagnostic(new Diagnostic("Invalid method evaluation: method name is missing."), null, methodEval);
+				return null;
+			}
+
 			if (methodEval.MethodName.Contains("."))
 			{
 				string strIdentifier = StringUtil.LeftOfLast(methodEval.MethodName, ".");
@@ -2681,6 +2688,12 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				{
 					if (methodEval.MethodName == "nameof")
 					{
+						if (methodEval.Parameters.Count == 0)
+						{
+							this.AddDiagnostic(new Diagnostic("nameof requires one parameter."), null, methodEval);
+							return null;
+						}
+
 						string strValue = methodEval.Parameters[0].ToString();
 						if (strValue == "that")
 						{
@@ -2721,7 +2734,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				FunctionEvaluation info = new FunctionEvaluation();
 				info.Parameters = lstParameters;
 
-				FunctionRuntimeInfo functionRuntimeInfo = (obj as FunctionRuntimeInfo);
+				FunctionRuntimeInfo? functionRuntimeInfo = obj as FunctionRuntimeInfo;
+				if (functionRuntimeInfo == null)
+				{
+					string symbolTypeName = obj.GetType().Name;
+					this.AddDiagnostic(new Diagnostic($"Cannot call symbol {methodEval.MethodName}: symbol type {symbolTypeName} is not a function."), null, methodEval);
+					return null;
+				}
 
 				//TODO: allow for function overloading here
 				if (info.Parameters.Count != functionRuntimeInfo.Parameters.Count)

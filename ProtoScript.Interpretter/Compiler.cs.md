@@ -7,3 +7,7 @@
 ## StringRef Built-in Type Registration (2026-03-13)
 - Added built-in type aliases `StringRef` and `stringref` during compiler initialization.
 - Design Decision: expose string-reference return/parameter contracts without requiring project-level imports.
+
+## Method Evaluation Null-Guard Diagnostics (2026-03-13)
+- Hardened `Compile(MethodEvaluation)` to report diagnostics when method name is missing, `nameof` has no parameters, or a non-function symbol is invoked.
+- Design Decision: convert prior `NullReferenceException` crash paths into actionable compiler diagnostics with statement context so best-effort mode can skip offending files cleanly.

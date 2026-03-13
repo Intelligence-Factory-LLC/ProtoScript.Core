@@ -1846,8 +1846,7 @@ namespace ProtoScript.Interpretter
 
 		private Scope GetFunctionEvaluationScope2(FunctionRuntimeInfo infoFunc, List<object> lstParameters)
 		{
-			///Evaluate each parameter and add it to a new cloned scope for running the function 
-			///
+			// Evaluate each parameter and bind it into a cloned function scope with detailed assignment diagnostics.
 			Scope scope = infoFunc.Scope.Clone();
 
 			for (int i = 0; i < lstParameters.Count; i++)
@@ -1855,7 +1854,24 @@ namespace ProtoScript.Interpretter
 				object oParamValue = lstParameters[i];
 				ParameterRuntimeInfo infoParam = (ParameterRuntimeInfo)infoFunc.Parameters[i].Clone();
 
-				infoParam.Value = MakeAssignable(oParamValue, infoParam.Type, infoFunc.Info);
+				try
+				{
+					infoParam.Value = MakeAssignable(oParamValue, infoParam.Type, infoFunc.Info);
+				}
+				catch (RuntimeException err) when (err.Message == "Cannot assign value")
+				{
+					string functionName = string.IsNullOrWhiteSpace(infoFunc.FunctionName)
+						? "(unknown)"
+						: infoFunc.FunctionName;
+					string parameterName = string.IsNullOrWhiteSpace(infoParam.ParameterName)
+						? $"arg{i}"
+						: infoParam.ParameterName;
+					string expectedType = infoParam.Type?.ToString() ?? "(unknown)";
+					string actualType = oParamValue?.GetType().FullName ?? "null";
+					string actualValue = DescribeValueForDiagnostic(oParamValue);
+					string detail = $"Cannot assign value for function '{functionName}' parameter '{parameterName}' at index {i}. Expected {expectedType}, got {actualType} value={actualValue}.";
+					throw new RuntimeException(detail, err.Info ?? infoFunc.Info, err);
+				}
 
 				scope.Stack[infoParam.Index] = infoParam;
 			}
@@ -1871,6 +1887,43 @@ namespace ProtoScript.Interpretter
 			//}
 
 			return scope;
+		}
+
+		private static string DescribeValueForDiagnostic(object? value)
+		{
+			if (value == null)
+				return "null";
+
+			if (value is string str)
+			{
+				if (str.Length > 80)
+					return "\"" + str.Substring(0, 80) + "...\"";
+				return "\"" + str + "\"";
+			}
+
+			if (value is PrototypeTypeInfo prototypeTypeInfo)
+				return "PrototypeTypeInfo(" + (prototypeTypeInfo.Prototype?.PrototypeName ?? "null") + ")";
+
+			if (value is FunctionRuntimeInfo functionRuntimeInfo)
+				return "FunctionRuntimeInfo(" + functionRuntimeInfo.FunctionName + ")";
+
+			if (value is Prototype prototype)
+				return "Prototype(" + prototype.PrototypeName + ")";
+
+			if (value is ValueRuntimeInfo valueRuntimeInfo)
+				return "ValueRuntimeInfo(" + (valueRuntimeInfo.Type?.ToString() ?? "unknown") + ")";
+
+			try
+			{
+				string text = value.ToString() ?? value.GetType().Name;
+				if (text.Length > 80)
+					text = text.Substring(0, 80) + "...";
+				return text;
+			}
+			catch
+			{
+				return value.GetType().Name;
+			}
 		}
 
 		public Prototype? RunMethodAsPrototype(Prototype? protoInstance, string strMethodName, List<object> lstParameters)
