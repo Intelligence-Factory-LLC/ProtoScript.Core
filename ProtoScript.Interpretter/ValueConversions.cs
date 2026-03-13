@@ -34,6 +34,25 @@ namespace ProtoScript.Interpretter
 			if (targetType.IsAssignableFrom(unwrapped.GetType()))
 				return unwrapped;
 
+			if (unwrapped is StringReference stringReference)
+			{
+				if (targetType == typeof(string))
+				{
+					if (stringReference.TryResolveString(out string? strValue))
+						return strValue;
+				}
+				else if (targetType == typeof(Prototype))
+				{
+					if (stringReference.TryResolvePrototype(out Prototype? prototypeValue))
+						return prototypeValue;
+				}
+				else if (targetType == typeof(StringWrapper))
+				{
+					if (stringReference.TryResolvePrototype(out Prototype? wrapperPrototype))
+						return new StringWrapper(wrapperPrototype!);
+				}
+			}
+
 			if (unwrapped is Prototype prototype)
 			{
 				object? convertedPrototype = ConvertPrototypeToPrimitive(prototype, targetType);
@@ -73,6 +92,12 @@ namespace ProtoScript.Interpretter
 			Prototype? asPrototype = SimpleInterpretter.GetAsPrototype(unwrapped);
 			if (asPrototype != null)
 				return asPrototype;
+
+			if (unwrapped is StringReference stringReference)
+			{
+				if (stringReference.TryResolvePrototype(out Prototype? referencedPrototype))
+					return referencedPrototype;
+			}
 
 			if (unwrapped is string str)
 				return StringWrapper.ToPrototype(str);
@@ -267,10 +292,25 @@ namespace ProtoScript.Interpretter
 
 				if (infoTarget.Type == typeof(string))
 					return true;
+
+				if (infoTarget.Type == typeof(StringReference))
+					return true;
 			}
 
 			if (infoSource.Type == typeof(string) && infoTarget.Type == typeof(StringWrapper))
 				return true;
+
+			if (infoSource.Type == typeof(string) && infoTarget.Type == typeof(StringReference))
+				return true;
+
+			if (infoSource.Type == typeof(StringReference))
+			{
+				if (infoTarget.Type == typeof(string) || infoTarget.Type == typeof(StringWrapper) || infoTarget.Type == typeof(StringReference))
+					return true;
+
+				if (infoTarget is PrototypeTypeInfo targetPrototypeType && Prototypes.TypeOf(targetPrototypeType.Prototype, System_String.Prototype))
+					return true;
+			}
 
 			if (infoSource.Type == typeof(BoolWrapper))
 			{
@@ -382,6 +422,60 @@ namespace ProtoScript.Interpretter
 			if (value == null)
 				return false;
 
+			if (value is StringReference stringReferenceValue)
+			{
+				if (effectiveType == typeof(StringReference))
+				{
+					converted = stringReferenceValue;
+					return true;
+				}
+
+				if (effectiveType == typeof(string))
+				{
+					if (stringReferenceValue.TryResolveString(out string? stringValue))
+					{
+						converted = stringValue;
+						return true;
+					}
+
+					return false;
+				}
+
+				if (effectiveType == typeof(StringWrapper))
+				{
+					if (stringReferenceValue.TryResolvePrototype(out Prototype? wrappedPrototype))
+					{
+						converted = new StringWrapper(wrappedPrototype!);
+						return true;
+					}
+
+					return false;
+				}
+
+				if (effectiveType == typeof(Prototype))
+				{
+					if (stringReferenceValue.TryResolvePrototype(out Prototype? resolvedPrototype))
+					{
+						converted = resolvedPrototype;
+						return true;
+					}
+
+					return false;
+				}
+
+				if (targetTypeInfo is PrototypeTypeInfo stringPrototypeType
+					&& Prototypes.TypeOf(stringPrototypeType.Prototype, System_String.Prototype))
+				{
+					if (stringReferenceValue.TryResolvePrototype(out Prototype? resolvedStringPrototype))
+					{
+						converted = resolvedStringPrototype;
+						return true;
+					}
+
+					return false;
+				}
+			}
+
 			if (value is Prototype prototype)
 			{
 				if (TryConvertPrototype(prototype, targetTypeInfo, effectiveType, out converted))
@@ -408,6 +502,12 @@ namespace ProtoScript.Interpretter
 
 			if (value is string str)
 			{
+				if (effectiveType == typeof(StringReference))
+				{
+					converted = StringReference.FromString(str);
+					return true;
+				}
+
 				if (effectiveType == typeof(StringWrapper))
 				{
 					converted = new StringWrapper(str);
@@ -527,6 +627,12 @@ namespace ProtoScript.Interpretter
 				return true;
 			}
 
+			if (effectiveType == typeof(StringReference) && Prototypes.TypeOf(prototype, System_String.Prototype))
+			{
+				converted = new StringReference(prototype.PrototypeName);
+				return true;
+			}
+
 			if (targetTypeInfo is PrototypeTypeInfo targetPrototypeTypeInfo && Prototypes.TypeOf(prototype, targetPrototypeTypeInfo.Prototype))
 			{
 				converted = prototype;
@@ -604,6 +710,9 @@ namespace ProtoScript.Interpretter
 		{
 			try
 			{
+				if (targetType == typeof(StringReference) && Prototypes.TypeOf(prototype, System_String.Prototype))
+					return new StringReference(prototype.PrototypeName);
+
 				if (targetType == typeof(string) && Prototypes.TypeOf(prototype, System_String.Prototype))
 					return StringWrapper.ToString(prototype);
 

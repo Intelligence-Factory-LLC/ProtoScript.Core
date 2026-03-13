@@ -1993,6 +1993,17 @@ namespace ProtoScript.Interpretter
 					if (oReturn is ValueRuntimeInfo valueRuntimeInfo)
 						oReturn = valueRuntimeInfo.Value;
 
+					// Only coerce string boundary contracts on external invocation; keep legacy return semantics for other types.
+					if (oReturn != null
+						&& (infoFunc.ReturnType.Type == typeof(StringReference)
+							|| infoFunc.ReturnType.Type == typeof(string))
+						&& oReturn.GetType() != infoFunc.ReturnType.Type)
+					{
+						object? converted;
+						if (ValueConversions.TryMakeAssignable(oReturn, infoFunc.ReturnType, out converted))
+							oReturn = converted;
+					}
+
 					if (oReturn is UninitializedReturn)
 						throw new RuntimeException("Method did not return a value", infoFunc.Info);
 				}

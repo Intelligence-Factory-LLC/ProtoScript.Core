@@ -115,6 +115,8 @@ namespace ProtoScript.Interpretter
 			this.Symbols.InsertSymbol("bool", new TypeInfo(typeof(bool)));
 			this.Symbols.InsertSymbol("string", new TypeInfo(typeof(string)));
 			this.Symbols.InsertSymbol("int", new TypeInfo(typeof(int)));
+			this.Symbols.InsertSymbol("StringRef", new TypeInfo(typeof(StringReference)));
+			this.Symbols.InsertSymbol("stringref", new TypeInfo(typeof(StringReference)));
 			this.Symbols.InsertSymbol("Function", new TypeInfo(typeof(FunctionRuntimeInfo)));
 
 			//Default imports
