@@ -692,6 +692,10 @@ namespace ProtoScript.Extensions
 				{
 					result.Result = JsonUtil.ToFriendlyJSON(jsonArray).ToString();
 				}
+				else if (obj is StringReference stringReference)
+				{
+					result.Result = stringReference.PrototypeName;
+				}
 				else
 				{
 					Prototype? protoValue = session.Interpretter.GetOrConvertToPrototype(obj);

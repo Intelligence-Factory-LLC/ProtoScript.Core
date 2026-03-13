@@ -38,9 +38,57 @@ function ReturnRef() : StringRef
 			Assert.IsNotNull(result);
 			Assert.IsInstanceOfType<StringReference>(result);
 			StringReference handle = (StringReference)result!;
+			Assert.IsTrue(handle.PrototypeName.StartsWith("System.String[ref:", StringComparison.Ordinal));
+			Assert.IsTrue(handle.PrototypeName.EndsWith("]", StringComparison.Ordinal));
 			Assert.IsFalse(string.IsNullOrWhiteSpace(handle.PrototypeName));
 			Assert.IsTrue(handle.TryResolveString(out string? resolvedValue));
 			Assert.AreEqual("Large payload for handle", resolvedValue);
+		}
+
+		// Purpose: Handle text must not leak secret payload fragments.
+		[TestMethod]
+		public void ReturnTypeStringRef_DoesNotLeakSecretInHandle()
+		{
+			string secret = "sk_live_super_secret_value_123";
+			string code = @"
+function ReturnRef(string value) : StringRef
+{
+	return value;
+}
+";
+			NativeInterpretter interpretter = BuildInterpreter(code);
+			object? result = interpretter.RunMethodAsObject(null, "ReturnRef", new List<object> { secret });
+
+			Assert.IsNotNull(result);
+			Assert.IsInstanceOfType<StringReference>(result);
+			StringReference handle = (StringReference)result!;
+			Assert.IsTrue(handle.PrototypeName.StartsWith("System.String[ref:", StringComparison.Ordinal));
+			Assert.IsFalse(handle.PrototypeName.Contains(secret, StringComparison.Ordinal));
+			Assert.IsTrue(handle.TryResolveString(out string? resolvedValue));
+			Assert.AreEqual(secret, resolvedValue);
+		}
+
+		// Purpose: Large payloads should return bounded opaque handles and still resolve.
+		[TestMethod]
+		public void ReturnTypeStringRef_LargePayload_ReturnsBoundedOpaqueHandle()
+		{
+			string payload = new string('x', 1024 * 1024);
+			string code = @"
+function ReturnRef(string value) : StringRef
+{
+	return value;
+}
+";
+			NativeInterpretter interpretter = BuildInterpreter(code);
+			object? result = interpretter.RunMethodAsObject(null, "ReturnRef", new List<object> { payload });
+
+			Assert.IsNotNull(result);
+			Assert.IsInstanceOfType<StringReference>(result);
+			StringReference handle = (StringReference)result!;
+			Assert.IsTrue(handle.PrototypeName.StartsWith("System.String[ref:", StringComparison.Ordinal));
+			Assert.IsTrue(handle.PrototypeName.Length < 96);
+			Assert.IsTrue(handle.TryResolveString(out string? resolvedValue));
+			Assert.AreEqual(payload, resolvedValue);
 		}
 
 		// Purpose: Passing StringRef into a function expecting string should auto-resolve to text.
