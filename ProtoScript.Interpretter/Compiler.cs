@@ -2862,7 +2862,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				}
 				catch (Exception err)
 				{
-					this.AddDiagnostic(new Diagnostic($"Could not load assembly from path {fullPath}: {err.Message}"), statement, null);
+					string message = $"Could not load assembly from path {fullPath}: {err.Message}"
+						+ BuildAssemblyLoadFailureDetails(fullPath, err);
+					this.AddDiagnostic(new Diagnostic(message), statement, null);
 					return;
 				}
 			}
@@ -2895,6 +2897,131 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				statement.Reference = assembly.GetName().Name ?? statement.AssemblyName;
 
 			References[statement.Reference] = assembly;
+		}
+
+		private static string BuildAssemblyLoadFailureDetails(string fullPath, Exception err)
+		{
+			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			sb.Append(" | details: path=").Append(fullPath);
+
+			try
+			{
+				FileInfo info = new FileInfo(fullPath);
+				sb.Append(", exists=").Append(info.Exists ? "true" : "false");
+				if (info.Exists)
+				{
+					sb.Append(", length=").Append(info.Length);
+					sb.Append(", lastWriteUtc=").Append(info.LastWriteTimeUtc.ToString("O"));
+				}
+			}
+			catch (Exception fileInfoErr)
+			{
+				sb.Append(", exists=unknown");
+				sb.Append(", fileInfoError=").Append(fileInfoErr.GetType().Name).Append(": ").Append(fileInfoErr.Message);
+			}
+
+			sb.Append(", exceptionType=").Append(err.GetType().FullName ?? err.GetType().Name);
+			sb.Append(", exceptionMessage=").Append(err.Message);
+
+			string innerChain = FormatInnerExceptionChain(err, 3);
+			if (!string.IsNullOrWhiteSpace(innerChain))
+			{
+				sb.Append(", innerExceptions=").Append(innerChain);
+			}
+
+			string probeHint = TryGetProbeHint(err);
+			if (!string.IsNullOrWhiteSpace(probeHint))
+			{
+				sb.Append(", probeHint=").Append(probeHint);
+			}
+
+			return sb.ToString();
+		}
+
+		private static string FormatInnerExceptionChain(Exception err, int maxDepth)
+		{
+			if (maxDepth <= 0)
+				return string.Empty;
+
+			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			int depth = 0;
+			Exception? current = err.InnerException;
+			while (current != null && depth < maxDepth)
+			{
+				if (depth > 0)
+					sb.Append(" -> ");
+
+				sb.Append('[')
+					.Append(depth + 1)
+					.Append("] ")
+					.Append(current.GetType().Name)
+					.Append(": ")
+					.Append(current.Message);
+
+				current = current.InnerException;
+				depth++;
+			}
+
+			return sb.ToString();
+		}
+
+		private static string TryGetProbeHint(Exception err)
+		{
+			string? missingDependency = null;
+			string? fusionLog = null;
+
+			Exception? current = err;
+			int depth = 0;
+			while (current != null && depth < 8)
+			{
+				if (current is FileNotFoundException fnf && !string.IsNullOrWhiteSpace(fnf.FileName))
+				{
+					missingDependency = fnf.FileName;
+				}
+
+				if (string.IsNullOrWhiteSpace(fusionLog))
+				{
+					try
+					{
+						PropertyInfo? fusionProp = current.GetType().GetProperty("FusionLog", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+						if (fusionProp != null && fusionProp.PropertyType == typeof(string))
+						{
+							string? fusionValue = fusionProp.GetValue(current) as string;
+							if (!string.IsNullOrWhiteSpace(fusionValue))
+								fusionLog = fusionValue;
+						}
+					}
+					catch
+					{
+						// Ignore reflection issues and continue probing.
+					}
+				}
+
+				current = current.InnerException;
+				depth++;
+			}
+
+			if (string.IsNullOrWhiteSpace(missingDependency) && string.IsNullOrWhiteSpace(fusionLog))
+				return string.Empty;
+
+			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			if (!string.IsNullOrWhiteSpace(missingDependency))
+			{
+				sb.Append("missingDependency=").Append(missingDependency);
+			}
+
+			if (!string.IsNullOrWhiteSpace(fusionLog))
+			{
+				if (sb.Length > 0)
+					sb.Append("; ");
+
+				string normalizedFusion = fusionLog.Replace("\r", " ").Replace("\n", " ").Trim();
+				if (normalizedFusion.Length > 500)
+					normalizedFusion = normalizedFusion.Substring(0, 500) + "...";
+				sb.Append("fusionLog=").Append(normalizedFusion);
+			}
+
+			return sb.ToString();
 		}
 
 		private static bool LooksLikeAssemblyPath(string assemblyName)
