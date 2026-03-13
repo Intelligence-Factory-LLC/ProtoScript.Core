@@ -39,7 +39,7 @@ namespace ProtoScript.Tests
 		}
 
 		[TestMethod]
-		public void ParseProject_SupportsImportPathAlias_WithForwardSlashPath()
+		public void ParseProject_RejectsImportPathAlias_WithForwardSlashPath()
 		{
 			string tempDir = CreateTempDirectory();
 			try
@@ -56,8 +56,12 @@ namespace ProtoScript.Tests
 					ProjectPath = projectPath
 				});
 
-				Assert.AreEqual(ProtoScriptValidationExitCodes.Success, response.ExitCode);
-				Assert.IsTrue(response.Summary.FileCount >= 2);
+				Assert.AreEqual(ProtoScriptValidationExitCodes.ValidationFailed, response.ExitCode);
+				Assert.IsTrue(response.Diagnostics.Any(x =>
+					x.Category == "parse"
+					&& x.Code == "PS1001"
+					&& x.Message.Contains("cannot target files", StringComparison.OrdinalIgnoreCase)
+					&& x.Message.Contains("Use include", StringComparison.OrdinalIgnoreCase)));
 			}
 			finally
 			{

@@ -38,30 +38,36 @@ namespace ProtoScript.Tests
 		}
 
 		[TestMethod]
-		public void ParseFile_WithImportPathAlias_AddsInclude()
+		public void ParseFile_WithImportPathAlias_ThrowsHelpfulError()
 		{
-			ProtoScript.File file = ProtoScript.Parsers.Files.ParseFileContents("import Path/File.pts;");
-			Assert.AreEqual(1, file.Includes.Count);
-			Assert.AreEqual(0, file.Imports.Count);
-			Assert.AreEqual("Path/File.pts", file.Includes[0].FileName);
+			ProtoScriptParsingException err = Assert.ThrowsException<ProtoScriptParsingException>(() =>
+				ProtoScript.Parsers.Files.ParseFileContents("import Path/File.pts;"));
+
+			Assert.AreEqual("assembly alias", err.Expected);
+			Assert.IsTrue(err.Explanation?.Contains("cannot target files", StringComparison.OrdinalIgnoreCase) ?? false);
+			Assert.IsTrue(err.Explanation?.Contains("Use include", StringComparison.OrdinalIgnoreCase) ?? false);
 		}
 
 		[TestMethod]
-		public void ParseFile_WithImportPathAlias_BackslashPath_AddsInclude()
+		public void ParseFile_WithImportPathAlias_BackslashPath_ThrowsHelpfulError()
 		{
-			ProtoScript.File file = ProtoScript.Parsers.Files.ParseFileContents("import Path\\File.pts;");
-			Assert.AreEqual(1, file.Includes.Count);
-			Assert.AreEqual(0, file.Imports.Count);
-			Assert.AreEqual("Path\\File.pts", file.Includes[0].FileName);
+			ProtoScriptParsingException err = Assert.ThrowsException<ProtoScriptParsingException>(() =>
+				ProtoScript.Parsers.Files.ParseFileContents("import Path\\File.pts;"));
+
+			Assert.AreEqual("assembly alias", err.Expected);
+			Assert.IsTrue(err.Explanation?.Contains("cannot target files", StringComparison.OrdinalIgnoreCase) ?? false);
+			Assert.IsTrue(err.Explanation?.Contains("Use include", StringComparison.OrdinalIgnoreCase) ?? false);
 		}
 
 		[TestMethod]
-		public void ParseFile_WithImportPathAlias_FileNameOnly_AddsInclude()
+		public void ParseFile_WithImportPathAlias_FileNameOnly_ThrowsHelpfulError()
 		{
-			ProtoScript.File file = ProtoScript.Parsers.Files.ParseFileContents("import File.pts;");
-			Assert.AreEqual(1, file.Includes.Count);
-			Assert.AreEqual(0, file.Imports.Count);
-			Assert.AreEqual("File.pts", file.Includes[0].FileName);
+			ProtoScriptParsingException err = Assert.ThrowsException<ProtoScriptParsingException>(() =>
+				ProtoScript.Parsers.Files.ParseFileContents("import File.pts;"));
+
+			Assert.AreEqual("assembly alias", err.Expected);
+			Assert.IsTrue(err.Explanation?.Contains("cannot target files", StringComparison.OrdinalIgnoreCase) ?? false);
+			Assert.IsTrue(err.Explanation?.Contains("Use include", StringComparison.OrdinalIgnoreCase) ?? false);
 		}
 
 		[TestMethod]
