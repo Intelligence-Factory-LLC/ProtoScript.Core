@@ -58,6 +58,22 @@ namespace ProtoScript.Interpretter
 			Diagnostics.Add(new CompilerDiagnostic() { Diagnostic = new Diagnostic(strMessage), Statement = statement, Expression = expression });
 		}
 
+		private void RegisterBestEffortFileSkip(string filePath, string explanation)
+		{
+			if (ProjectCompilationMode != CompilationMode.BestEffort)
+				return;
+
+			if (string.IsNullOrWhiteSpace(filePath))
+				return;
+
+			if (!DisabledFiles.Any(x => StringUtil.EqualNoCase(x, filePath)))
+			{
+				DisabledFiles.Add(filePath);
+			}
+
+			this.AddDiagnostic($"Best-effort: skipped file after failure during include parse: {filePath}. {explanation}", null, null);
+		}
+
 		private TypeInfo ResolveTypeInfo(ProtoScript.Type type, Statement? statement, Expression? expression)
 		{
 			if (null == type)
@@ -144,26 +160,87 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			Compiler compiler = this;
 
 			File file = ProtoScript.Parsers.Files.Parse(strProjectFile);
+			bool bIgnoreIncludeErrors = ProjectCompilationMode == CompilationMode.BestEffort;
+			ConcurrentDictionary<string, string> includeParseFailures = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 			Logs.DebugLog.CreateTimer("CompileProject.ParseFiles");
 
-			List<File> lstFiles = GetAllIncludedFiles(file, AllowParallelism);
+			List<File> lstFiles = GetAllIncludedFiles(
+				file,
+				AllowParallelism,
+				bIgnoreIncludeErrors,
+				(path, err) =>
+				{
+					string explanation = string.IsNullOrWhiteSpace(err?.Message)
+						? "Included file failed to parse"
+						: err.Message;
+
+					includeParseFailures.TryAdd(path, explanation);
+				});
 			lstFiles.Remove(file);
 			lstFiles.Insert(0, file);
 
+			if (bIgnoreIncludeErrors)
+			{
+				HashSet<string> failedIncludePaths = new HashSet<string>(includeParseFailures.Keys, StringComparer.OrdinalIgnoreCase);
+				lstFiles = lstFiles.Where(fileIncluded =>
+					!failedIncludePaths.Contains(fileIncluded.Info?.FullName ?? string.Empty)).ToList();
+			}
+
 			Logs.DebugLog.WriteTimer("CompileProject.ParseFiles");
 
-			return CompileFileList(lstFiles);
+			List<Compiled.Statement> statements = CompileFileList(lstFiles);
+
+			if (bIgnoreIncludeErrors)
+			{
+				foreach (var includeFailure in includeParseFailures)
+				{
+					compiler.RegisterBestEffortFileSkip(includeFailure.Key, includeFailure.Value);
+				}
+			}
+
+			return statements;
 		}
 
 		//>Compile a single file
 		public List<Compiled.Statement> CompileSingleFile(string strFilePath)
 		{
 			File file = ProtoScript.Parsers.Files.Parse(strFilePath);
-			List<File> lstFiles = new List<File> { file };
-			lstFiles.AddRange(GetAllIncludedFiles(file, AllowParallelism));
+			bool bIgnoreIncludeErrors = ProjectCompilationMode == CompilationMode.BestEffort;
+			ConcurrentDictionary<string, string> includeParseFailures = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-			return CompileFileList(lstFiles);
+			List<File> lstFiles = new List<File> { file };
+			lstFiles.AddRange(GetAllIncludedFiles(
+				file,
+				AllowParallelism,
+				bIgnoreIncludeErrors,
+				(path, err) =>
+				{
+					string explanation = string.IsNullOrWhiteSpace(err?.Message)
+						? "Included file failed to parse"
+						: err.Message;
+
+					includeParseFailures.TryAdd(path, explanation);
+				}));
+
+			if (bIgnoreIncludeErrors)
+			{
+				HashSet<string> failedIncludePaths = new HashSet<string>(includeParseFailures.Keys, StringComparer.OrdinalIgnoreCase);
+				lstFiles = lstFiles.Where(fileIncluded =>
+					!failedIncludePaths.Contains(fileIncluded.Info?.FullName ?? string.Empty)).ToList();
+			}
+
+			List<Compiled.Statement> statements = CompileFileList(lstFiles);
+
+			if (bIgnoreIncludeErrors)
+			{
+				foreach (var includeFailure in includeParseFailures)
+				{
+					this.RegisterBestEffortFileSkip(includeFailure.Key, includeFailure.Value);
+				}
+			}
+
+			return statements;
 		}
 
 
@@ -358,25 +435,33 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 		}
 
 
-		static public List<File> GetAllIncludedFiles(File file, bool bAllowParallelism, bool bIgnoreErrors = false)
+		static public List<File> GetAllIncludedFiles(
+			File file,
+			bool bAllowParallelism,
+			bool bIgnoreErrors = false,
+			Action<string, Exception>? includeParseFailureHandler = null)
 		{
 			List<File> lstFiles = new List<File>();
 
 			//Note: testing shows parallelism has no effect on performance.
 			if (bAllowParallelism)
 			{
-				GetIncludedFilesRecursive(file, lstFiles, bIgnoreErrors);
+				GetIncludedFilesRecursive(file, lstFiles, bIgnoreErrors, includeParseFailureHandler);
 			}
 			else
 			{
-				GetIncludedFiles(file, lstFiles, bIgnoreErrors);
+				GetIncludedFiles(file, lstFiles, bIgnoreErrors, includeParseFailureHandler);
 			}
 
 			return lstFiles;
 		}
 
 		///	Recursively gather all included files in parallel.
-		static private void GetIncludedFilesRecursive(File file, List<File> lstFiles, bool bIgnoreErrors)
+		static private void GetIncludedFilesRecursive(
+			File file,
+			List<File> lstFiles,
+			bool bIgnoreErrors,
+			Action<string, Exception>? includeParseFailureHandler)
 		{
 			//TODO: Doesn't currently work because the order of defining prototypes still matters.
 
@@ -413,7 +498,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 						foreach (string path in paths)
 						{
-							File? sub = TryParse(path, bIgnoreErrors, inc, fileCurrent);
+							File? sub = TryParse(path, bIgnoreErrors, inc, fileCurrent, includeParseFailureHandler);
 							if (sub != null)
 							{
 								if (seen.TryAdd(sub.Info.FullName, 0))
@@ -443,7 +528,11 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 
 
-		static private void GetIncludedFiles(File file, List<File> lstFiles, bool bIgnoreErrors)
+		static private void GetIncludedFiles(
+			File file,
+			List<File> lstFiles,
+			bool bIgnoreErrors,
+			Action<string, Exception>? includeParseFailureHandler)
 		{
 			string strRootDir = StringUtil.LeftOfLast(file.Info.FullName, "\\");
 
@@ -453,13 +542,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				{
 					foreach (string strFile in Directory.GetFiles(strRootDir, include.FileName, include.Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
 					{
-						File? fileSub = TryParse(strFile, bIgnoreErrors, include, file);
+						File? fileSub = TryParse(strFile, bIgnoreErrors, include, file, includeParseFailureHandler);
 						if (fileSub != null)
 						{
 							if (!lstFiles.Any(x => StringUtil.EqualNoCase(x.Info.FullName, fileSub.Info.FullName)))
 							{
 								lstFiles.Add(fileSub);
-								GetIncludedFiles(fileSub, lstFiles, bIgnoreErrors);
+								GetIncludedFiles(fileSub, lstFiles, bIgnoreErrors, includeParseFailureHandler);
 							}
 							else
 							{
@@ -479,13 +568,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				else
 				{
 					string path = FileUtil.BuildPath(strRootDir, include.FileName);
-					File? fileSub = TryParse(path, bIgnoreErrors, include, file);
+					File? fileSub = TryParse(path, bIgnoreErrors, include, file, includeParseFailureHandler);
 					if (fileSub != null)
 					{
 						if (!lstFiles.Any(x => StringUtil.EqualNoCase(x.Info.FullName, fileSub.Info.FullName)))
 						{
 							lstFiles.Add(fileSub);
-							GetIncludedFiles(fileSub, lstFiles, bIgnoreErrors);
+							GetIncludedFiles(fileSub, lstFiles, bIgnoreErrors, includeParseFailureHandler);
 						}
 						else
 						{
@@ -507,7 +596,12 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 
 		// Parse one include target and preserve include-site source location for missing-file diagnostics.
-		static private ProtoScript.File ? TryParse(string strFile, bool bIgnoreErrors, IncludeStatement? includeStatement = null, File? sourceFile = null)
+		static private ProtoScript.File ? TryParse(
+			string strFile,
+			bool bIgnoreErrors,
+			IncludeStatement? includeStatement = null,
+			File? sourceFile = null,
+			Action<string, Exception>? includeParseFailureHandler = null)
 		{
 			try
 			{
@@ -521,7 +615,10 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			catch (Parsers.Files.FileDoesNotExistException err)
 			{
 				if (bIgnoreErrors)
+				{
+					includeParseFailureHandler?.Invoke(strFile, err);
 					return null;
+				}
 
 				StatementParsingInfo info = includeStatement?.Info ?? new StatementParsingInfo
 				{
@@ -537,10 +634,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				wrapped.m_strProtoScript = sourceFile?.RawCode ?? string.Empty;
 				throw wrapped;
 			}
-			catch (Exception)
+			catch (Exception err)
 			{
 				if (bIgnoreErrors)
+				{
+					includeParseFailureHandler?.Invoke(strFile, err);
 					return null;
+				}
 
 				throw;
 			}
