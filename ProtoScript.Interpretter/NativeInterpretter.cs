@@ -378,7 +378,15 @@ namespace ProtoScript.Interpretter
 						return false;
 					}
 
-					boundParameters[parameterName] = rawValue;
+					object? convertedValue = null;
+					if (parameterType != null && !ValueConversions.TryMakeAssignable(rawValue, parameterType, out convertedValue))
+					{
+						string targetTypeName = parameterType?.Type?.Name ?? parameterType?.ToString() ?? "unknown";
+						error = parameterName + " wrong type: " + targetTypeName;
+						return false;
+					}
+
+					boundParameters[parameterName] = convertedValue ?? rawValue;
 				}
 			}
 
@@ -2423,3 +2431,6 @@ namespace ProtoScript.Interpretter
 
 	}
 }
+
+
+

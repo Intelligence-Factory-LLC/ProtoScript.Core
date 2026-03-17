@@ -1,4 +1,4 @@
-using ProtoScript.Interpretter;
+﻿using ProtoScript.Interpretter;
 
 namespace ProtoScript.Tests
 {
@@ -151,5 +151,32 @@ function ReturnText() : string
 			Assert.IsInstanceOfType<string>(result);
 			Assert.AreEqual("Raw text", result);
 		}
-	}
+
+		// Purpose: Passing a StringReference handle text into a StringRef parameter should rehydrate to the same reference.
+		[TestMethod]
+		public void StringReferenceParameter_AcceptsHandleTextString()
+		{
+			string code = @"
+function ReturnRef() : StringRef
+{
+	return ""Handle text conversion"";
+}
+
+function EchoRef(StringRef value) : string
+{
+	return value;
+}
+";
+			NativeInterpretter interpretter = BuildInterpreter(code);
+			object? handleObj = interpretter.RunMethodAsObject(null, "ReturnRef", new List<object>());
+
+			Assert.IsNotNull(handleObj);
+			Assert.IsInstanceOfType<StringReference>(handleObj);
+			StringReference handle = (StringReference)handleObj!;
+			string handleText = handle.PrototypeName;
+
+			object? result = interpretter.RunMethodAsObject(null, "EchoRef", new List<object> { handleText });
+			Assert.AreEqual("Handle text conversion", result);
+		}
+}
 }

@@ -1,4 +1,4 @@
-using Ontology;
+﻿using Ontology;
 using Ontology.BaseTypes;
 using Ontology.Simulation;
 using ProtoScript.Interpretter.RuntimeInfo;
@@ -504,6 +504,13 @@ namespace ProtoScript.Interpretter
 			{
 				if (effectiveType == typeof(StringReference))
 				{
+					string trimmed = str?.Trim() ?? string.Empty;
+					if (trimmed.StartsWith("System.String[ref:", StringComparison.OrdinalIgnoreCase) && trimmed.EndsWith("]", StringComparison.Ordinal))
+					{
+						converted = new StringReference(trimmed);
+						return true;
+					}
+
 					converted = StringReference.FromString(str);
 					return true;
 				}
@@ -766,3 +773,4 @@ namespace ProtoScript.Interpretter
 		}
 	}
 }
+

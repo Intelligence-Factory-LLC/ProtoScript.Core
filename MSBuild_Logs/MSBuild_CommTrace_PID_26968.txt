@@ -1,0 +1,884 @@
+.NET TP Worker (TID 6) 639091931234851589 +    5.9644ms: Starting to acquire 8 new or existing node(s) to establish nodes from ID 2 to 9...
+.NET TP Worker (TID 6) 639091931234973585 +   12.1996ms: Building handshake for node type X64, NodeReuse, (version 1): options 16777228.
+.NET TP Worker (TID 6) 639091931234983628 +    1.0043ms: Handshake salt is 
+.NET TP Worker (TID 6) 639091931234992992 +    0.9364ms: Tools directory root is C:\Program Files\dotnet\sdk\9.0.300
+.NET TP Worker (TID 6) 639091931235285816 +   29.2824ms: Attempting to connect to 4 existing processes 'dotnet'...
+.NET TP Worker (TID 22) 639091931235460850 +   17.5034ms: Trying to connect to existing process dotnet with id 26968 to establish node 6...
+.NET TP Worker (TID 12) 639091931235474053 +    1.3203ms: Trying to connect to existing process dotnet with id 31484 to establish node 4...
+.NET TP Worker (TID 21) 639091931235492387 +    1.8334ms: Trying to connect to existing process dotnet with id 16440 to establish node 5...
+.NET TP Worker (TID 6) 639091931235495773 +    0.3386ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 23) 639091931235502118 +    0.6345ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 24) 639091931235504741 +    0.2623ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 4) 639091931235513176 +    0.8435ms: Trying to connect to existing process dotnet with id 20688 to establish node 3...
+.NET TP Worker (TID 22) 639091931235519573 +    0.6397ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 25) 639091931235529613 +     1.004ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 12) 639091931235545779 +    1.6166ms: Attempting connect to PID 31484 with pipe MSBuild31484 with timeout 0 ms
+.NET TP Worker (TID 4) 639091931235550681 +    0.4902ms: Attempting connect to PID 20688 with pipe MSBuild20688 with timeout 0 ms
+.NET TP Worker (TID 21) 639091931235558263 +    0.7582ms: Attempting connect to PID 16440 with pipe MSBuild16440 with timeout 0 ms
+.NET TP Worker (TID 23) 639091931235568008 +    0.9745ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931235574650 +    0.6642ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 22) 639091931235581865 +    0.7215ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 25) 639091931235586043 +    0.4178ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931235588649 +    0.2606ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931235592088 +    0.3439ms: Failed to connect to pipe MSBuild20688. The operation has timed out.
+.NET TP Worker (TID 12) 639091931235600421 +    0.8333ms: Failed to connect to pipe MSBuild31484. The operation has timed out.
+.NET TP Worker (TID 21) 639091931235607132 +    0.6711ms: Failed to connect to pipe MSBuild16440. The operation has timed out.
+.NET TP Worker (TID 12) 639091931235614480 +    0.7348ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 21) 639091931235619764 +    0.5284ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 4) 639091931235624363 +    0.4599ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 12) 639091931235632136 +    0.7773ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931235638706 +     0.657ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931235644796 +     0.609ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 25) 639091931235892263 +   24.7467ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38864
+.NET TP Worker (TID 6) 639091931235912199 +    1.9936ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 27528
+.NET TP Worker (TID 25) 639091931235916705 +    0.4506ms: Attempting connect to PID 38864 with pipe MSBuild38864 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931235944563 +    2.7858ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 36128
+.NET TP Worker (TID 22) 639091931235956213 +     1.165ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38240
+.NET TP Worker (TID 21) 639091931235968679 +    1.2466ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 26696
+.NET TP Worker (TID 4) 639091931235971833 +    0.3154ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 26268
+.NET TP Worker (TID 24) 639091931235992033 +      2.02ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38324
+.NET TP Worker (TID 23) 639091931235995904 +    0.3871ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 18608
+.NET TP Worker (TID 6) 639091931235998627 +    0.2723ms: Attempting connect to PID 27528 with pipe MSBuild27528 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931236003897 +     0.527ms: Attempting connect to PID 36128 with pipe MSBuild36128 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931236014730 +    1.0833ms: Attempting connect to PID 38240 with pipe MSBuild38240 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931236017242 +    0.2512ms: Attempting connect to PID 26696 with pipe MSBuild26696 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931236021661 +    0.4419ms: Attempting connect to PID 26268 with pipe MSBuild26268 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931236024853 +    0.3192ms: Attempting connect to PID 38324 with pipe MSBuild38324 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931236038435 +    1.3582ms: Attempting connect to PID 18608 with pipe MSBuild18608 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931244625785 +   858.735ms: Failed to connect to pipe MSBuild38864. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931244656123 +    3.0338ms: Could not connect to node with PID 38864; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931244718202 +    6.2079ms: Failed to connect to pipe MSBuild18608. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931244746931 +    2.8729ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931244755254 +    0.8323ms: Could not connect to node with PID 18608; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931244766153 +    1.0899ms: Failed to connect to pipe MSBuild38324. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931244774179 +    0.8026ms: Could not connect to node with PID 38324; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931244812107 +    3.7928ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931244831525 +    1.9418ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931245176925 +     34.54ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 27896
+.NET TP Worker (TID 25) 639091931245357933 +   18.1008ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 21976
+.NET TP Worker (TID 23) 639091931245388787 +    3.0854ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 16556
+.NET TP Worker (TID 22) 639091931245394642 +    0.5855ms: Failed to connect to pipe MSBuild38240. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931245403690 +    0.9048ms: Attempting connect to PID 21976 with pipe MSBuild21976 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931245424758 +    2.1068ms: Could not connect to node with PID 38240; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931245439914 +    1.5156ms: Attempting connect to PID 16556 with pipe MSBuild16556 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931245449962 +    1.0048ms: Attempting connect to PID 27896 with pipe MSBuild27896 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931245474845 +    2.4883ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 22) 639091931245585506 +   11.0661ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 26208
+.NET TP Worker (TID 22) 639091931245600650 +    1.5144ms: Attempting connect to PID 26208 with pipe MSBuild26208 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931246483330 +    88.268ms: Failed to connect to pipe MSBuild26696. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931246500388 +    1.7058ms: Could not connect to node with PID 26696; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931246522461 +    2.2073ms: Failed to connect to pipe MSBuild26268. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931246545325 +    2.2864ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931246617262 +    7.1937ms: Could not connect to node with PID 26268; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931246631552 +     1.429ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931246741675 +   11.0123ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 18084
+.NET TP Worker (TID 4) 639091931246760319 +    1.8644ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 23348
+.NET TP Worker (TID 4) 639091931246771318 +    1.0999ms: Attempting connect to PID 23348 with pipe MSBuild23348 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931247295868 +    52.455ms: Failed to connect to pipe MSBuild27528. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931247429438 +    13.357ms: Attempting connect to PID 18084 with pipe MSBuild18084 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931247479694 +    5.0256ms: Could not connect to node with PID 27528; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931247503427 +    2.3733ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931247761417 +    25.799ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35184
+.NET TP Worker (TID 6) 639091931247807031 +    4.5614ms: Attempting connect to PID 35184 with pipe MSBuild35184 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931249159247 +  135.2216ms: Failed to connect to pipe MSBuild36128. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931249179692 +    2.0445ms: Could not connect to node with PID 36128; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931249224576 +    4.4884ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931249444819 +   22.0243ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 36560
+.NET TP Worker (TID 12) 639091931250794717 +  134.9898ms: Attempting connect to PID 36560 with pipe MSBuild36560 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931255531226 +  473.6509ms: Failed to connect to pipe MSBuild27896. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931255578654 +    4.7428ms: Could not connect to node with PID 27896; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931255628153 +    4.9499ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931255916553 +     28.84ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 26404
+.NET TP Worker (TID 24) 639091931255935443 +     1.889ms: Attempting connect to PID 26404 with pipe MSBuild26404 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931256543696 +   60.8253ms: Failed to connect to pipe MSBuild26208. Access to the path is denied.
+.NET TP Worker (TID 22) 639091931256602450 +    5.8754ms: Could not connect to node with PID 26208; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 22) 639091931256641460 +     3.901ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 22) 639091931256782547 +   14.1087ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 13964
+.NET TP Worker (TID 22) 639091931256806183 +    2.3636ms: Attempting connect to PID 13964 with pipe MSBuild13964 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931257245240 +   43.9057ms: Failed to connect to pipe MSBuild16556. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931257324256 +    7.9016ms: Could not connect to node with PID 16556; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 25) 639091931257520245 +   19.5989ms: Failed to connect to pipe MSBuild21976. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931257536977 +    1.6732ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 25) 639091931257549205 +    1.2228ms: Could not connect to node with PID 21976; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 25) 639091931257569820 +    2.0615ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 25) 639091931257693593 +   12.3773ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 27948
+.NET TP Worker (TID 25) 639091931257765924 +    7.2331ms: Attempting connect to PID 27948 with pipe MSBuild27948 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931257982867 +   21.6943ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38820
+.NET TP Worker (TID 23) 639091931258036721 +    5.3854ms: Attempting connect to PID 38820 with pipe MSBuild38820 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931260135421 +    209.87ms: Failed to connect to pipe MSBuild35184. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931260274301 +    13.888ms: Failed to connect to pipe MSBuild23348. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931260293675 +    1.9374ms: Could not connect to node with PID 35184; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931260298390 +    0.4715ms: Could not connect to node with PID 23348; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931260305582 +    0.7192ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931260313170 +    0.7588ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931260538422 +   22.5252ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 14076
+.NET TP Worker (TID 4) 639091931260591032 +     5.261ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 36584
+.NET TP Worker (TID 4) 639091931260608265 +    1.7233ms: Attempting connect to PID 36584 with pipe MSBuild36584 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931260639696 +    3.1431ms: Failed to connect to pipe MSBuild18084. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931260645038 +    0.5342ms: Could not connect to node with PID 18084; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931260655707 +    1.0669ms: Attempting connect to PID 14076 with pipe MSBuild14076 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931260682217 +     2.651ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931260873025 +   19.0808ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35240
+.NET TP Worker (TID 21) 639091931260927946 +    5.4921ms: Attempting connect to PID 35240 with pipe MSBuild35240 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931264236191 +  330.8245ms: Failed to connect to pipe MSBuild36560. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931264386248 +   15.0057ms: Could not connect to node with PID 36560; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931264767796 +   38.1548ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931264986453 +   21.8657ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 12536
+.NET TP Worker (TID 12) 639091931265030684 +    4.4231ms: Attempting connect to PID 12536 with pipe MSBuild12536 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931266061792 +  103.1108ms: Failed to connect to pipe MSBuild27948. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931266097623 +    3.5831ms: Failed to connect to pipe MSBuild38820. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931266132627 +    3.5004ms: Could not connect to node with PID 38820; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931266144786 +    1.2159ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 25) 639091931266255615 +   11.0829ms: Could not connect to node with PID 27948; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931267532937 +  127.7322ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35532
+.NET TP Worker (TID 25) 639091931267602909 +    6.9972ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 22) 639091931267618949 +     1.604ms: Failed to connect to pipe MSBuild13964. Access to the path is denied.
+.NET TP Worker (TID 22) 639091931267659113 +    4.0164ms: Could not connect to node with PID 13964; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931267670947 +    1.1834ms: Attempting connect to PID 35532 with pipe MSBuild35532 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931267683832 +    1.2885ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 25) 639091931267778536 +    9.4704ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 23504
+.NET TP Worker (TID 22) 639091931267819032 +    4.0496ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35308
+.NET TP Worker (TID 24) 639091931267828724 +    0.9692ms: Failed to connect to pipe MSBuild26404. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931267839503 +    1.0779ms: Attempting connect to PID 23504 with pipe MSBuild23504 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931267851310 +    1.1807ms: Attempting connect to PID 35308 with pipe MSBuild35308 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931269199193 +  134.7883ms: Could not connect to node with PID 26404; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931269787074 +   58.7881ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931270011714 +    22.464ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 33308
+.NET TP Worker (TID 24) 639091931270079984 +     6.827ms: Attempting connect to PID 33308 with pipe MSBuild33308 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931271254898 +  117.4914ms: Failed to connect to pipe MSBuild14076. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931271344620 +    8.9722ms: Could not connect to node with PID 14076; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931271444757 +   10.0137ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931271808940 +   36.4183ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 17588
+.NET TP Worker (TID 6) 639091931271886716 +    7.7776ms: Attempting connect to PID 17588 with pipe MSBuild17588 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931271946844 +    6.0128ms: Failed to connect to pipe MSBuild36584. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931272958690 +  101.1846ms: Failed to connect to pipe MSBuild35240. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931273093003 +   13.4313ms: Could not connect to node with PID 35240; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931273207709 +   11.4706ms: Could not connect to node with PID 36584; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931273214942 +    0.7233ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931273225559 +    1.0617ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931273470645 +   24.5086ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 30700
+.NET TP Worker (TID 21) 639091931273521077 +    5.0432ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 18216
+.NET TP Worker (TID 4) 639091931273629245 +   10.8168ms: Attempting connect to PID 30700 with pipe MSBuild30700 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931273654733 +    2.5488ms: Attempting connect to PID 18216 with pipe MSBuild18216 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931277469471 +  381.4738ms: Failed to connect to pipe MSBuild12536. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931277520293 +    5.0822ms: Could not connect to node with PID 12536; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931277536619 +    1.6326ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931277764086 +   22.7467ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35568
+.NET TP Worker (TID 12) 639091931277796867 +    3.2781ms: Attempting connect to PID 35568 with pipe MSBuild35568 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931278118612 +   32.1745ms: Failed to connect to pipe MSBuild35532. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931278151601 +    3.2989ms: Could not connect to node with PID 35532; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931278190933 +    3.9332ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931278389217 +   19.8284ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 31180
+.NET TP Worker (TID 23) 639091931278440486 +    5.1269ms: Attempting connect to PID 31180 with pipe MSBuild31180 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931278757814 +   31.7328ms: Failed to connect to pipe MSBuild35308. Access to the path is denied.
+.NET TP Worker (TID 22) 639091931278783353 +    2.5539ms: Could not connect to node with PID 35308; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 22) 639091931278807219 +    2.3866ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 22) 639091931279002512 +   19.5293ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 36908
+.NET TP Worker (TID 22) 639091931279043176 +    4.0664ms: Attempting connect to PID 36908 with pipe MSBuild36908 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931279500430 +   45.7254ms: Failed to connect to pipe MSBuild23504. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931279542831 +    4.2401ms: Could not connect to node with PID 23504; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 25) 639091931279584802 +    4.1971ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 25) 639091931279721143 +   13.6341ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 33812
+.NET TP Worker (TID 25) 639091931279736400 +    1.5257ms: Attempting connect to PID 33812 with pipe MSBuild33812 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931282802920 +   306.652ms: Failed to connect to pipe MSBuild33308. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931283384930 +    58.201ms: Could not connect to node with PID 33308; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931283487533 +   10.2603ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931283850891 +   36.3358ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 9616
+.NET TP Worker (TID 24) 639091931283886707 +    3.5816ms: Attempting connect to PID 9616 with pipe MSBuild9616 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931285054531 +  116.7824ms: Failed to connect to pipe MSBuild17588. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931285092832 +    3.8301ms: Failed to connect to pipe MSBuild18216. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931285140253 +    4.7421ms: Could not connect to node with PID 17588; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931285148769 +    0.8516ms: Could not connect to node with PID 18216; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931285167351 +    1.8582ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931285175509 +    0.8158ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931285468111 +   29.2602ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 37760
+.NET TP Worker (TID 21) 639091931285493516 +    2.5405ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 24816
+.NET TP Worker (TID 6) 639091931285504489 +    1.0973ms: Attempting connect to PID 37760 with pipe MSBuild37760 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931285521663 +    1.7174ms: Attempting connect to PID 24816 with pipe MSBuild24816 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931289579650 +  405.7987ms: Failed to connect to pipe MSBuild30700. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931289648235 +    6.8585ms: Could not connect to node with PID 30700; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931289707872 +    5.9637ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931289914542 +    20.667ms: Failed to connect to pipe MSBuild35568. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931290009524 +    9.4982ms: Could not connect to node with PID 35568; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931290032158 +    2.2634ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931290212835 +   18.0677ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 28832
+.NET TP Worker (TID 12) 639091931290244421 +    3.1586ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 36748
+.NET TP Worker (TID 12) 639091931290249957 +    0.5536ms: Attempting connect to PID 36748 with pipe MSBuild36748 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931290293126 +    4.3169ms: Attempting connect to PID 28832 with pipe MSBuild28832 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931293566493 +  327.3367ms: Failed to connect to pipe MSBuild36908. Access to the path is denied.
+.NET TP Worker (TID 22) 639091931293654254 +    8.7761ms: Could not connect to node with PID 36908; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 22) 639091931293707808 +    5.3554ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931293714612 +    0.6804ms: Failed to connect to pipe MSBuild31180. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931293734229 +    1.9617ms: Could not connect to node with PID 31180; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931293757675 +    2.3446ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931294025120 +   26.7445ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 9928
+.NET TP Worker (TID 22) 639091931294062104 +    3.6984ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 31152
+.NET TP Worker (TID 23) 639091931294098560 +    3.6456ms: Attempting connect to PID 9928 with pipe MSBuild9928 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931294144924 +    4.6364ms: Attempting connect to PID 31152 with pipe MSBuild31152 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931295223072 +  107.8148ms: Failed to connect to pipe MSBuild33812. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931295354078 +   13.1006ms: Could not connect to node with PID 33812; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 25) 639091931295410155 +    5.6077ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 25) 639091931295664663 +   25.4508ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 34720
+.NET TP Worker (TID 25) 639091931295700813 +     3.615ms: Attempting connect to PID 34720 with pipe MSBuild34720 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931296640696 +   93.9883ms: Failed to connect to pipe MSBuild9616. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931296683323 +    4.2627ms: Could not connect to node with PID 9616; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931296726468 +    4.3145ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931297289714 +   56.3246ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 36268
+.NET TP Worker (TID 24) 639091931297414107 +   12.4393ms: Attempting connect to PID 36268 with pipe MSBuild36268 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931297540129 +   12.6022ms: Failed to connect to pipe MSBuild37760. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931297560767 +    2.0638ms: Could not connect to node with PID 37760; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931297617764 +    5.6997ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931297928206 +   31.0442ms: Failed to connect to pipe MSBuild24816. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931297973462 +    4.5256ms: Could not connect to node with PID 24816; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931298021847 +    4.8385ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931298161623 +   13.9776ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38460
+.NET TP Worker (TID 6) 639091931298185307 +    2.3684ms: Attempting connect to PID 38460 with pipe MSBuild38460 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931298330458 +   14.5151ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 30064
+.NET TP Worker (TID 21) 639091931298375453 +    4.4995ms: Attempting connect to PID 30064 with pipe MSBuild30064 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931304005006 +  562.9553ms: Failed to connect to pipe MSBuild36748. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931304292517 +   28.7511ms: Could not connect to node with PID 36748; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931304354198 +    6.1681ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931304624658 +    27.046ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 37748
+.NET TP Worker (TID 12) 639091931304703348 +     7.869ms: Attempting connect to PID 37748 with pipe MSBuild37748 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931305428710 +   72.5362ms: Failed to connect to pipe MSBuild28832. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931305844564 +   41.5854ms: Could not connect to node with PID 28832; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931305963815 +   11.9251ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931306322137 +   35.8322ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 32792
+.NET TP Worker (TID 25) 639091931306425560 +   10.3423ms: Failed to connect to pipe MSBuild34720. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931306464530 +     3.897ms: Failed to connect to pipe MSBuild9928. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931306496096 +    3.1566ms: Attempting connect to PID 32792 with pipe MSBuild32792 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931306532313 +    3.6217ms: Could not connect to node with PID 34720; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931306551031 +    1.8718ms: Could not connect to node with PID 9928; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 25) 639091931306566349 +    1.5318ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931307279511 +   71.3162ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931307483832 +   20.4321ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38760
+.NET TP Worker (TID 23) 639091931307515161 +    3.1329ms: Attempting connect to PID 38760 with pipe MSBuild38760 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931307551780 +    3.6619ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38452
+.NET TP Worker (TID 25) 639091931307571217 +    1.9437ms: Attempting connect to PID 38452 with pipe MSBuild38452 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931308549880 +   97.8663ms: Failed to connect to pipe MSBuild36268. Access to the path is denied.
+.NET TP Worker (TID 22) 639091931310070337 +  152.0457ms: Failed to connect to pipe MSBuild31152. Access to the path is denied.
+.NET TP Worker (TID 22) 639091931310119025 +    4.8688ms: Could not connect to node with PID 31152; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931310131833 +    1.2808ms: Could not connect to node with PID 36268; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 22) 639091931310159396 +    2.7563ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931310191193 +    3.1797ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931310483581 +   29.2388ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 29912
+.NET TP Worker (TID 24) 639091931310522798 +    3.9217ms: Attempting connect to PID 29912 with pipe MSBuild29912 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931310610801 +    8.8003ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 27568
+.NET TP Worker (TID 22) 639091931310627375 +    1.6574ms: Attempting connect to PID 27568 with pipe MSBuild27568 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931313282353 +  265.4978ms: Failed to connect to pipe MSBuild30064. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931313374462 +    9.2109ms: Failed to connect to pipe MSBuild38460. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931313461677 +    8.7215ms: Could not connect to node with PID 30064; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931313509981 +    4.8304ms: Could not connect to node with PID 38460; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931313542086 +    3.2105ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931313569271 +    2.7185ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931313720098 +   15.0827ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 32020
+.NET TP Worker (TID 21) 639091931313801098 +       8.1ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 34972
+.NET TP Worker (TID 21) 639091931313825849 +    2.4751ms: Attempting connect to PID 34972 with pipe MSBuild34972 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931313880784 +    5.4935ms: Attempting connect to PID 32020 with pipe MSBuild32020 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931319243946 +  536.3162ms: Failed to connect to pipe MSBuild37748. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931319291442 +    4.7496ms: Could not connect to node with PID 37748; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931319399719 +   10.8277ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931319430656 +    3.0937ms: Failed to connect to pipe MSBuild32792. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931319457570 +    2.6914ms: Could not connect to node with PID 32792; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931319474130 +     1.656ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931319765040 +    29.091ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 23212
+.NET TP Worker (TID 4) 639091931319822589 +    5.7549ms: Attempting connect to PID 23212 with pipe MSBuild23212 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931319857489 +      3.49ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 10692
+.NET TP Worker (TID 12) 639091931319868426 +    1.0937ms: Attempting connect to PID 10692 with pipe MSBuild10692 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931321863997 +  199.5571ms: Failed to connect to pipe MSBuild38452. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931321945002 +    8.1005ms: Could not connect to node with PID 38452; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 25) 639091931323773109 +  182.8107ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931323953815 +   18.0706ms: Failed to connect to pipe MSBuild38760. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931323974369 +    2.0554ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 37756
+.NET TP Worker (TID 23) 639091931324053465 +    7.9096ms: Could not connect to node with PID 38760; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931324068153 +    1.4688ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 25) 639091931324193648 +   12.5495ms: Attempting connect to PID 37756 with pipe MSBuild37756 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931324464019 +   27.0371ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 23172
+.NET TP Worker (TID 23) 639091931324567016 +   10.2997ms: Attempting connect to PID 23172 with pipe MSBuild23172 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931325075595 +   50.8579ms: Failed to connect to pipe MSBuild29912. Access to the path is denied.
+.NET TP Worker (TID 22) 639091931325249759 +   17.4164ms: Failed to connect to pipe MSBuild27568. Access to the path is denied.
+.NET TP Worker (TID 22) 639091931325275362 +    2.5603ms: Could not connect to node with PID 27568; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931325286061 +    1.0699ms: Could not connect to node with PID 29912; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 22) 639091931325300604 +    1.4543ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931325326112 +    2.5508ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 22) 639091931325468353 +   14.2241ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38124
+.NET TP Worker (TID 24) 639091931325493628 +    2.5275ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 27860
+.NET TP Worker (TID 22) 639091931325521866 +    2.8238ms: Attempting connect to PID 38124 with pipe MSBuild38124 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931325551292 +    2.9426ms: Attempting connect to PID 27860 with pipe MSBuild27860 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931327087515 +  153.6223ms: Failed to connect to pipe MSBuild34972. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931327222613 +   13.5098ms: Could not connect to node with PID 34972; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931327275926 +    5.3313ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931327596746 +    32.082ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 28660
+.NET TP Worker (TID 21) 639091931327701454 +   10.4708ms: Attempting connect to PID 28660 with pipe MSBuild28660 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931330206406 +  250.4952ms: Failed to connect to pipe MSBuild32020. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931330292831 +    8.6425ms: Could not connect to node with PID 32020; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931330326974 +    3.4143ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931330527507 +   20.0533ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 632
+.NET TP Worker (TID 6) 639091931330577531 +    5.0024ms: Attempting connect to PID 632 with pipe MSBuild632 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931333330382 +  275.2851ms: Failed to connect to pipe MSBuild10692. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931333368404 +    3.8022ms: Could not connect to node with PID 10692; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931333435017 +    6.6613ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931333464809 +    2.9792ms: Failed to connect to pipe MSBuild23212. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931333475865 +    1.1056ms: Could not connect to node with PID 23212; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931333488659 +    1.2794ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931333590564 +   10.1905ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 5008
+.NET TP Worker (TID 12) 639091931333628709 +    3.8145ms: Attempting connect to PID 5008 with pipe MSBuild5008 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931333663917 +    3.5208ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 36880
+.NET TP Worker (TID 4) 639091931333813895 +   14.9978ms: Attempting connect to PID 36880 with pipe MSBuild36880 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931337673128 +  385.9233ms: Failed to connect to pipe MSBuild37756. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931337755611 +    8.2483ms: Could not connect to node with PID 37756; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 25) 639091931337809791 +     5.418ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931337973247 +   16.3456ms: Failed to connect to pipe MSBuild27860. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931338023496 +    5.0249ms: Could not connect to node with PID 27860; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 22) 639091931338067494 +    4.3998ms: Failed to connect to pipe MSBuild38124. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931338082429 +    1.4935ms: Failed to connect to pipe MSBuild23172. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931338089997 +    0.7568ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931338094441 +    0.4444ms: Could not connect to node with PID 23172; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 22) 639091931338101909 +    0.7468ms: Could not connect to node with PID 38124; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 22) 639091931338114698 +    1.2789ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931338144070 +    2.9372ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 22) 639091931338343833 +   19.9763ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 28768
+.NET TP Worker (TID 23) 639091931338413414 +    6.9581ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 37776
+.NET TP Worker (TID 23) 639091931338494671 +    8.1257ms: Attempting connect to PID 37776 with pipe MSBuild37776 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931338527968 +    3.3297ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 34568
+.NET TP Worker (TID 25) 639091931338532432 +    0.4464ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 23392
+.NET TP Worker (TID 24) 639091931338539454 +    0.7022ms: Attempting connect to PID 34568 with pipe MSBuild34568 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931338568012 +    2.8558ms: Attempting connect to PID 23392 with pipe MSBuild23392 with timeout 30000 ms
+.NET TP Worker (TID 22) 639091931338616678 +    4.8666ms: Attempting connect to PID 28768 with pipe MSBuild28768 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931342096121 +  347.9443ms: Failed to connect to pipe MSBuild28660. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931342155849 +    5.9728ms: Could not connect to node with PID 28660; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931342300747 +   14.4898ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931342858007 +    55.726ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 26648
+.NET TP Worker (TID 21) 639091931342961639 +   10.3632ms: Attempting connect to PID 26648 with pipe MSBuild26648 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931343878489 +    91.685ms: Failed to connect to pipe MSBuild632. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931343962510 +    8.4021ms: Could not connect to node with PID 632; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931344054709 +    9.2199ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931344201648 +   14.6939ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 17004
+.NET TP Worker (TID 6) 639091931344239280 +    3.7632ms: Attempting connect to PID 17004 with pipe MSBuild17004 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931346908042 +  266.8762ms: Failed to connect to pipe MSBuild36880. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931346944213 +    3.6171ms: Could not connect to node with PID 36880; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931346985351 +    4.1138ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931347301364 +   31.6013ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 36432
+.NET TP Worker (TID 4) 639091931347409532 +   10.8168ms: Attempting connect to PID 36432 with pipe MSBuild36432 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931350013208 +  260.3676ms: Failed to connect to pipe MSBuild37776. Access to the path is denied.
+.NET TP Worker (TID 22) 639091931351332955 +  131.9747ms: Failed to connect to pipe MSBuild28768. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931351418675 +     8.572ms: Could not connect to node with PID 37776; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931351454332 +    3.5657ms: Failed to connect to pipe MSBuild5008. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931351483805 +    2.9473ms: Could not connect to node with PID 5008; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 22) 639091931351497193 +    1.3388ms: Could not connect to node with PID 28768; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931351530684 +    3.3491ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931351564255 +    3.3571ms: Failed to connect to pipe MSBuild34568. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931351600629 +    3.6374ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 22) 639091931351611685 +    1.1056ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931351670397 +    5.8712ms: Could not connect to node with PID 34568; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931351698649 +    2.8252ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931351802811 +   10.4162ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38072
+.NET TP Worker (TID 22) 639091931351828158 +    2.5347ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 24312
+.NET TP Worker (TID 22) 639091931351855840 +    2.7682ms: Attempting connect to PID 24312 with pipe MSBuild24312 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931351862265 +    0.6425ms: Attempting connect to PID 38072 with pipe MSBuild38072 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931351872313 +    1.0048ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 23124
+.NET TP Worker (TID 24) 639091931351896378 +    2.4065ms: Attempting connect to PID 23124 with pipe MSBuild23124 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931353176344 +  127.9966ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 33784
+.NET TP Worker (TID 12) 639091931353255277 +    7.8933ms: Attempting connect to PID 33784 with pipe MSBuild33784 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931353518956 +   26.3679ms: Failed to connect to pipe MSBuild23392. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931353550952 +    3.1996ms: Could not connect to node with PID 23392; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 25) 639091931353601532 +     5.058ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 25) 639091931353824396 +   22.2864ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 33724
+.NET TP Worker (TID 25) 639091931353947997 +   12.3601ms: Attempting connect to PID 33724 with pipe MSBuild33724 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931356602279 +  265.4282ms: Failed to connect to pipe MSBuild17004. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931356773963 +   17.1684ms: Could not connect to node with PID 17004; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931356898472 +   12.4509ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931357371417 +   47.2945ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 33296
+.NET TP Worker (TID 6) 639091931357454378 +    8.2961ms: Attempting connect to PID 33296 with pipe MSBuild33296 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931357853201 +   39.8823ms: Failed to connect to pipe MSBuild26648. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931357868870 +    1.5669ms: Could not connect to node with PID 26648; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931357898659 +    2.9789ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931358157011 +   25.8352ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 29784
+.NET TP Worker (TID 21) 639091931358210852 +    5.3841ms: Attempting connect to PID 29784 with pipe MSBuild29784 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931362892307 +  468.1455ms: Failed to connect to pipe MSBuild36432. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931363003054 +   11.0747ms: Could not connect to node with PID 36432; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931363031593 +    2.8539ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931363330879 +   29.9286ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 22584
+.NET TP Worker (TID 4) 639091931363367204 +    3.6325ms: Attempting connect to PID 22584 with pipe MSBuild22584 with timeout 30000 ms
+.NET TP Worker (TID 25) 639091931364065480 +   69.8276ms: Failed to connect to pipe MSBuild33724. Access to the path is denied.
+.NET TP Worker (TID 25) 639091931364101781 +    3.6301ms: Could not connect to node with PID 33724; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 25) 639091931364116474 +    1.4693ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 22) 639091931364380768 +   26.4294ms: Failed to connect to pipe MSBuild24312. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931365363592 +   98.2824ms: Failed to connect to pipe MSBuild38072. Access to the path is denied.
+.NET TP Worker (TID 22) 639091931365417273 +    5.3681ms: Could not connect to node with PID 24312; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 22) 639091931365430651 +    1.3378ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 23) 639091931369987945 +  455.7294ms: Could not connect to node with PID 38072; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931370079218 +    9.1273ms: Failed to connect to pipe MSBuild33784. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931370106266 +    2.7048ms: Failed to connect to pipe MSBuild29784. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931370121296 +     1.503ms: Could not connect to node with PID 29784; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931370130796 +      0.95ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 23) 639091931370144947 +    1.4151ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 12) 639091931370148582 +    0.3635ms: Could not connect to node with PID 33784; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931370179090 +    3.0508ms: Failed to connect to pipe MSBuild33296. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931370208131 +    2.9041ms: Failed to connect to pipe MSBuild23124. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931370225412 +    1.7281ms: Could not connect to node with PID 23124; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931370258920 +    3.3508ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931370277396 +    1.8476ms: Could not connect to node with PID 33296; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931370282029 +    0.4633ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 24) 639091931370293324 +    1.1295ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 12) 639091931370478682 +   18.5358ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 32944
+.NET TP Worker (TID 12) 639091931370532316 +    5.3634ms: Attempting connect to PID 32944 with pipe MSBuild32944 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931372953925 +  242.1609ms: Failed to connect to pipe MSBuild22584. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931372995899 +    4.1974ms: Could not connect to node with PID 22584; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931373018228 +    2.2329ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 12) 639091931375659076 +  264.0848ms: Failed to connect to pipe MSBuild32944. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931375740560 +    8.1484ms: Could not connect to node with PID 32944; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931375746980 +     0.642ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 6) 639091931376058384 +   31.1404ms: Starting to acquire 7 new or existing node(s) to establish nodes from ID 10 to 16...
+.NET TP Worker (TID 6) 639091931376119896 +    6.1512ms: Building handshake for node type X64, NodeReuse, (version 1): options 16777228.
+.NET TP Worker (TID 6) 639091931376134496 +      1.46ms: Handshake salt is 
+.NET TP Worker (TID 6) 639091931376158657 +    2.4161ms: Tools directory root is C:\Program Files\dotnet\sdk\9.0.300
+.NET TP Worker (TID 6) 639091931376692569 +   53.3912ms: Attempting to connect to 84 existing processes 'dotnet'...
+.NET TP Worker (TID 6) 639091931376736099 +     4.353ms: Trying to connect to existing process dotnet with id 632 to establish node 10...
+.NET TP Worker (TID 6) 639091931376771934 +    3.5835ms: Trying to connect to existing process dotnet with id 9616 to establish node 10...
+.NET TP Worker (TID 6) 639091931376779459 +    0.7525ms: Trying to connect to existing process dotnet with id 9928 to establish node 10...
+.NET TP Worker (TID 6) 639091931376781394 +    0.1935ms: Trying to connect to existing process dotnet with id 10692 to establish node 10...
+.NET TP Worker (TID 6) 639091931376790231 +    0.8837ms: Trying to connect to existing process dotnet with id 12536 to establish node 10...
+.NET TP Worker (TID 4) 639091931376792975 +    0.2744ms: Trying to connect to existing process dotnet with id 5008 to establish node 11...
+.NET TP Worker (TID 4) 639091931376804399 +    1.1424ms: Trying to connect to existing process dotnet with id 16440 to establish node 11...
+.NET TP Worker (TID 6) 639091931376819954 +    1.5555ms: Trying to connect to existing process dotnet with id 14076 to establish node 10...
+.NET TP Worker (TID 6) 639091931376825616 +    0.5662ms: Trying to connect to existing process dotnet with id 18084 to establish node 10...
+.NET TP Worker (TID 6) 639091931376832129 +    0.6513ms: Trying to connect to existing process dotnet with id 20688 to establish node 10...
+.NET TP Worker (TID 6) 639091931376840014 +    0.7885ms: Trying to connect to existing process dotnet with id 21976 to establish node 10...
+.NET TP Worker (TID 23) 639091931376850537 +    1.0523ms: Trying to connect to existing process dotnet with id 17588 to establish node 14...
+.NET TP Worker (TID 12) 639091931376857064 +    0.6527ms: Trying to connect to existing process dotnet with id 13964 to establish node 12...
+.NET TP Worker (TID 12) 639091931376934000 +    7.6936ms: Trying to connect to existing process dotnet with id 23172 to establish node 12...
+.NET TP Worker (TID 21) 639091931376976987 +    4.2987ms: Trying to connect to existing process dotnet with id 18608 to establish node 16...
+.NET TP Worker (TID 24) 639091931377003024 +    2.6037ms: Trying to connect to existing process dotnet with id 16556 to establish node 13...
+.NET TP Worker (TID 24) 639091931377023375 +    2.0351ms: Trying to connect to existing process dotnet with id 23392 to establish node 13...
+.NET TP Worker (TID 24) 639091931377036892 +    1.3517ms: Trying to connect to existing process dotnet with id 23504 to establish node 13...
+.NET TP Worker (TID 24) 639091931377047354 +    1.0462ms: Trying to connect to existing process dotnet with id 24312 to establish node 13...
+.NET TP Worker (TID 27) 639091931377054858 +    0.7504ms: Trying to connect to existing process dotnet with id 18216 to establish node 15...
+.NET TP Worker (TID 12) 639091931377059064 +    0.4206ms: Trying to connect to existing process dotnet with id 23212 to establish node 12...
+.NET TP Worker (TID 21) 639091931377074606 +    1.5542ms: Trying to connect to existing process dotnet with id 23348 to establish node 16...
+.NET TP Worker (TID 4) 639091931377083573 +    0.8967ms: Trying to connect to existing process dotnet with id 17004 to establish node 11...
+.NET TP Worker (TID 6) 639091931377087280 +    0.3707ms: Trying to connect to existing process dotnet with id 22584 to establish node 10...
+.NET TP Worker (TID 4) 639091931377089777 +    0.2497ms: Trying to connect to existing process dotnet with id 26648 to establish node 11...
+.NET TP Worker (TID 4) 639091931377095605 +    0.5828ms: Trying to connect to existing process dotnet with id 26968 to establish node 11...
+.NET TP Worker (TID 4) 639091931377100618 +    0.5013ms: Trying to connect to existing process dotnet with id 27528 to establish node 11...
+.NET TP Worker (TID 12) 639091931377105130 +    0.4512ms: Trying to connect to existing process dotnet with id 26268 to establish node 12...
+.NET TP Worker (TID 12) 639091931377107801 +    0.2671ms: Trying to connect to existing process dotnet with id 27860 to establish node 12...
+.NET TP Worker (TID 23) 639091931377114829 +    0.7028ms: Trying to connect to existing process dotnet with id 23124 to establish node 14...
+.NET TP Worker (TID 23) 639091931377120685 +    0.5856ms: Trying to connect to existing process dotnet with id 27948 to establish node 14...
+.NET TP Worker (TID 24) 639091931377140465 +     1.978ms: Trying to connect to existing process dotnet with id 24816 to establish node 13...
+.NET TP Worker (TID 27) 639091931377155482 +    1.5017ms: Trying to connect to existing process dotnet with id 26208 to establish node 15...
+.NET TP Worker (TID 27) 639091931377186431 +    3.0949ms: Trying to connect to existing process dotnet with id 28832 to establish node 15...
+.NET TP Worker (TID 27) 639091931377189706 +    0.3275ms: Trying to connect to existing process dotnet with id 29784 to establish node 15...
+.NET TP Worker (TID 27) 639091931377191772 +    0.2066ms: Trying to connect to existing process dotnet with id 29912 to establish node 15...
+.NET TP Worker (TID 27) 639091931377194856 +    0.3084ms: Trying to connect to existing process dotnet with id 30064 to establish node 15...
+.NET TP Worker (TID 27) 639091931377206205 +    1.1349ms: Trying to connect to existing process dotnet with id 30700 to establish node 15...
+.NET TP Worker (TID 27) 639091931377214528 +    0.8323ms: Trying to connect to existing process dotnet with id 31152 to establish node 15...
+.NET TP Worker (TID 23) 639091931377222089 +    0.7561ms: Trying to connect to existing process dotnet with id 28660 to establish node 14...
+.NET TP Worker (TID 24) 639091931377233872 +    1.1783ms: Trying to connect to existing process dotnet with id 28768 to establish node 13...
+.NET TP Worker (TID 24) 639091931377238953 +    0.5081ms: Trying to connect to existing process dotnet with id 32020 to establish node 13...
+.NET TP Worker (TID 24) 639091931377243061 +    0.4108ms: Trying to connect to existing process dotnet with id 32792 to establish node 13...
+.NET TP Worker (TID 21) 639091931377254186 +    1.1125ms: Trying to connect to existing process dotnet with id 26404 to establish node 16...
+.NET TP Worker (TID 12) 639091931377257109 +    0.2923ms: Trying to connect to existing process dotnet with id 27896 to establish node 12...
+.NET TP Worker (TID 6) 639091931377259674 +    0.2565ms: Trying to connect to existing process dotnet with id 26696 to establish node 10...
+.NET TP Worker (TID 27) 639091931377265515 +    0.5841ms: Trying to connect to existing process dotnet with id 31180 to establish node 15...
+.NET TP Worker (TID 23) 639091931377270029 +    0.4514ms: Trying to connect to existing process dotnet with id 31484 to establish node 14...
+.NET TP Worker (TID 23) 639091931377283629 +      1.36ms: Trying to connect to existing process dotnet with id 33812 to establish node 14...
+.NET TP Worker (TID 23) 639091931377287355 +    0.3726ms: Trying to connect to existing process dotnet with id 34568 to establish node 14...
+.NET TP Worker (TID 23) 639091931377289696 +    0.2341ms: Trying to connect to existing process dotnet with id 34720 to establish node 14...
+.NET TP Worker (TID 23) 639091931377292057 +    0.2361ms: Trying to connect to existing process dotnet with id 34972 to establish node 14...
+.NET TP Worker (TID 23) 639091931377294140 +    0.2083ms: Trying to connect to existing process dotnet with id 35184 to establish node 14...
+.NET TP Worker (TID 23) 639091931377296297 +    0.2157ms: Trying to connect to existing process dotnet with id 35240 to establish node 14...
+.NET TP Worker (TID 23) 639091931377301088 +    0.4791ms: Trying to connect to existing process dotnet with id 35308 to establish node 14...
+.NET TP Worker (TID 23) 639091931377321174 +    2.0086ms: Trying to connect to existing process dotnet with id 35532 to establish node 14...
+.NET TP Worker (TID 23) 639091931377330547 +    0.9373ms: Trying to connect to existing process dotnet with id 35568 to establish node 14...
+.NET TP Worker (TID 23) 639091931377357967 +     2.742ms: Trying to connect to existing process dotnet with id 36128 to establish node 14...
+.NET TP Worker (TID 23) 639091931377377915 +    1.9948ms: Trying to connect to existing process dotnet with id 36268 to establish node 14...
+.NET TP Worker (TID 23) 639091931377400765 +     2.285ms: Trying to connect to existing process dotnet with id 36432 to establish node 14...
+.NET TP Worker (TID 23) 639091931377422894 +    2.2129ms: Trying to connect to existing process dotnet with id 36560 to establish node 14...
+.NET TP Worker (TID 23) 639091931377436979 +    1.4085ms: Trying to connect to existing process dotnet with id 36584 to establish node 14...
+.NET TP Worker (TID 23) 639091931377440463 +    0.3484ms: Trying to connect to existing process dotnet with id 36748 to establish node 14...
+.NET TP Worker (TID 23) 639091931377446908 +    0.6445ms: Trying to connect to existing process dotnet with id 36880 to establish node 14...
+.NET TP Worker (TID 27) 639091931377458769 +    1.1861ms: Trying to connect to existing process dotnet with id 33784 to establish node 15...
+.NET TP Worker (TID 27) 639091931377465239 +     0.647ms: Trying to connect to existing process dotnet with id 37748 to establish node 15...
+.NET TP Worker (TID 24) 639091931377471356 +    0.6117ms: Trying to connect to existing process dotnet with id 32944 to establish node 13...
+.NET TP Worker (TID 21) 639091931377478045 +    0.6689ms: Trying to connect to existing process dotnet with id 33296 to establish node 16...
+.NET TP Worker (TID 21) 639091931377480538 +    0.2493ms: Trying to connect to existing process dotnet with id 37776 to establish node 16...
+.NET TP Worker (TID 21) 639091931377483526 +    0.2988ms: Trying to connect to existing process dotnet with id 38072 to establish node 16...
+.NET TP Worker (TID 23) 639091931377497418 +    1.3892ms: Trying to connect to existing process dotnet with id 36908 to establish node 14...
+.NET TP Worker (TID 23) 639091931377501317 +    0.3899ms: Trying to connect to existing process dotnet with id 38240 to establish node 14...
+.NET TP Worker (TID 27) 639091931377507390 +    0.6073ms: Trying to connect to existing process dotnet with id 37756 to establish node 15...
+.NET TP Worker (TID 27) 639091931377523467 +    1.6077ms: Trying to connect to existing process dotnet with id 38452 to establish node 15...
+.NET TP Worker (TID 27) 639091931377539373 +    1.5906ms: Trying to connect to existing process dotnet with id 38460 to establish node 15...
+.NET TP Worker (TID 12) 639091931377547185 +    0.7812ms: Trying to connect to existing process dotnet with id 33724 to establish node 12...
+.NET TP Worker (TID 21) 639091931377564780 +    1.7595ms: Trying to connect to existing process dotnet with id 38124 to establish node 16...
+.NET TP Worker (TID 4) 639091931377579951 +    1.5171ms: Trying to connect to existing process dotnet with id 27568 to establish node 11...
+.NET TP Worker (TID 23) 639091931377590151 +      1.02ms: Trying to connect to existing process dotnet with id 38324 to establish node 14...
+.NET TP Worker (TID 23) 639091931377618318 +    2.8167ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 6) 639091931377631035 +    1.2717ms: Trying to connect to existing process dotnet with id 33308 to establish node 10...
+.NET TP Worker (TID 6) 639091931377633772 +    0.2737ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 27) 639091931377665615 +    3.1843ms: Trying to connect to existing process dotnet with id 38760 to establish node 15...
+.NET TP Worker (TID 6) 639091931377673316 +    0.7701ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931377705150 +    3.1834ms: Trying to connect to existing process dotnet with id 38864 to establish node 16...
+.NET TP Worker (TID 21) 639091931377722430 +     1.728ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 21) 639091931377732906 +    1.0476ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931377777030 +    4.4124ms: Trying to connect to existing process dotnet with id 37760 to establish node 13...
+.NET TP Worker (TID 24) 639091931377795652 +    1.8622ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 27) 639091931377803568 +    0.7916ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 12) 639091931377807755 +    0.4187ms: Trying to connect to existing process dotnet with id 38820 to establish node 12...
+.NET TP Worker (TID 12) 639091931377809783 +    0.2028ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 23) 639091931377812205 +    0.2422ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931377818905 +      0.67ms: Could not connect to existing process, now creating a process...
+.NET TP Worker (TID 4) 639091931379150464 +  133.1559ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931379539966 +   38.9502ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931379579530 +    3.9564ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931379720370 +    14.084ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931379789241 +    6.8871ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 29560
+.NET TP Worker (TID 21) 639091931379809356 +    2.0115ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 14216
+.NET TP Worker (TID 23) 639091931379820427 +    1.1071ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 36564
+.NET TP Worker (TID 4) 639091931379831169 +    1.0742ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 36844
+.NET TP Worker (TID 23) 639091931379859706 +    2.8537ms: Attempting connect to PID 36564 with pipe MSBuild36564 with timeout 30000 ms
+.NET TP Worker (TID 27) 639091931379893333 +    3.3627ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 28760
+.NET TP Worker (TID 27) 639091931379935808 +    4.2475ms: Attempting connect to PID 28760 with pipe MSBuild28760 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931380010994 +    7.5186ms: Attempting connect to PID 29560 with pipe MSBuild29560 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931380036585 +    2.5591ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 30116
+.NET TP Worker (TID 24) 639091931380065946 +    2.9361ms: Attempting connect to PID 30116 with pipe MSBuild30116 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931380115050 +    4.9104ms: Attempting connect to PID 14216 with pipe MSBuild14216 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931380147237 +    3.2187ms: Attempting connect to PID 36844 with pipe MSBuild36844 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931380421418 +   27.4181ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 19488
+.NET TP Worker (TID 12) 639091931380479223 +    5.7805ms: Attempting connect to PID 19488 with pipe MSBuild19488 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931388571176 +  809.1953ms: Failed to connect to pipe MSBuild14216. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931388728811 +   15.7635ms: Could not connect to node with PID 14216; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931388793579 +    6.4768ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931389081045 +   28.7466ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 31824
+.NET TP Worker (TID 21) 639091931389125699 +    4.4654ms: Attempting connect to PID 31824 with pipe MSBuild31824 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931390038335 +   91.2636ms: Failed to connect to pipe MSBuild36844. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931390111500 +    7.3165ms: Could not connect to node with PID 36844; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931390145420 +     3.392ms: Failed to connect to pipe MSBuild29560. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931390176628 +    3.1208ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931390240483 +    6.3855ms: Could not connect to node with PID 29560; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931390286631 +    4.6148ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931390434357 +   14.7726ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35444
+.NET TP Worker (TID 4) 639091931390465274 +    3.0917ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35168
+.NET TP Worker (TID 6) 639091931390511705 +    4.6431ms: Attempting connect to PID 35444 with pipe MSBuild35444 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931390547200 +    3.5495ms: Attempting connect to PID 35168 with pipe MSBuild35168 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931390563546 +    1.6346ms: Failed to connect to pipe MSBuild36564. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931394537102 +  397.3556ms: Failed to connect to pipe MSBuild28760. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931394559273 +    2.2171ms: Failed to connect to pipe MSBuild30116. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931394595272 +    3.5999ms: Failed to connect to pipe MSBuild19488. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931394614021 +    1.8749ms: Could not connect to node with PID 36564; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931394657027 +    4.3006ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931394726267 +     6.924ms: Could not connect to node with PID 30116; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931394739883 +    1.3616ms: Could not connect to node with PID 28760; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931394749168 +    0.9285ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931394756686 +    0.7518ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931394761192 +    0.4506ms: Could not connect to node with PID 19488; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931394764028 +    0.2836ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931394952350 +   18.8322ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35752
+.NET TP Worker (TID 23) 639091931394981394 +    2.9044ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 18540
+.NET TP Worker (TID 24) 639091931394991071 +    0.9677ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35808
+.NET TP Worker (TID 12) 639091931395005103 +    1.4032ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35204
+.NET TP Worker (TID 27) 639091931395011776 +    0.6673ms: Attempting connect to PID 35752 with pipe MSBuild35752 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931395015813 +    0.4037ms: Attempting connect to PID 35808 with pipe MSBuild35808 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931395025537 +    0.9724ms: Attempting connect to PID 18540 with pipe MSBuild18540 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931395031732 +    0.6195ms: Attempting connect to PID 35204 with pipe MSBuild35204 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931401183026 +  615.1294ms: Failed to connect to pipe MSBuild35444. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931401246991 +    6.3965ms: Failed to connect to pipe MSBuild31824. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931401279825 +    3.2834ms: Could not connect to node with PID 31824; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931401300992 +    2.1167ms: Could not connect to node with PID 35444; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931401311145 +    1.0153ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931401317442 +    0.6297ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931401365070 +    4.7628ms: Failed to connect to pipe MSBuild35168. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931401372035 +    0.6965ms: Could not connect to node with PID 35168; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931401380805 +     0.877ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931401641707 +   26.0902ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 20888
+.NET TP Worker (TID 21) 639091931401714161 +    7.2454ms: Attempting connect to PID 20888 with pipe MSBuild20888 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931401743765 +    2.9604ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 34556
+.NET TP Worker (TID 6) 639091931402455673 +   71.1908ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38640
+.NET TP Worker (TID 6) 639091931402494319 +    3.8646ms: Attempting connect to PID 38640 with pipe MSBuild38640 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931402568967 +    7.4648ms: Attempting connect to PID 34556 with pipe MSBuild34556 with timeout 30000 ms
+.NET TP Worker (TID 27) 639091931404675168 +  210.6201ms: Failed to connect to pipe MSBuild35752. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931404727250 +    5.2082ms: Could not connect to node with PID 35752; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931404838917 +   11.1667ms: Failed to connect to pipe MSBuild35204. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931404892966 +    5.4049ms: Could not connect to node with PID 35204; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931404911400 +    1.8434ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931404942290 +     3.089ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931405248560 +    30.627ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 16412
+.NET TP Worker (TID 24) 639091931405305555 +    5.6995ms: Failed to connect to pipe MSBuild35808. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931405319841 +    1.4286ms: Attempting connect to PID 16412 with pipe MSBuild16412 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931405328329 +    0.8488ms: Could not connect to node with PID 35808; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931405342285 +    1.3956ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931405395876 +    5.3591ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35440
+.NET TP Worker (TID 12) 639091931405421102 +    2.5226ms: Attempting connect to PID 35440 with pipe MSBuild35440 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931405475614 +    5.4512ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 25280
+.NET TP Worker (TID 24) 639091931405502254 +     2.664ms: Attempting connect to PID 25280 with pipe MSBuild25280 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931405761313 +   25.9059ms: Failed to connect to pipe MSBuild18540. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931406728786 +   96.7473ms: Could not connect to node with PID 18540; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931406913088 +   18.4302ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931407127401 +   21.4313ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 34028
+.NET TP Worker (TID 23) 639091931407277934 +   15.0533ms: Attempting connect to PID 34028 with pipe MSBuild34028 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931413158846 +  588.0912ms: Failed to connect to pipe MSBuild34556. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931413195000 +    3.6154ms: Could not connect to node with PID 34556; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931413230946 +    3.5946ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931413555124 +   32.4178ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 16144
+.NET TP Worker (TID 4) 639091931413599839 +    4.4715ms: Attempting connect to PID 16144 with pipe MSBuild16144 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931413612641 +    1.2802ms: Failed to connect to pipe MSBuild38640. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931413616425 +    0.3784ms: Could not connect to node with PID 38640; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931413637342 +    2.0917ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931413787294 +   14.9952ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 29096
+.NET TP Worker (TID 6) 639091931413808863 +    2.1569ms: Attempting connect to PID 29096 with pipe MSBuild29096 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931414032190 +   22.3327ms: Failed to connect to pipe MSBuild20888. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931414175230 +    14.304ms: Could not connect to node with PID 20888; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931414193647 +    1.8417ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931414399966 +   20.6319ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 29712
+.NET TP Worker (TID 21) 639091931414438033 +    3.8067ms: Attempting connect to PID 29712 with pipe MSBuild29712 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931419151298 +  471.3265ms: Failed to connect to pipe MSBuild34028. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931419376015 +   22.4717ms: Failed to connect to pipe MSBuild25280. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931419434684 +    5.8669ms: Failed to connect to pipe MSBuild16412. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931419477295 +    4.2611ms: Could not connect to node with PID 16412; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931419491730 +    1.4435ms: Could not connect to node with PID 34028; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931419505744 +    1.4014ms: Could not connect to node with PID 25280; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931419537173 +    3.1429ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931419576867 +    3.9694ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931421270140 +  169.3273ms: Failed to connect to pipe MSBuild35440. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931421294845 +    2.4705ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931421340380 +    4.5535ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 35944
+.NET TP Worker (TID 24) 639091931421454323 +   11.3943ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 5816
+.NET TP Worker (TID 12) 639091931421472810 +    1.8487ms: Could not connect to node with PID 35440; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931421476860 +     0.405ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 33740
+.NET TP Worker (TID 27) 639091931421486733 +    0.9873ms: Attempting connect to PID 35944 with pipe MSBuild35944 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931421506834 +    2.0101ms: Attempting connect to PID 5816 with pipe MSBuild5816 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931421528887 +    2.2053ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931421549196 +    2.0309ms: Attempting connect to PID 33740 with pipe MSBuild33740 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931421824805 +   27.5609ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 26980
+.NET TP Worker (TID 12) 639091931421873704 +    4.8899ms: Attempting connect to PID 26980 with pipe MSBuild26980 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931426350967 +  447.7263ms: Failed to connect to pipe MSBuild16144. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931426435744 +    8.4777ms: Could not connect to node with PID 16144; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931426481724 +     4.598ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931426923415 +   44.1691ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 38892
+.NET TP Worker (TID 4) 639091931427004752 +    8.1337ms: Attempting connect to PID 38892 with pipe MSBuild38892 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931427758707 +   75.3955ms: Failed to connect to pipe MSBuild29096. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931427815372 +    5.6665ms: Could not connect to node with PID 29096; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931427843838 +    2.8466ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931428241792 +   39.7954ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 34488
+.NET TP Worker (TID 6) 639091931428297171 +    5.5379ms: Attempting connect to PID 34488 with pipe MSBuild34488 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931430036243 +  173.9072ms: Failed to connect to pipe MSBuild29712. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931430106190 +    6.9947ms: Could not connect to node with PID 29712; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931430152813 +    4.6623ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931430413341 +   26.0528ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 34356
+.NET TP Worker (TID 21) 639091931430427212 +    1.3871ms: Attempting connect to PID 34356 with pipe MSBuild34356 with timeout 30000 ms
+.NET TP Worker (TID 27) 639091931432682390 +  225.5178ms: Failed to connect to pipe MSBuild35944. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931432732955 +    5.0565ms: Could not connect to node with PID 35944; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931432752290 +    1.9335ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931432913145 +   16.0855ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 31820
+.NET TP Worker (TID 27) 639091931432933595 +     2.045ms: Attempting connect to PID 31820 with pipe MSBuild31820 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931433843063 +   90.9468ms: Failed to connect to pipe MSBuild5816. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931433902572 +    5.9509ms: Failed to connect to pipe MSBuild33740. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931433920288 +    1.7716ms: Failed to connect to pipe MSBuild26980. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931433934537 +    1.4249ms: Could not connect to node with PID 5816; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931433949791 +    1.5254ms: Could not connect to node with PID 33740; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931433953266 +    0.3475ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931433955725 +    0.2459ms: Could not connect to node with PID 26980; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931433963587 +    0.7862ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931433966450 +    0.2863ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931435195971 +  122.9521ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 34936
+.NET TP Worker (TID 24) 639091931435229765 +    3.3794ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 30996
+.NET TP Worker (TID 23) 639091931435245897 +    1.6132ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 14300
+.NET TP Worker (TID 24) 639091931435256638 +    1.0741ms: Attempting connect to PID 30996 with pipe MSBuild30996 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931435260241 +    0.3603ms: Attempting connect to PID 34936 with pipe MSBuild34936 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931435268788 +    0.8547ms: Attempting connect to PID 14300 with pipe MSBuild14300 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931440608836 +  534.0048ms: Failed to connect to pipe MSBuild34488. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931440646483 +    3.7647ms: Failed to connect to pipe MSBuild38892. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931440676440 +    2.9957ms: Could not connect to node with PID 34488; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931440688902 +    1.2462ms: Could not connect to node with PID 38892; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931440719957 +    3.1055ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931440728169 +    0.8212ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931440932707 +   20.4538ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 28476
+.NET TP Worker (TID 6) 639091931440955260 +    2.2553ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 23416
+.NET TP Worker (TID 6) 639091931440982123 +    2.6863ms: Attempting connect to PID 23416 with pipe MSBuild23416 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931440999556 +    1.7433ms: Attempting connect to PID 28476 with pipe MSBuild28476 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931442711957 +  171.2401ms: Failed to connect to pipe MSBuild34356. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931442800506 +    8.8549ms: Could not connect to node with PID 34356; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931442822953 +    2.2447ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931443030934 +   20.7981ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 30880
+.NET TP Worker (TID 21) 639091931443057530 +    2.6596ms: Attempting connect to PID 30880 with pipe MSBuild30880 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931449555672 +  649.8142ms: Failed to connect to pipe MSBuild14300. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931449588241 +    3.2569ms: Failed to connect to pipe MSBuild34936. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931449592387 +    0.4146ms: Could not connect to node with PID 34936; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931449608983 +    1.6596ms: Failed to connect to pipe MSBuild31820. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931449653912 +    4.4929ms: Could not connect to node with PID 31820; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931449684733 +    3.0821ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931449710567 +    2.5834ms: Could not connect to node with PID 14300; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931449732062 +    2.1495ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931449741963 +    0.9901ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931449942245 +   20.0282ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39064
+.NET TP Worker (TID 23) 639091931449962348 +    2.0103ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39072
+.NET TP Worker (TID 23) 639091931449996530 +    3.4182ms: Attempting connect to PID 39072 with pipe MSBuild39072 with timeout 30000 ms
+.NET TP Worker (TID 27) 639091931450007510 +     1.098ms: Attempting connect to PID 39064 with pipe MSBuild39064 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931450203010 +     19.55ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39056
+.NET TP Worker (TID 12) 639091931450212043 +    0.9033ms: Attempting connect to PID 39056 with pipe MSBuild39056 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931450277169 +    6.5126ms: Failed to connect to pipe MSBuild30996. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931450312719 +     3.555ms: Could not connect to node with PID 30996; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931450352334 +    3.9615ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931450580662 +   22.8328ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39120
+.NET TP Worker (TID 24) 639091931450605830 +    2.5168ms: Attempting connect to PID 39120 with pipe MSBuild39120 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931451658739 +  105.2909ms: Failed to connect to pipe MSBuild28476. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931451688333 +    2.9594ms: Could not connect to node with PID 28476; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931451707927 +    1.9594ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931451863334 +   15.5407ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39204
+.NET TP Worker (TID 4) 639091931451888903 +    2.5569ms: Attempting connect to PID 39204 with pipe MSBuild39204 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931452324981 +   43.6078ms: Failed to connect to pipe MSBuild23416. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931452353945 +    2.8964ms: Could not connect to node with PID 23416; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931452438479 +    8.4534ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931452754687 +   31.6208ms: Failed to connect to pipe MSBuild30880. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931452777545 +    2.2858ms: Could not connect to node with PID 30880; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931452791479 +    1.3934ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39240
+.NET TP Worker (TID 6) 639091931452818301 +    2.6822ms: Attempting connect to PID 39240 with pipe MSBuild39240 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931452828213 +    0.9912ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931452906084 +    7.7871ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39260
+.NET TP Worker (TID 21) 639091931452916385 +    1.0301ms: Attempting connect to PID 39260 with pipe MSBuild39260 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931460870375 +   795.399ms: Failed to connect to pipe MSBuild39072. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931460898294 +    2.7919ms: Failed to connect to pipe MSBuild39064. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931460907073 +    0.8779ms: Could not connect to node with PID 39072; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931460918300 +    1.1227ms: Could not connect to node with PID 39064; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931460929918 +    1.1618ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931460946340 +    1.6422ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931461225395 +   27.9055ms: Failed to connect to pipe MSBuild39120. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931461421820 +   19.6425ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39724
+.NET TP Worker (TID 23) 639091931461459820 +       3.8ms: Attempting connect to PID 39724 with pipe MSBuild39724 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931461486664 +    2.6844ms: Could not connect to node with PID 39120; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931461523538 +    3.6874ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39732
+.NET TP Worker (TID 27) 639091931461531144 +    0.7606ms: Attempting connect to PID 39732 with pipe MSBuild39732 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931461538555 +    0.7411ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931461724154 +   18.5599ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39776
+.NET TP Worker (TID 12) 639091931462704540 +   98.0386ms: Failed to connect to pipe MSBuild39056. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931462730321 +    2.5781ms: Attempting connect to PID 39776 with pipe MSBuild39776 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931462756662 +    2.6341ms: Could not connect to node with PID 39056; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931462765042 +     0.838ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931462927500 +   16.2458ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39840
+.NET TP Worker (TID 12) 639091931462969587 +    4.2087ms: Attempting connect to PID 39840 with pipe MSBuild39840 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931464598810 +  162.9223ms: Failed to connect to pipe MSBuild39260. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931464640558 +    4.1748ms: Failed to connect to pipe MSBuild39204. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931464643357 +    0.2799ms: Could not connect to node with PID 39260; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 4) 639091931464648824 +    0.5467ms: Could not connect to node with PID 39204; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931464682957 +    3.4133ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931464704597 +     2.164ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931465042892 +   33.8295ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39912
+.NET TP Worker (TID 4) 639091931465082195 +    3.9303ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 33652
+.NET TP Worker (TID 21) 639091931465113068 +    3.0873ms: Attempting connect to PID 39912 with pipe MSBuild39912 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931465119983 +    0.6915ms: Attempting connect to PID 33652 with pipe MSBuild33652 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931465578725 +   45.8742ms: Failed to connect to pipe MSBuild39240. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931465616716 +    3.7991ms: Could not connect to node with PID 39240; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931465631586 +     1.487ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931465788277 +   15.6691ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 37444
+.NET TP Worker (TID 6) 639091931465822485 +    3.4208ms: Attempting connect to PID 37444 with pipe MSBuild37444 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931471954831 +  613.2346ms: Failed to connect to pipe MSBuild39840. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931471992682 +    3.7851ms: Could not connect to node with PID 39840; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931472016380 +    2.3698ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931472211627 +   19.5247ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39400
+.NET TP Worker (TID 12) 639091931472225521 +    1.3894ms: Attempting connect to PID 39400 with pipe MSBuild39400 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931472878719 +   65.3198ms: Failed to connect to pipe MSBuild39776. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931472903915 +    2.5196ms: Could not connect to node with PID 39776; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931472934520 +    3.0605ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 23) 639091931473157860 +    22.334ms: Failed to connect to pipe MSBuild39724. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931473180582 +    2.2722ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39964
+.NET TP Worker (TID 24) 639091931473207615 +    2.7033ms: Attempting connect to PID 39964 with pipe MSBuild39964 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931473225532 +    1.7917ms: Could not connect to node with PID 39724; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931473247601 +    2.2069ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931473275486 +    2.7885ms: Failed to connect to pipe MSBuild39732. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931473280074 +    0.4588ms: Could not connect to node with PID 39732; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931473292032 +    1.1958ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931473387022 +     9.499ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40000
+.NET TP Worker (TID 23) 639091931473398599 +    1.1577ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39988
+.NET TP Worker (TID 27) 639091931473401302 +    0.2703ms: Attempting connect to PID 40000 with pipe MSBuild40000 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931473421958 +    2.0656ms: Attempting connect to PID 39988 with pipe MSBuild39988 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931474491938 +   106.998ms: Failed to connect to pipe MSBuild33652. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931474654779 +   16.2841ms: Failed to connect to pipe MSBuild39912. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931474672407 +    1.7628ms: Could not connect to node with PID 33652; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931474703515 +    3.1108ms: Could not connect to node with PID 39912; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931474711250 +    0.7735ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931474717317 +    0.6067ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931475035061 +   31.7744ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40112
+.NET TP Worker (TID 21) 639091931475068284 +    3.3223ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40104
+.NET TP Worker (TID 4) 639091931475092971 +    2.4687ms: Attempting connect to PID 40112 with pipe MSBuild40112 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931475102306 +    0.9335ms: Attempting connect to PID 40104 with pipe MSBuild40104 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931477307462 +  220.5156ms: Failed to connect to pipe MSBuild37444. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931477377297 +    6.9835ms: Could not connect to node with PID 37444; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931477407757 +     3.046ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931477620840 +   21.3083ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40264
+.NET TP Worker (TID 6) 639091931477656284 +    3.5444ms: Attempting connect to PID 40264 with pipe MSBuild40264 with timeout 30000 ms
+.NET TP Worker (TID 27) 639091931482516224 +   485.994ms: Failed to connect to pipe MSBuild40000. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931482555206 +    3.8982ms: Could not connect to node with PID 40000; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931482575437 +    2.0231ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931483056686 +   48.1249ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40452
+.NET TP Worker (TID 27) 639091931483087731 +    3.1045ms: Attempting connect to PID 40452 with pipe MSBuild40452 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931483441692 +   35.3961ms: Failed to connect to pipe MSBuild39988. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931483543891 +   10.2199ms: Could not connect to node with PID 39988; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931483597952 +    5.4061ms: Failed to connect to pipe MSBuild39964. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931483674633 +    7.6681ms: Could not connect to node with PID 39964; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931483759758 +    8.5125ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931483786427 +    2.6669ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931483975773 +   18.9346ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40516
+.NET TP Worker (TID 23) 639091931484017471 +    4.1698ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40504
+.NET TP Worker (TID 23) 639091931484027857 +    1.0386ms: Attempting connect to PID 40504 with pipe MSBuild40504 with timeout 30000 ms
+.NET TP Worker (TID 24) 639091931484048137 +     2.028ms: Attempting connect to PID 40516 with pipe MSBuild40516 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931484181335 +   13.3198ms: Failed to connect to pipe MSBuild39400. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931484233053 +    5.1718ms: Could not connect to node with PID 39400; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931484248851 +    1.5798ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931484641333 +   39.2482ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40556
+.NET TP Worker (TID 12) 639091931484756800 +   11.5467ms: Attempting connect to PID 40556 with pipe MSBuild40556 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931486334130 +   157.733ms: Failed to connect to pipe MSBuild40104. Access to the path is denied.
+.NET TP Worker (TID 21) 639091931486415281 +    8.1151ms: Could not connect to node with PID 40104; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931486446199 +    3.0918ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 4) 639091931486796663 +   35.0464ms: Failed to connect to pipe MSBuild40112. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931486818711 +    2.2048ms: Could not connect to node with PID 40112; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931486832423 +    1.3712ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40632
+.NET TP Worker (TID 4) 639091931486840330 +    0.7907ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 21) 639091931486867557 +    2.7227ms: Attempting connect to PID 40632 with pipe MSBuild40632 with timeout 30000 ms
+.NET TP Worker (TID 4) 639091931487020268 +   15.2711ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40648
+.NET TP Worker (TID 4) 639091931487068820 +    4.8552ms: Attempting connect to PID 40648 with pipe MSBuild40648 with timeout 30000 ms
+.NET TP Worker (TID 6) 639091931491454856 +  438.6036ms: Failed to connect to pipe MSBuild40264. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931491501640 +    4.6784ms: Could not connect to node with PID 40264; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 6) 639091931491552629 +    5.0989ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 6) 639091931491795260 +   24.2631ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40904
+.NET TP Worker (TID 6) 639091931491820940 +     2.568ms: Attempting connect to PID 40904 with pipe MSBuild40904 with timeout 30000 ms
+.NET TP Worker (TID 12) 639091931495582389 +  376.1449ms: Failed to connect to pipe MSBuild40556. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931495657682 +    7.5293ms: Failed to connect to pipe MSBuild40452. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931495698031 +    4.0349ms: Failed to connect to pipe MSBuild40516. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931495715466 +    1.7435ms: Could not connect to node with PID 40556; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931495749827 +    3.4361ms: Could not connect to node with PID 40452; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931495772424 +    2.2597ms: Could not connect to node with PID 40516; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931495787432 +    1.5008ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931495790894 +    0.3462ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 24) 639091931495810951 +    2.0057ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 27) 639091931496185592 +   37.4641ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 33212
+.NET TP Worker (TID 24) 639091931496256142 +     7.055ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 40020
+.NET TP Worker (TID 23) 639091931496262525 +    0.6383ms: Failed to connect to pipe MSBuild40504. Access to the path is denied.
+.NET TP Worker (TID 23) 639091931496268945 +     0.642ms: Could not connect to node with PID 40504; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931496276893 +    0.7948ms: Attempting connect to PID 40020 with pipe MSBuild40020 with timeout 30000 ms
+.NET TP Worker (TID 27) 639091931496281488 +    0.4595ms: Attempting connect to PID 33212 with pipe MSBuild33212 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931496289891 +    0.8403ms: Launching node from C:\Program Files\dotnet\sdk\9.0.300\MSBuild.dll
+.NET TP Worker (TID 12) 639091931496301117 +    1.1226ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 39944
+.NET TP Worker (TID 12) 639091931496316242 +    1.5125ms: Attempting connect to PID 39944 with pipe MSBuild39944 with timeout 30000 ms
+.NET TP Worker (TID 23) 639091931496376848 +    6.0606ms: Successfully launched C:\Program Files\dotnet\dotnet.exe node with PID 34188
+.NET TP Worker (TID 23) 639091931496400396 +    2.3548ms: Attempting connect to PID 34188 with pipe MSBuild34188 with timeout 30000 ms
+.NET TP Worker (TID 21) 639091931501306190 +  490.5794ms: Failed to connect to pipe MSBuild40632. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931501423326 +   11.7136ms: Failed to connect to pipe MSBuild40648. Access to the path is denied.
+.NET TP Worker (TID 4) 639091931501447134 +    2.3808ms: Could not connect to node with PID 40648; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931501459564 +     1.243ms: Could not connect to node with PID 40632; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 21) 639091931501640483 +   18.0919ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 4) 639091931501675863 +     3.538ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 6) 639091931506416116 +  474.0253ms: Failed to connect to pipe MSBuild40904. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931506539357 +   12.3241ms: Could not connect to node with PID 40904; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931506570090 +    3.0733ms: Failed to connect to pipe MSBuild34188. Access to the path is denied.
+.NET TP Worker (TID 6) 639091931506581685 +    1.1595ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 23) 639091931506613176 +    3.1491ms: Could not connect to node with PID 34188; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 23) 639091931506620414 +    0.7238ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 27) 639091931506625158 +    0.4744ms: Failed to connect to pipe MSBuild33212. Access to the path is denied.
+.NET TP Worker (TID 27) 639091931506631863 +    0.6705ms: Could not connect to node with PID 33212; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 27) 639091931506658601 +    2.6738ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 24) 639091931506711843 +    5.3242ms: Failed to connect to pipe MSBuild40020. Access to the path is denied.
+.NET TP Worker (TID 24) 639091931506746898 +    3.5055ms: Could not connect to node with PID 40020; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 24) 639091931506757825 +    1.0927ms: FAILED TO CONNECT TO A CHILD NODE
+.NET TP Worker (TID 12) 639091931507470164 +   71.2339ms: Failed to connect to pipe MSBuild39944. Access to the path is denied.
+.NET TP Worker (TID 12) 639091931507491443 +    2.1279ms: Could not connect to node with PID 39944; it is still running. This can occur when two multiprocess builds run in parallel and the other one 'stole' this node
+.NET TP Worker (TID 12) 639091931507502005 +    1.0562ms: FAILED TO CONNECT TO A CHILD NODE

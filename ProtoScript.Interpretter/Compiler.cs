@@ -284,6 +284,43 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					return TrySkipFailedFile(fileCurrent, explanation);
 				}
 
+				bool IsNonBlockingImportOrReferenceDiagnostic(CompilerDiagnostic diagnostic, string stageName)
+				{
+					if (diagnostic.Statement == null)
+						return false;
+
+					if (stageName != "DeclareFilePrototypes")
+						return false;
+
+					return diagnostic.Statement is ImportStatement || diagnostic.Statement is ReferenceStatement;
+				}
+
+				bool TrySkipFailedFileFromStageDiagnostics(File fileCurrent, int diagnosticsBefore)
+				{
+					if (ProjectCompilationMode != CompilationMode.BestEffort)
+						return false;
+
+					string filePath = fileCurrent.Info?.FullName ?? string.Empty;
+					for (int i = diagnosticsBefore; i < this.Diagnostics.Count; i++)
+					{
+						CompilerDiagnostic diagnostic = this.Diagnostics[i];
+						string? diagnosticFilePath = GetDiagnosticFilePath(diagnostic);
+						if (string.IsNullOrWhiteSpace(diagnosticFilePath))
+							continue;
+						if (!StringUtil.EqualNoCase(diagnosticFilePath, filePath))
+							continue;
+
+						if (IsNonBlockingImportOrReferenceDiagnostic(diagnostic, currentStage))
+							continue;
+
+						string diagnosticMessage = diagnostic.Diagnostic?.Message ?? "Compiler diagnostic generated.";
+						TrySkipFailedFile(fileCurrent, "Compiler diagnostic: " + diagnosticMessage);
+						return true;
+					}
+
+					return false;
+				}
+
 				static string? GetDiagnosticFilePath(CompilerDiagnostic diagnostic)
 				{
 					return diagnostic.Statement?.Info?.File ?? diagnostic.Expression?.Info?.File;
@@ -321,20 +358,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 						if (ProjectCompilationMode == CompilationMode.BestEffort)
 						{
-							string filePath = fileCurrent.Info?.FullName ?? string.Empty;
-							for (int i = diagnosticsBefore; i < this.Diagnostics.Count; i++)
-							{
-								CompilerDiagnostic diagnostic = this.Diagnostics[i];
-								string? diagnosticFilePath = GetDiagnosticFilePath(diagnostic);
-								if (string.IsNullOrWhiteSpace(diagnosticFilePath))
-									continue;
-								if (!StringUtil.EqualNoCase(diagnosticFilePath, filePath))
-									continue;
-
-								string diagnosticMessage = diagnostic.Diagnostic?.Message ?? "Compiler diagnostic generated.";
-								TrySkipFailedFile(fileCurrent, "Compiler diagnostic: " + diagnosticMessage);
-								break;
-							}
+							TrySkipFailedFileFromStageDiagnostics(fileCurrent, diagnosticsBefore);
 						}
 					}
 					Logs.DebugLog.WriteTimer("CompileProject." + stageName);
