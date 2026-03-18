@@ -275,14 +275,25 @@ throw;
 				case "[]":
 					return 1;		
 
+				case ">":
+				case ">=":
+				case "<":
+				case "<=":
+					return 2;
+
 				case "typeof":
 				case "==":
 				case "!=":
-					return 2;
+					return 3;
+
+				case "&&":
+				case "||":
+				case "??":
+					return 4;
 
 				case "?":
 				case ":":
-					return 4;
+					return 5;
 
 				default:
 					return 3;

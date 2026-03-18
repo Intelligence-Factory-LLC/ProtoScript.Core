@@ -129,6 +129,15 @@
 							}
 					}
 				}
+
+				if (lstAnnotations.Count > 0)
+				{
+					throw new ProtoScriptParsingException(
+						tok.getString(),
+						tok.getCursor(),
+						"prototype member declaration",
+						"Annotations inside a prototype body must directly precede a field, function, or nested prototype declaration.");
+				}
 			}
 			else
 			{

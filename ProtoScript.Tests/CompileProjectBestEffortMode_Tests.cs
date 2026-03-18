@@ -158,6 +158,59 @@ import Ontology.NonExistentType MissingType;");
 			}
 		}
 
+		[TestMethod]
+		public void CompileProject_BestEffort_InvalidPrototypeBodyAnnotations_ReportCompilerDiagnosticAndSkipFile()
+		{
+			string tempDir = CreateTempDirectory();
+			try
+			{
+				System.IO.File.WriteAllText(Path.Combine(tempDir, "Project.pts"),
+@"include ""BrokenAnnotations.pts"";
+include ""Healthy.pts"";");
+
+				System.IO.File.WriteAllText(Path.Combine(tempDir, "BrokenAnnotations.pts"),
+@"prototype BaseObject;
+prototype SemanticEntityBase;
+prototype SessionPlan : BaseObject, SemanticEntityBase
+{
+	[SemanticEntity(""session plan"")]
+	[SemanticEntity(""plan"")]
+}");
+
+				System.IO.File.WriteAllText(Path.Combine(tempDir, "Healthy.pts"),
+@"prototype HealthySkill
+{
+	function Execute() : string
+	{
+		return ""ok"";
+	}
+}");
+
+				Compiler compiler = new Compiler();
+				compiler.Initialize();
+				compiler.ProjectCompilationMode = Compiler.CompilationMode.BestEffort;
+
+				compiler.CompileProject(Path.Combine(tempDir, "Project.pts"));
+
+				Assert.IsTrue(
+					compiler.DisabledFiles.Any(x => x.EndsWith("BrokenAnnotations.pts", StringComparison.OrdinalIgnoreCase)),
+					"Expected invalid annotation file to be disabled in best-effort mode.");
+
+				Assert.IsTrue(
+					compiler.Diagnostics.Any(x =>
+						(x.Diagnostic?.Message ?? string.Empty).Contains("Best-effort: skipped file after failure during include parse", StringComparison.OrdinalIgnoreCase)
+						&& (x.Diagnostic?.Message ?? string.Empty).Contains("BrokenAnnotations.pts", StringComparison.OrdinalIgnoreCase)),
+					"Expected a compiler diagnostic for include-parse skip of the invalid annotation file.");
+
+				TypeInfo? healthyType = compiler.Symbols.GetGlobalScope().GetSymbol("HealthySkill") as TypeInfo;
+				Assert.IsNotNull(healthyType, "Expected healthy file to compile even when annotation file is invalid.");
+			}
+			finally
+			{
+				DeleteDirectory(tempDir);
+			}
+		}
+
 		private static string CreateTempDirectory()
 		{
 			string path = Path.Combine(Path.GetTempPath(), "ProtoScriptBestEffort_" + Guid.NewGuid().ToString("N"));
