@@ -468,14 +468,55 @@ movePast("*/");  // Base Tokenizer.movePast for fixed delimiter
 
 		public bool CouldBeNext(string strTok)
 		{
-			if (peekNextToken() == strTok) { getNextToken(); return true; }
+			return TryConsume(strTok);
+		}
+
+		public bool IsNext(string strTok)
+		{
+			return peekNextToken() == strTok;
+		}
+
+		public bool TryConsume(string strTok)
+		{
+			int saveCursor = getCursor();
+			if (getNextToken() == strTok)
+			{
+				return true;
+			}
+
+			setCursor(saveCursor);
 			return false;
+		}
+
+		public bool TryConsumeIdentifier()
+		{
+			int saveCursor = getCursor();
+			string token = getNextToken();
+			if (string.IsNullOrEmpty(token))
+			{
+				setCursor(saveCursor);
+				return false;
+			}
+
+			if (IsOperator(token))
+			{
+				setCursor(saveCursor);
+				return false;
+			}
+
+			if (token.Length == 1 && isSymbol(token[0]))
+			{
+				setCursor(saveCursor);
+				return false;
+			}
+
+			return true;
 		}
 
 		public bool MustBeNext(string strTok)
 		{
 			int saveCursor = getCursor();
-			if (getNextToken() != strTok) { throw new ProtoScriptTokenizingException(getString(), saveCursor, strTok); }
+			if (!TryConsume(strTok)) { throw new ProtoScriptTokenizingException(getString(), saveCursor, strTok); }
 			return true;
 		}
 

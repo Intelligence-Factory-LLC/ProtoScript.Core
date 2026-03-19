@@ -50,33 +50,38 @@ namespace ProtoScript.Parsers
 		{
 			includeStatement = null;
 			int saveCursor = tok.getCursor();
-			try
-			{
-				tok.movePastWhitespace();
-				int startCursor = tok.getCursor();
-				tok.MustBeNext("import");
-
-				string fileName = ParsePathLiteral(tok, "import");
-				tok.MustBeNext(";");
-
-				if (!LooksLikeProtoScriptPath(fileName))
-				{
-					tok.setCursor(saveCursor);
-					return false;
-				}
-
-				includeStatement = new ProtoScript.IncludeStatement();
-				includeStatement.Info.File = Files.CurrentFile;
-				includeStatement.Info.StartStatement(startCursor);
-				includeStatement.FileName = fileName;
-				includeStatement.Info.StopStatement(tok.getCursor());
-				return true;
-			}
-			catch (ProtoScriptTokenizingException)
+			tok.movePastWhitespace();
+			int startCursor = tok.getCursor();
+			if (!tok.TryConsume("import"))
 			{
 				tok.setCursor(saveCursor);
 				return false;
 			}
+
+			if (!TryParsePathLiteralWithoutExceptions(tok, out string fileName))
+			{
+				tok.setCursor(saveCursor);
+				return false;
+			}
+
+			if (!tok.TryConsume(";"))
+			{
+				tok.setCursor(saveCursor);
+				return false;
+			}
+
+			if (!LooksLikeProtoScriptPath(fileName))
+			{
+				tok.setCursor(saveCursor);
+				return false;
+			}
+
+			includeStatement = new ProtoScript.IncludeStatement();
+			includeStatement.Info.File = Files.CurrentFile;
+			includeStatement.Info.StartStatement(startCursor);
+			includeStatement.FileName = fileName;
+			includeStatement.Info.StopStatement(tok.getCursor());
+			return true;
 		}
 
 		public static string ParsePathLiteral(Tokenizer tok, string statementKeyword)
@@ -221,6 +226,50 @@ namespace ProtoScript.Parsers
 		private static ProtoScriptParsingException BuildPathLiteralException(Tokenizer tok, string statementKeyword, string expected, string explanation)
 		{
 			return new ProtoScriptParsingException(tok.getString(), tok.getCursor(), expected, explanation);
+		}
+
+		private static bool TryParsePathLiteralWithoutExceptions(Tokenizer tok, out string fileName)
+		{
+			fileName = string.Empty;
+
+			string firstToken = tok.peekNextToken();
+			if (IsQuotedPathLiteral(firstToken))
+			{
+				fileName = NormalizeQuotedPathLiteral(tok.getNextToken());
+				return true;
+			}
+
+			int startCursor = -1;
+			int stopCursor = -1;
+			StringBuilder pathBuilder = new StringBuilder();
+
+			while (tok.hasMoreTokens())
+			{
+				string token = tok.peekNextToken();
+				if (token == ";")
+					break;
+
+				if (!IsAllowedUnquotedPathToken(tok, token))
+					return false;
+
+				string consumed = tok.getNextToken();
+				int consumedStop = tok.getCursor();
+				int consumedStart = consumedStop - consumed.Length;
+				if (startCursor < 0)
+					startCursor = consumedStart;
+
+				stopCursor = consumedStop;
+				pathBuilder.Append(consumed);
+			}
+
+			if (pathBuilder.Length == 0)
+				return false;
+
+			if (ContainsWhitespace(tok.getString(), startCursor, stopCursor))
+				return false;
+
+			fileName = pathBuilder.ToString();
+			return true;
 		}
 
 		private static string FormatStatementName(string statementKeyword)

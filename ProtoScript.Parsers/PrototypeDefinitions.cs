@@ -88,16 +88,14 @@
 						default:
 							{
 								int iCursor = tok.getCursor();
-								try
+								if (LooksLikeMethodDeclaration(tok))
 								{
 									MethodDefinition method = MethodDefinitions.Parse(tok);
 									result.Methods.Add(ConvertMethodToFunction(method));
 									break;
 								}
-								catch
-								{
-									tok.setCursor(iCursor);
-								}
+
+								tok.setCursor(iCursor);
 
 								FieldDefinition field = FieldDefinitions.Parse(tok);
                                 if (field == null)
@@ -195,6 +193,66 @@
 			function.BaseConstructor = method.BaseConstructor;
 			function.Info = method.Info;
 			return function;
+		}
+
+		private static bool LooksLikeMethodDeclaration(Tokenizer tok)
+		{
+			int saveCursor = tok.getCursor();
+			try
+			{
+				Modifiers.Parse(tok);
+
+				string firstToken = tok.peekNextToken();
+				if (firstToken == "const" || firstToken == "volatile" || firstToken == "enum" || firstToken == "class")
+					return false;
+
+				Types.Parse(tok);
+
+				string next = tok.peekNextToken();
+				if (next == "(")
+				{
+					// Constructor-like forms are uncommon in prototype bodies and often indicate an initializer statement.
+					return false;
+				}
+
+				if (next == ";" || next == "=" || next == "{" || next == "[")
+					return false;
+
+				if (!TryConsumeMethodName(tok))
+					return false;
+
+				return tok.peekNextToken() == "(";
+			}
+			catch (ProtoScriptParsingException)
+			{
+				return false;
+			}
+			catch (ProtoScriptTokenizingException)
+			{
+				return false;
+			}
+			finally
+			{
+				tok.setCursor(saveCursor);
+			}
+		}
+
+		private static bool TryConsumeMethodName(Tokenizer tok)
+		{
+			if (tok.TryConsume("~"))
+				return tok.TryConsumeIdentifier();
+
+			if (tok.TryConsume("operator"))
+			{
+				string next = tok.peekNextToken();
+				if (string.IsNullOrEmpty(next))
+					return false;
+
+				tok.getNextToken();
+				return true;
+			}
+
+			return tok.TryConsumeIdentifier();
 		}
 	}
 }

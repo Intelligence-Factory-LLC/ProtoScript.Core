@@ -78,5 +78,30 @@ namespace ProtoScript.Tests
 			Assert.AreEqual(1, file.Imports.Count);
 			Assert.AreEqual("Ontology", file.Imports[0].Reference);
 		}
+
+		[TestMethod]
+		public void TryParseImportAsInclude_LegacyAssemblyImport_ReturnsFalseAndRestoresCursor()
+		{
+			Tokenizer tok = new Tokenizer("import Ontology Ontology.Collection Collection;");
+			int startCursor = tok.getCursor();
+
+			bool parsed = IncludeStatements.TryParseImportAsInclude(tok, out ProtoScript.IncludeStatement includeStatement);
+
+			Assert.IsFalse(parsed);
+			Assert.IsNull(includeStatement);
+			Assert.AreEqual(startCursor, tok.getCursor());
+		}
+
+		[TestMethod]
+		public void TryParseImportAsInclude_PathImport_ReturnsIncludeWithoutExceptions()
+		{
+			Tokenizer tok = new Tokenizer("import Path/File.pts;");
+
+			bool parsed = IncludeStatements.TryParseImportAsInclude(tok, out ProtoScript.IncludeStatement includeStatement);
+
+			Assert.IsTrue(parsed);
+			Assert.IsNotNull(includeStatement);
+			Assert.AreEqual("Path/File.pts", includeStatement.FileName);
+		}
 	}
 }
