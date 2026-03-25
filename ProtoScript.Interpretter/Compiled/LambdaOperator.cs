@@ -33,7 +33,15 @@ namespace ProtoScript.Interpretter.Compiled
 				Interpretter.Symbols.LeaveScope();
 			}
 
-			return (bool)oReturn;
+			if (oReturn is bool b)
+				return b;
+
+			object? converted;
+			if (ValueConversions.TryMakeAssignable(oReturn, new TypeInfo(typeof(bool)), out converted) && converted is bool convertedBool)
+				return convertedBool;
+
+			string actualType = oReturn?.GetType().FullName ?? "null";
+			throw new RuntimeException($"Lambda predicate must return bool-compatible value but returned '{actualType}'.", this.Info);
 		}
 	}
 }

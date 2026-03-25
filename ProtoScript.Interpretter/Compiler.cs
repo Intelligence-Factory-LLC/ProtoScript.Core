@@ -9,6 +9,7 @@ using ProtoScript.Interpretter.RuntimeInfo;
 using ProtoScript.Interpretter.Symbols;
 using ProtoScript.Parsers;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reflection;
 using TypeInfo = ProtoScript.Interpretter.RuntimeInfo.TypeInfo;
 
@@ -47,6 +48,8 @@ namespace ProtoScript.Interpretter
 		private static readonly object s_assemblyPathCacheLock = new object();
 		private static readonly ConcurrentDictionary<string, object> s_shadowCopyLocks =
 			new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+		private readonly Dictionary<string, ReferenceAssemblyInfo> _referenceAssemblyInfos =
+			new Dictionary<string, ReferenceAssemblyInfo>(StringComparer.OrdinalIgnoreCase);
 
 		public void AddDiagnostic(Diagnostic diagnostic, Statement? statement, Expression? expression)
 		{
@@ -2981,11 +2984,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 		public void Compile(ReferenceStatement statement)
 		{
 			Assembly? assembly = null;
+			string loadResolution = string.Empty;
 			if (statement.IsFileReference || LooksLikeAssemblyPath(statement.AssemblyName))
 			{
 				if (!TryResolveReferenceAssemblyPath(statement, out string fullPath, out string? resolveError))
 				{
 					this.AddDiagnostic(new Diagnostic(resolveError ?? $"Could not resolve reference path {statement.AssemblyName}"), statement, null);
+					TrackReferenceAssemblyInfo(statement, null, false, "resolve-path", resolveError);
 					return;
 				}
 
@@ -2993,16 +2998,18 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				if (!StringUtil.EqualNoCase(Path.GetExtension(fullPath), ".dll"))
 				{
 					this.AddDiagnostic(new Diagnostic($"Reference path must point to a .dll file: {fullPath}"), statement, null);
+					TrackReferenceAssemblyInfo(statement, null, false, "validate-extension", $"Reference path must point to a .dll file: {fullPath}");
 					return;
 				}
 
 				try
 				{
-					assembly = LoadAssemblyFromResolvedPath(fullPath);
+					assembly = LoadAssemblyFromResolvedPath(fullPath, out loadResolution);
 				}
 				catch (BadImageFormatException)
 				{
 					this.AddDiagnostic(new Diagnostic($"Invalid .dll reference: {fullPath}"), statement, null);
+					TrackReferenceAssemblyInfo(statement, null, false, "load-from-path", $"Invalid .dll reference: {fullPath}");
 					return;
 				}
 				catch (Exception err)
@@ -3010,6 +3017,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					string message = $"Could not load assembly from path {fullPath}: {err.Message}"
 						+ BuildAssemblyLoadFailureDetails(fullPath, err);
 					this.AddDiagnostic(new Diagnostic(message), statement, null);
+					TrackReferenceAssemblyInfo(statement, null, false, "load-from-path", message);
 					return;
 				}
 			}
@@ -3018,12 +3026,14 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				try
 				{
 					assembly = Assembly.Load(statement.AssemblyName);
+					loadResolution = "assembly-load";
 				}
 				catch
 				{
 					try
 					{
 						assembly = Assembly.LoadFrom(statement.AssemblyName);
+						loadResolution = "assembly-load-from";
 					}
 					catch
 					{
@@ -3035,6 +3045,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			if (null == assembly)
 			{
 				this.AddDiagnostic(new Diagnostic("Could not load assembly " + statement.AssemblyName), statement, null);
+				TrackReferenceAssemblyInfo(statement, null, false, "load-failed", "Could not load assembly " + statement.AssemblyName);
 				return;
 			}
 
@@ -3042,6 +3053,128 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				statement.Reference = assembly.GetName().Name ?? statement.AssemblyName;
 
 			References[statement.Reference] = assembly;
+			TrackReferenceAssemblyInfo(statement, assembly, true, loadResolution, null);
+		}
+
+		public IReadOnlyList<ReferenceAssemblyInfo> GetReferenceAssemblyInfos()
+		{
+			return _referenceAssemblyInfos.Values
+				.OrderBy(x => x.Alias, StringComparer.OrdinalIgnoreCase)
+				.ToList();
+		}
+
+		public string GetReferenceAssemblyReport()
+		{
+			List<ReferenceAssemblyInfo> infos = GetReferenceAssemblyInfos().ToList();
+			if (infos.Count == 0)
+				return "No reference assemblies tracked.";
+
+			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			sb.AppendLine("Reference assemblies:");
+			foreach (ReferenceAssemblyInfo info in infos)
+			{
+				sb.Append("- alias=").Append(info.Alias);
+				sb.Append(", requested=").Append(info.RequestedReference);
+				sb.Append(", succeeded=").Append(info.LoadSucceeded ? "true" : "false");
+				sb.Append(", resolution=").Append(info.LoadResolution);
+
+				if (!string.IsNullOrWhiteSpace(info.AssemblyVersion))
+					sb.Append(", version=").Append(info.AssemblyVersion);
+
+				if (info.LastWriteUtc.HasValue)
+					sb.Append(", lastWriteUtc=").Append(info.LastWriteUtc.Value.ToString("O"));
+
+				if (!string.IsNullOrWhiteSpace(info.ResolvedAssemblyPath))
+					sb.Append(", path=").Append(info.ResolvedAssemblyPath);
+
+				if (!string.IsNullOrWhiteSpace(info.Error))
+					sb.Append(", error=").Append(info.Error);
+
+				sb.AppendLine();
+			}
+
+			return sb.ToString().TrimEnd();
+		}
+
+		private void TrackReferenceAssemblyInfo(ReferenceStatement statement, Assembly? assembly, bool loadSucceeded, string loadResolution, string? error)
+		{
+			string alias = !string.IsNullOrWhiteSpace(statement.Reference)
+				? statement.Reference
+				: statement.AssemblyName;
+
+			string? loadedLocation = null;
+			try
+			{
+				loadedLocation = assembly?.Location;
+			}
+			catch
+			{
+				loadedLocation = null;
+			}
+
+			string? metadataPath = statement.ResolvedAssemblyPath;
+			if (string.IsNullOrWhiteSpace(metadataPath))
+				metadataPath = loadedLocation;
+
+			string? fileVersion = null;
+			System.DateTime? lastWriteUtc = null;
+			if (!string.IsNullOrWhiteSpace(metadataPath))
+			{
+				try
+				{
+					FileInfo info = new FileInfo(metadataPath);
+					if (info.Exists)
+					{
+						lastWriteUtc = info.LastWriteTimeUtc;
+						FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(metadataPath);
+						fileVersion = fileVersionInfo?.FileVersion;
+					}
+				}
+				catch
+				{
+					// Best-effort metadata only.
+				}
+			}
+
+			string? informationalVersion = null;
+			try
+			{
+				informationalVersion = assembly?
+					.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+					.InformationalVersion;
+			}
+			catch
+			{
+				informationalVersion = null;
+			}
+
+			AssemblyName? assemblyName = null;
+			try
+			{
+				assemblyName = assembly?.GetName();
+			}
+			catch
+			{
+				assemblyName = null;
+			}
+
+			_referenceAssemblyInfos[alias] = new ReferenceAssemblyInfo
+			{
+				Alias = alias,
+				RequestedReference = statement.AssemblyName,
+				IsFileReference = statement.IsFileReference,
+				ResolvedAssemblyPath = statement.ResolvedAssemblyPath,
+				AssemblySimpleName = assemblyName?.Name,
+				AssemblyFullName = assembly?.FullName,
+				AssemblyVersion = assemblyName?.Version?.ToString(),
+				FileVersion = fileVersion,
+				InformationalVersion = informationalVersion,
+				LastWriteUtc = lastWriteUtc,
+				LoadedLocation = loadedLocation,
+				LoadResolution = string.IsNullOrWhiteSpace(loadResolution) ? "unknown" : loadResolution,
+				LoadSucceeded = loadSucceeded,
+				Error = error
+			};
 		}
 
 		private static string BuildAssemblyLoadFailureDetails(string fullPath, Exception err)
@@ -3236,15 +3369,15 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			return true;
 		}
 
-		private static Assembly LoadAssemblyFromResolvedPath(string fullPath)
+		private static Assembly LoadAssemblyFromResolvedPath(string fullPath, out string loadResolution)
 		{
 			lock (s_assemblyPathCacheLock)
 			{
-				return LoadAssemblyFromResolvedPath(fullPath, s_assemblyPathCache);
+				return LoadAssemblyFromResolvedPath(fullPath, s_assemblyPathCache, out loadResolution);
 			}
 		}
 
-		private static Assembly LoadAssemblyFromResolvedPath(string path, Dictionary<string, Assembly> loadedAssemblies)
+		private static Assembly LoadAssemblyFromResolvedPath(string path, Dictionary<string, Assembly> loadedAssemblies, out string loadResolution)
 		{
 			string fullPath = Path.GetFullPath(path);
 			string fingerprint = BuildShadowDirectoryKey(fullPath);
@@ -3254,6 +3387,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			if (loadedAssemblies.TryGetValue(fingerprint, out Assembly? cached))
 			{
 				Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=fingerprint");
+				loadResolution = "cache-fingerprint";
 				return cached;
 			}
 
@@ -3261,6 +3395,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			{
 				loadedAssemblies[fingerprint] = loadedFromLocation;
 				Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=exact-location");
+				loadResolution = "exact-location";
 				return loadedFromLocation;
 			}
 
@@ -3268,6 +3403,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			{
 				loadedAssemblies[fingerprint] = loadedByIdentity;
 				Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=assembly-identity");
+				loadResolution = "assembly-identity";
 				return loadedByIdentity;
 			}
 
@@ -3332,6 +3468,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				Assembly loadedAssembly = Assembly.LoadFrom(shadowEntryPath);
 				loadedAssemblies[fingerprint] = loadedAssembly;
 				Logs.DebugLog.WriteEvent("AssemblyLoad.LoadedLocation", loadedAssembly.Location);
+				loadResolution = "load-from-shadow";
 				return loadedAssembly;
 			}
 			finally

@@ -125,5 +125,46 @@ import CopiedAsm ProtoScript.Parsers.Files FilesParser;
 					Directory.Delete(tempDir, true);
 			}
 		}
+
+		[TestMethod]
+		public void GetReferenceAssemblyInfos_IncludesVersionAndModifiedDate_ForFileReference()
+		{
+			string parsersAssemblyPath = typeof(Files).Assembly.Location.Replace("\\", "/");
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			ProtoScript.ReferenceStatement statement = ReferenceStatements.Parse($"reference \"{parsersAssemblyPath}\" ParsersAsm;");
+
+			compiler.Compile(statement);
+
+			ReferenceAssemblyInfo? info = compiler
+				.GetReferenceAssemblyInfos()
+				.FirstOrDefault(x => x.Alias == "ParsersAsm");
+
+			Assert.IsNotNull(info);
+			Assert.IsTrue(info!.LoadSucceeded);
+			Assert.IsFalse(string.IsNullOrWhiteSpace(info.AssemblyVersion));
+			Assert.IsTrue(info.LastWriteUtc.HasValue);
+			Assert.AreEqual(Path.GetFullPath(typeof(Files).Assembly.Location), Path.GetFullPath(info.LoadedLocation!));
+		}
+
+		[TestMethod]
+		public void GetReferenceAssemblyReport_IsDeterministicAndContainsAlias()
+		{
+			string parsersAssemblyPath = typeof(Files).Assembly.Location.Replace("\\", "/");
+			string code = $@"
+reference ""{parsersAssemblyPath}"" ZAlias;
+reference ""{parsersAssemblyPath}"" AAlias;
+";
+			ProtoScript.File file = Files.ParseFileContents(code);
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			compiler.Compile(file);
+
+			string report = compiler.GetReferenceAssemblyReport();
+
+			Assert.IsTrue(report.Contains("alias=AAlias", StringComparison.Ordinal));
+			Assert.IsTrue(report.Contains("alias=ZAlias", StringComparison.Ordinal));
+			Assert.IsTrue(report.IndexOf("alias=AAlias", StringComparison.Ordinal) < report.IndexOf("alias=ZAlias", StringComparison.Ordinal));
+		}
 	}
 }
