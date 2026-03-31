@@ -73,5 +73,38 @@ prototype ToRemoveGuidNamedBuffalySessions : SessionManagementSkillAction
 			}
 		}
 
+		[TestMethod]
+		public void Compile_PrototypeInheritsFromString_ShowsValueTypeGuidance()
+		{
+			const string code = @"
+prototype ResultType;
+prototype HtmlResult : ResultType, String
+{
+}
+
+function TestHtml() : HtmlResult
+{
+	return ""Buffaly"";
+}";
+
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			compiler.Compile(Files.ParseFileContents(code));
+
+			string combinedDiagnostics = string.Join(
+				"\n",
+				compiler.Diagnostics.Select(x => x.Diagnostic.Message));
+
+			Assert.IsTrue(
+				combinedDiagnostics.Contains("Type Of is not found: String", StringComparison.Ordinal),
+				"Expected missing type-of diagnostic for String. Actual: " + combinedDiagnostics);
+			Assert.IsTrue(
+				combinedDiagnostics.Contains("Prototype inheritance only supports prototype base types", StringComparison.Ordinal),
+				"Expected inheritance guidance for value/native types. Actual: " + combinedDiagnostics);
+			Assert.IsTrue(
+				combinedDiagnostics.Contains("Use a field/property for value types instead", StringComparison.Ordinal),
+				"Expected actionable field/property guidance. Actual: " + combinedDiagnostics);
+		}
+
 	}
 }
