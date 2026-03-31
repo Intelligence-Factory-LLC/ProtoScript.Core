@@ -19,20 +19,21 @@ namespace ProtoScript.Interpretter.Interpretting
 
 				foreach (var catchBlock in statement.CatchBlocks)
 				{
-					TypeInfo typeInfo = interpretter.Symbols.GetTypeInfo(catchBlock.Type);
-					if (catchBlock.Type == null || typeInfo.Type.IsAssignableFrom(exWorking.GetType()))
+					TypeInfo? typeInfo = catchBlock.Type == null ? null : interpretter.Symbols.GetTypeInfo(catchBlock.Type);
+					if (catchBlock.Type == null || (typeInfo?.Type != null && typeInfo.Type.IsAssignableFrom(exWorking.GetType())))
 					{
 						Scope scope = catchBlock.Statements.Scope;
 
 						try
 						{
 							interpretter.Symbols.EnterScope(scope.Clone());
-							
-							catchBlock.ExceptionValue.Value = exWorking;
+							if (catchBlock.ExceptionValue != null)
+							{
+								catchBlock.ExceptionValue.Value = exWorking;
+							}
 
 							if (interpretter.Evaluate(catchBlock.Statements))
 							{
-								interpretter.Symbols.LeaveScope();
 								return true;
 							}
 						}

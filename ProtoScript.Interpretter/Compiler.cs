@@ -1302,6 +1302,9 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			if (exp.Value == "&&")
 				return CompileAndOperator(exp);
 
+			if (exp.Value == "??")
+				return CompileNullCoalescingOperator(exp);
+
 			if (exp.Value == "?")
 				return CompileConditionalOperator(exp);
 
@@ -1685,6 +1688,28 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				return typeInfo.Type.Name;
 
 			return typeInfo.ToString();
+		}
+
+		public Compiled.Expression CompileNullCoalescingOperator(BinaryOperator op)
+		{
+			Compiled.Expression compiledLeft = Compile(op.Left);
+			Compiled.Expression compiledRight = Compile(op.Right);
+
+			if (compiledLeft == null || compiledRight == null)
+			{
+				this.AddDiagnostic(new Diagnostic("Could not compile null-coalescing operator"), null, op);
+				return null;
+			}
+
+			TypeInfo inferredType = InferConditionalOperatorType(compiledLeft.InferredType, compiledRight.InferredType, op);
+
+			return new Compiled.NullCoalescingOperator
+			{
+				Left = compiledLeft,
+				Right = compiledRight,
+				InferredType = inferredType,
+				Info = op.Info
+			};
 		}
 
 		public Compiled.Expression CompileConditionalOperator(BinaryOperator op)
@@ -3484,7 +3509,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				Path.GetTempPath(),
 				"ProtoScriptShadow",
 				"p" + Environment.ProcessId,
-				BuildShadowDirectoryKey(sourceAssemblyPath));
+				BuildShadowDirectoryKeyForDirectory(sourceDirectory));
 
 			object copyLock = s_shadowCopyLocks.GetOrAdd(shadowDirectory, _ => new object());
 			lock (copyLock)
@@ -3496,17 +3521,44 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					foreach (string sourceDllPath in Directory.GetFiles(sourceDirectory, "*.dll"))
 					{
 						string destinationDllPath = Path.Combine(shadowDirectory, Path.GetFileName(sourceDllPath));
-						CopyFileWithRetry(sourceDllPath, destinationDllPath);
+						CopyFileIfChangedWithRetry(sourceDllPath, destinationDllPath);
 					}
 				}
 				else
 				{
 					string destinationPath = Path.Combine(shadowDirectory, Path.GetFileName(sourceAssemblyPath));
-					CopyFileWithRetry(sourceAssemblyPath, destinationPath);
+					CopyFileIfChangedWithRetry(sourceAssemblyPath, destinationPath);
 				}
 			}
 
 			return shadowDirectory;
+		}
+
+		private static string BuildShadowDirectoryKeyForDirectory(string sourceDirectoryPath)
+		{
+			if (string.IsNullOrWhiteSpace(sourceDirectoryPath))
+			{
+				return "NO_SOURCE_DIRECTORY";
+			}
+
+			string normalizedPath = Path.GetFullPath(sourceDirectoryPath).Trim().ToLowerInvariant();
+			byte[] bytes = System.Text.Encoding.UTF8.GetBytes(normalizedPath);
+			byte[] hash = System.Security.Cryptography.SHA256.HashData(bytes);
+			return Convert.ToHexString(hash);
+		}
+
+		private static void CopyFileIfChangedWithRetry(string sourcePath, string destinationPath)
+		{
+			FileInfo sourceInfo = new FileInfo(sourcePath);
+			FileInfo destinationInfo = new FileInfo(destinationPath);
+			if (destinationInfo.Exists
+				&& destinationInfo.Length == sourceInfo.Length
+				&& destinationInfo.LastWriteTimeUtc >= sourceInfo.LastWriteTimeUtc)
+			{
+				return;
+			}
+
+			CopyFileWithRetry(sourcePath, destinationPath);
 		}
 
 		private static void CopyFileWithRetry(string sourcePath, string destinationPath)

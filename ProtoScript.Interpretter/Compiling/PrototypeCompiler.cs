@@ -124,7 +124,7 @@ namespace ProtoScript.Interpretter.Compiling
 
 				if (null == protoTypeOf)
 				{
-					compiler.AddDiagnostic("Type Of is not found: " + typeOf.TypeName, protoDef, null);
+					compiler.AddDiagnostic(BuildMissingTypeOfDiagnostic(typeOf.TypeName, compiler), protoDef, null);
 					return;
 				}
 
@@ -161,6 +161,46 @@ namespace ProtoScript.Interpretter.Compiling
 			{
 				PrototypeCompiler.DeclarePrototypeTypeOfs(prototypeDefinition, compiler);
 			}
+		}
+
+		private static string BuildMissingTypeOfDiagnostic(string typeName, Compiler compiler)
+		{
+			TypeInfo? resolvedTypeInfo = compiler.Symbols.GetTypeInfo(typeName);
+			if (resolvedTypeInfo != null && resolvedTypeInfo is not PrototypeTypeInfo)
+			{
+				string resolvedName = resolvedTypeInfo.Type?.FullName ?? resolvedTypeInfo.GetType().Name;
+				return "Type Of is not found: " + typeName
+					+ ". '" + typeName + "' resolves to non-prototype type '" + resolvedName + "'. "
+					+ "Prototype inheritance only supports prototype base types. "
+					+ "Use a field/property for value types instead.";
+			}
+
+			if (IsLikelyNativeValueTypeName(typeName))
+			{
+				return "Type Of is not found: " + typeName
+					+ ". '" + typeName + "' appears to be a value/native type. "
+					+ "Prototype inheritance only supports prototype base types. "
+					+ "Use a field/property for value types instead.";
+			}
+
+			return "Type Of is not found: " + typeName;
+		}
+
+		private static bool IsLikelyNativeValueTypeName(string typeName)
+		{
+			return StringUtil.EqualNoCase(typeName, "string")
+				|| StringUtil.EqualNoCase(typeName, "String")
+				|| StringUtil.EqualNoCase(typeName, "bool")
+				|| StringUtil.EqualNoCase(typeName, "Boolean")
+				|| StringUtil.EqualNoCase(typeName, "int")
+				|| StringUtil.EqualNoCase(typeName, "Int32")
+				|| StringUtil.EqualNoCase(typeName, "long")
+				|| StringUtil.EqualNoCase(typeName, "Int64")
+				|| StringUtil.EqualNoCase(typeName, "double")
+				|| StringUtil.EqualNoCase(typeName, "float")
+				|| StringUtil.EqualNoCase(typeName, "decimal")
+				|| StringUtil.EqualNoCase(typeName, "DateTime")
+				|| StringUtil.EqualNoCase(typeName, "Guid");
 		}
 
 

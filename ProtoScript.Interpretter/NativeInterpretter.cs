@@ -976,6 +976,9 @@ namespace ProtoScript.Interpretter
 				case Compiled.AndOperator andOp:
 					return Evaluate(andOp);
 
+				case Compiled.NullCoalescingOperator nullCoalesceOp:
+					return Evaluate(nullCoalesceOp);
+
 				case Compiled.AddOperator addOp:
 					return Evaluate(addOp);
 
@@ -1202,6 +1205,28 @@ namespace ProtoScript.Interpretter
 				return Evaluate(exp.TrueExpression);
 
 			return Evaluate(exp.FalseExpression);
+		}
+
+		public object Evaluate(Compiled.NullCoalescingOperator exp)
+		{
+			object? left = Evaluate(exp.Left);
+			left = UnwrapNullCoalescingOperand(left);
+			if (left != null)
+				return left;
+
+			object? right = Evaluate(exp.Right);
+			return UnwrapNullCoalescingOperand(right);
+		}
+
+		private static object? UnwrapNullCoalescingOperand(object? value)
+		{
+			if (value is ValueRuntimeInfo valueRuntimeInfo)
+				return valueRuntimeInfo.Value;
+
+			if (value is PrototypeTypeInfo prototypeTypeInfo)
+				return prototypeTypeInfo.Prototype;
+
+			return value;
 		}
 
 		public object Evaluate(Compiled.IndexOperator exp)

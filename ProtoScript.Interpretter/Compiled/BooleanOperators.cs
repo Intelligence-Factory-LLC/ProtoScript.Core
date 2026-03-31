@@ -18,6 +18,10 @@ namespace ProtoScript.Interpretter.Compiled
 		public AndOperator() { InferredType = new TypeInfo(typeof(bool)); }
 	}
 
+	public class NullCoalescingOperator : BinaryExpression
+	{
+	}
+
 	public class ComparisonOperator : BinaryExpression
 	{
 		public string Operator;

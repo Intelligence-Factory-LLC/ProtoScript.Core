@@ -1,5 +1,6 @@
 ﻿using ProtoScript.Interpretter.RuntimeInfo;
 using ProtoScript.Interpretter.Symbols;
+using System;
 
 namespace ProtoScript.Interpretter.Compiling
 {
@@ -21,16 +22,31 @@ namespace ProtoScript.Interpretter.Compiling
 					compiledCatchBlock.Type = catchBlock.Type;
 					compiledCatchBlock.ExceptionName = catchBlock.ExceptionName;
 
-					TypeInfo infoType = compiler.Symbols.GetTypeInfo(catchBlock.Type) as TypeInfo;
+					TypeInfo infoType;
+					if (catchBlock.Type == null)
+					{
+						infoType = new TypeInfo(typeof(Exception));
+					}
+					else
+					{
+						infoType = compiler.Symbols.GetTypeInfo(catchBlock.Type) as TypeInfo;
+					}
+
+					if (infoType == null)
+					{
+						compiler.AddDiagnostic("Could not resolve catch type", statement, null);
+						continue;
+					}
 
 					Scope scope = new Scope(Scope.ScopeTypes.Block);
-					VariableRuntimeInfo variableRuntimeInfo = new VariableRuntimeInfo();
-					variableRuntimeInfo.Type = infoType;
-					variableRuntimeInfo.Index = scope.Stack.Add(variableRuntimeInfo);
-					compiledCatchBlock.ExceptionValue = variableRuntimeInfo;
-
-
-					scope.InsertSymbol(compiledCatchBlock.ExceptionName, variableRuntimeInfo);
+					if (!string.IsNullOrWhiteSpace(compiledCatchBlock.ExceptionName))
+					{
+						VariableRuntimeInfo variableRuntimeInfo = new VariableRuntimeInfo();
+						variableRuntimeInfo.Type = infoType;
+						variableRuntimeInfo.Index = scope.Stack.Add(variableRuntimeInfo);
+						compiledCatchBlock.ExceptionValue = variableRuntimeInfo;
+						scope.InsertSymbol(compiledCatchBlock.ExceptionName, variableRuntimeInfo);
+					}
 					compiler.Symbols.EnterScope(scope);
 					
 					try
