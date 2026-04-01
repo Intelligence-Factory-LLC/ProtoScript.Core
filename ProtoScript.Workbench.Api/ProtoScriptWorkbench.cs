@@ -65,6 +65,7 @@ namespace ProtoScript.Extensions
 			m_mapSessions.Clear();
 			m_Debugger = null;
 			m_Sockets = new Sockets();
+			Compiler.ClearAssemblyReferenceCache();
 		}
 
 		static protected void EnterSession(SessionObject session)

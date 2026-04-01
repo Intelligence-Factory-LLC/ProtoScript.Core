@@ -3402,6 +3402,14 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			}
 		}
 
+		public static void ClearAssemblyReferenceCache()
+		{
+			lock (s_assemblyPathCacheLock)
+			{
+				s_assemblyPathCache.Clear();
+			}
+		}
+
 		private static Assembly LoadAssemblyFromResolvedPath(string path, Dictionary<string, Assembly> loadedAssemblies, out string loadResolution)
 		{
 			string fullPath = Path.GetFullPath(path);
@@ -3422,14 +3430,6 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=exact-location");
 				loadResolution = "exact-location";
 				return loadedFromLocation;
-			}
-
-			if (TryGetLoadedAssemblyByIdentity(fullPath, out Assembly? loadedByIdentity))
-			{
-				loadedAssemblies[fingerprint] = loadedByIdentity;
-				Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=assembly-identity");
-				loadResolution = "assembly-identity";
-				return loadedByIdentity;
 			}
 
 			if (!System.IO.File.Exists(fullPath))
@@ -3466,13 +3466,6 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					loadedAssemblies[dependencyFingerprint] = loadedDependencyByLocation;
 					Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=exact-location");
 					return loadedDependencyByLocation;
-				}
-
-				if (TryGetLoadedAssemblyByIdentity(requestedName, out Assembly? loadedDependencyByIdentity))
-				{
-					loadedAssemblies[dependencyFingerprint] = loadedDependencyByIdentity;
-					Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=assembly-identity");
-					return loadedDependencyByIdentity;
 				}
 
 				string shadowDependencyPath = Path.Combine(shadowDirectory, requestedName.Name + ".dll");
