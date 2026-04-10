@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ProtoScript.Interpretter;
 using ProtoScript.Parsers;
+using System.IO;
 using System.Reflection;
 
 namespace ProtoScript.Tests
@@ -118,12 +119,34 @@ import CopiedAsm ProtoScript.Parsers.Files FilesParser;
 				Assert.AreEqual(0, compiler.Diagnostics.Count);
 				Assert.IsTrue(compiler.References.TryGetValue("CopiedAsm", out object? loadedObj));
 				Assert.AreSame(typeof(Files).Assembly, loadedObj as Assembly);
+				ReferenceAssemblyInfo? info = compiler
+					.GetReferenceAssemblyInfos()
+					.FirstOrDefault(x => x.Alias == "CopiedAsm");
+				Assert.IsNotNull(info);
+				Assert.AreNotEqual("assembly-identity", info!.LoadResolution);
 			}
 			finally
 			{
 				if (Directory.Exists(tempDir))
 					Directory.Delete(tempDir, true);
 			}
+		}
+
+		[TestMethod]
+		public void FileLoadAlreadyLoadedClassifier_IsSelective()
+		{
+			MethodInfo? method = typeof(Compiler).GetMethod(
+				"IsAlreadyLoadedFileLoadException",
+				BindingFlags.NonPublic | BindingFlags.Static);
+			Assert.IsNotNull(method);
+
+			object? match = method!.Invoke(null, new object[] { new FileLoadException("Assembly with same name is already loaded") });
+			object? nonMatch = method!.Invoke(null, new object[] { new FileLoadException("Could not load file or assembly due to invalid image") });
+
+			Assert.IsNotNull(match);
+			Assert.IsNotNull(nonMatch);
+			Assert.IsTrue((bool)match!);
+			Assert.IsFalse((bool)nonMatch!);
 		}
 
 		[TestMethod]

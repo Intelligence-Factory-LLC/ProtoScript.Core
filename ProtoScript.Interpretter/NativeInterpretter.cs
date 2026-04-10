@@ -105,8 +105,12 @@ namespace ProtoScript.Interpretter
 
 		private PrototypeTypeInfo? GetPrototypeTypeInfo(Prototype prototype)
 		{
-			PrototypeTypeInfo? prototypeTypeInfo = prototype.Data["TypeInfo"] as PrototypeTypeInfo;
-			return prototypeTypeInfo;
+			PrototypeTypeInfo? prototypeTypeInfo = Symbols.GetTypeInfo(prototype.PrototypeName) as PrototypeTypeInfo;
+			if (prototypeTypeInfo != null)
+				return prototypeTypeInfo;
+
+			// Legacy fallback for partially initialized contexts.
+			return prototype.Data["TypeInfo"] as PrototypeTypeInfo;
 		}
 
 		private FunctionRuntimeInfo GetConstructor(Prototype prototype)
@@ -884,7 +888,59 @@ namespace ProtoScript.Interpretter
 					return Symbols.ActiveScopes[i].Stack[exp.Index];
 			}
 
-			return exp.Scope.Stack[exp.Index];
+			if (IsScopeOwnedByCurrentRuntime(exp.Scope))
+			{
+				return exp.Scope.Stack[exp.Index];
+			}
+
+			throw new RuntimeException(
+				$"GetStack scope {iID} is not owned by current runtime. Active scope IDs: {string.Join(",", Symbols.ActiveScopes.Select(x => x.ID))}",
+				exp.Info);
+		}
+
+		private bool IsScopeOwnedByCurrentRuntime(Scope scope)
+		{
+			if (scope == null)
+				return false;
+
+			if (Symbols.GetGlobalScope().ID == scope.ID)
+				return true;
+
+			if (Symbols.ActiveScopes.Any(x => x.ID == scope.ID))
+				return true;
+
+			foreach (object? value in Symbols.GetGlobalScope().Symbols.Values)
+			{
+				if (TryGetOwnedScope(value, out Scope? ownedScope) && ownedScope != null && ownedScope.ID == scope.ID)
+					return true;
+			}
+
+			foreach (object? value in Symbols.GlobalStack)
+			{
+				if (TryGetOwnedScope(value, out Scope? ownedScope) && ownedScope != null && ownedScope.ID == scope.ID)
+					return true;
+			}
+
+			return false;
+		}
+
+		private static bool TryGetOwnedScope(object? value, out Scope? scope)
+		{
+			switch (value)
+			{
+				case Scope s:
+					scope = s;
+					return true;
+				case FunctionRuntimeInfo functionRuntimeInfo:
+					scope = functionRuntimeInfo.Scope;
+					return scope != null;
+				case PrototypeTypeInfo prototypeTypeInfo:
+					scope = prototypeTypeInfo.Scope;
+					return scope != null;
+				default:
+					scope = null;
+					return false;
+			}
 		}
 
 		public object Evaluate(GetGlobalStack exp)

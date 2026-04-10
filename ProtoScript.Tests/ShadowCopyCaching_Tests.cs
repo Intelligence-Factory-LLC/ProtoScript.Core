@@ -33,7 +33,7 @@ namespace ProtoScript.Tests
 		}
 
 		[TestMethod]
-		public void PrepareShadowCopyDirectory_RefreshesChangedSourceDll()
+		public void PrepareShadowCopyDirectory_UsesNewDirectoryWhenSourceDllChanges()
 		{
 			string tempDir = Path.Combine(Path.GetTempPath(), "ProtoScript_ShadowRefresh_" + Guid.NewGuid().ToString("N"));
 			Directory.CreateDirectory(tempDir);
@@ -51,9 +51,13 @@ namespace ProtoScript.Tests
 				System.Threading.Thread.Sleep(1200);
 				System.IO.File.WriteAllText(sourceDll, "version-2-with-more-bytes");
 
-				InvokePrepareShadowCopyDirectory(sourceDll);
-				string secondShadowContent = System.IO.File.ReadAllText(shadowDll);
+				string secondShadowDir = InvokePrepareShadowCopyDirectory(sourceDll);
+				string secondShadowDll = Path.Combine(secondShadowDir, "HotSwap.dll");
+				Assert.AreNotEqual(shadowDir, secondShadowDir);
+				Assert.IsTrue(System.IO.File.Exists(secondShadowDll));
+				string secondShadowContent = System.IO.File.ReadAllText(secondShadowDll);
 				Assert.AreEqual("version-2-with-more-bytes", secondShadowContent);
+				Assert.AreEqual("version-1", System.IO.File.ReadAllText(shadowDll));
 			}
 			finally
 			{

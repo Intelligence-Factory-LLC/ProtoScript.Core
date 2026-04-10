@@ -115,7 +115,7 @@ namespace ProtoScript.Interpretter.Compiling
 		static public void DeclarePrototypeTypeOfs(PrototypeDefinition protoDef, Compiler compiler)
 		{
 			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
-			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef, compiler);
 
 			foreach (ProtoScript.Type typeOf in protoDef.Inherits)
 			{				
@@ -210,7 +210,7 @@ namespace ProtoScript.Interpretter.Compiling
 			List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
 
 			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
-			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef, compiler);
 
 			compiler.Symbols.EnterScope(info.Scope);
 
@@ -271,7 +271,7 @@ namespace ProtoScript.Interpretter.Compiling
 			//prototype Converts<T>;
 			//then ignore the T until the Declaration. 
 			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
-			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef, compiler);
 
 			List<Compiled.Statement>? prototypeFunctions = DefinePrototypeFunctions(protoDef, info, compiler);
 			if (prototypeFunctions != null)
@@ -534,7 +534,7 @@ namespace ProtoScript.Interpretter.Compiling
 			List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
 
 			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
-			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef, compiler);
 
 			compiler.Symbols.EnterScope(info.Scope);
 			Scope scopeGlobal = compiler.Symbols.GetGlobalScope();
@@ -699,7 +699,7 @@ namespace ProtoScript.Interpretter.Compiling
 		public static void DeclareNestedPrototypes(PrototypeDefinition protoDef, Compiler compiler)
 		{
 			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
-			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef, compiler);
 
 			try
 			{
@@ -738,7 +738,7 @@ namespace ProtoScript.Interpretter.Compiling
 			List<Compiled.Statement> lstStatements = new List<Compiled.Statement>();
 
 			Prototype prototype = GetResolvedPrototypeOrThrow(protoDef);
-			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef);
+			PrototypeTypeInfo info = GetPrototypeTypeInfoOrThrow(prototype, protoDef, compiler);
 
 			try
 			{
@@ -777,10 +777,10 @@ namespace ProtoScript.Interpretter.Compiling
 				?? throw new InvalidOperationException($"Prototype '{protoDef.PrototypeName?.TypeName ?? "(unknown)"}' was not resolved during declaration.");
 		}
 
-		private static PrototypeTypeInfo GetPrototypeTypeInfoOrThrow(Prototype prototype, PrototypeDefinition protoDef)
+		private static PrototypeTypeInfo GetPrototypeTypeInfoOrThrow(Prototype prototype, PrototypeDefinition protoDef, Compiler compiler)
 		{
-			return prototype.Data["TypeInfo"] as PrototypeTypeInfo
-				?? throw new InvalidOperationException($"Prototype '{protoDef.PrototypeName?.TypeName ?? prototype.PrototypeName}' is missing TypeInfo metadata in Prototype.Data.");
+			return compiler.Symbols.GetTypeInfo(prototype.PrototypeName) as PrototypeTypeInfo
+				?? throw new InvalidOperationException($"Prototype '{protoDef.PrototypeName?.TypeName ?? prototype.PrototypeName}' is missing TypeInfo metadata in compiler symbols.");
 		}
 	}
 }

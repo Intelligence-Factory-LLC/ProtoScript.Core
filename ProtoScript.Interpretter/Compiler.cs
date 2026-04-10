@@ -3474,20 +3474,51 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					CopyFileWithRetry(dependencyFullPath, shadowDependencyPath);
 				}
 
-				Assembly loadedDependency = Assembly.LoadFrom(shadowDependencyPath);
-				loadedAssemblies[dependencyFingerprint] = loadedDependency;
-				Logs.DebugLog.WriteEvent("AssemblyLoad.LoadedLocation", loadedDependency.Location);
-				return loadedDependency;
+				try
+				{
+					Assembly loadedDependency = Assembly.LoadFrom(shadowDependencyPath);
+					loadedAssemblies[dependencyFingerprint] = loadedDependency;
+					Logs.DebugLog.WriteEvent("AssemblyLoad.LoadedLocation", loadedDependency.Location);
+					return loadedDependency;
+				}
+				catch (FileLoadException fileLoadException)
+				{
+					if (IsAlreadyLoadedFileLoadException(fileLoadException)
+						&& TryGetLoadedAssemblyByIdentity(dependencyFullPath, out Assembly? loadedDependencyAfterLoadFailure))
+					{
+						loadedAssemblies[dependencyFingerprint] = loadedDependencyAfterLoadFailure;
+						Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=assembly-identity-after-fileload");
+						return loadedDependencyAfterLoadFailure;
+					}
+
+					throw;
+				}
 			};
 
 			AppDomain.CurrentDomain.AssemblyResolve += resolver;
 			try
 			{
-				Assembly loadedAssembly = Assembly.LoadFrom(shadowEntryPath);
-				loadedAssemblies[fingerprint] = loadedAssembly;
-				Logs.DebugLog.WriteEvent("AssemblyLoad.LoadedLocation", loadedAssembly.Location);
-				loadResolution = "load-from-shadow";
-				return loadedAssembly;
+				try
+				{
+					Assembly loadedAssembly = Assembly.LoadFrom(shadowEntryPath);
+					loadedAssemblies[fingerprint] = loadedAssembly;
+					Logs.DebugLog.WriteEvent("AssemblyLoad.LoadedLocation", loadedAssembly.Location);
+					loadResolution = "load-from-shadow";
+					return loadedAssembly;
+				}
+				catch (FileLoadException fileLoadException)
+				{
+					if (IsAlreadyLoadedFileLoadException(fileLoadException)
+						&& TryGetLoadedAssemblyByIdentity(fullPath, out Assembly? loadedAssemblyAfterLoadFailure))
+					{
+						loadedAssemblies[fingerprint] = loadedAssemblyAfterLoadFailure;
+						Logs.DebugLog.WriteEvent("AssemblyLoad.CacheHit", "reason=assembly-identity-after-fileload");
+						loadResolution = "assembly-identity-after-fileload";
+						return loadedAssemblyAfterLoadFailure;
+					}
+
+					throw;
+				}
 			}
 			finally
 			{
@@ -3502,7 +3533,7 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 				Path.GetTempPath(),
 				"ProtoScriptShadow",
 				"p" + Environment.ProcessId,
-				BuildShadowDirectoryKeyForDirectory(sourceDirectory));
+				BuildShadowDirectoryVersionKey(sourceDirectory, sourceAssemblyPath));
 
 			object copyLock = s_shadowCopyLocks.GetOrAdd(shadowDirectory, _ => new object());
 			lock (copyLock)
@@ -3536,6 +3567,32 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 			string normalizedPath = Path.GetFullPath(sourceDirectoryPath).Trim().ToLowerInvariant();
 			byte[] bytes = System.Text.Encoding.UTF8.GetBytes(normalizedPath);
+			byte[] hash = System.Security.Cryptography.SHA256.HashData(bytes);
+			return Convert.ToHexString(hash);
+		}
+
+		private static string BuildShadowDirectoryVersionKey(string sourceDirectoryPath, string sourceAssemblyPath)
+		{
+			if (string.IsNullOrWhiteSpace(sourceDirectoryPath) || !Directory.Exists(sourceDirectoryPath))
+			{
+				return BuildShadowDirectoryKey(sourceAssemblyPath);
+			}
+
+			System.Text.StringBuilder fingerprint = new System.Text.StringBuilder();
+			fingerprint.Append(BuildShadowDirectoryKeyForDirectory(sourceDirectoryPath));
+
+			foreach (string sourceDllPath in Directory.GetFiles(sourceDirectoryPath, "*.dll").OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+			{
+				FileInfo fileInfo = new FileInfo(sourceDllPath);
+				fingerprint.Append('|');
+				fingerprint.Append(Path.GetFileName(sourceDllPath).ToLowerInvariant());
+				fingerprint.Append('|');
+				fingerprint.Append(fileInfo.Exists ? fileInfo.Length : 0L);
+				fingerprint.Append('|');
+				fingerprint.Append(fileInfo.Exists ? fileInfo.LastWriteTimeUtc.Ticks : 0L);
+			}
+
+			byte[] bytes = System.Text.Encoding.UTF8.GetBytes(fingerprint.ToString());
 			byte[] hash = System.Security.Cryptography.SHA256.HashData(bytes);
 			return Convert.ToHexString(hash);
 		}
@@ -3615,6 +3672,21 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 			}
 
 			assembly = null;
+			return false;
+		}
+
+		private static bool IsAlreadyLoadedFileLoadException(FileLoadException ex)
+		{
+			if (ex == null)
+				return false;
+
+			string message = ex.Message ?? string.Empty;
+			if (message.IndexOf("already loaded", StringComparison.OrdinalIgnoreCase) >= 0)
+				return true;
+
+			if (message.IndexOf("same name is already loaded", StringComparison.OrdinalIgnoreCase) >= 0)
+				return true;
+
 			return false;
 		}
 
