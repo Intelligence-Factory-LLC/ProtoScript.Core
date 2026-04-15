@@ -1,4 +1,4 @@
-﻿using BasicUtilities;
+using BasicUtilities;
 using System.Text;
 
 namespace ProtoScript.Parsers
@@ -934,7 +934,12 @@ if (op.Value == "." || op.Value == "?.")
 					Write(" = ");
 					ToString(initializer.Value);
 				}
-								
+				else
+				{
+					if (i != 0)
+						WriteStart();
+					ToString(oNew.Initializers[i]);
+				}
 
 				if (i == oNew.Initializers.Count - 1)
 					Write("}");
@@ -1182,3 +1187,4 @@ if (op.Value == "." || op.Value == "?.")
 
 
 }
+

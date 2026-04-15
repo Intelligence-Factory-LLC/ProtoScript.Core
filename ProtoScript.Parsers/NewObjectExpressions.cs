@@ -1,4 +1,4 @@
-﻿namespace ProtoScript.Parsers
+namespace ProtoScript.Parsers
 {
 	public class NewObjectExpressions
 	{
@@ -82,9 +82,18 @@
 					else
 					{
 						int iCursor = tok.getCursor();
+						bool parsedIdentifier = false;
+						try
+						{
+							strTok = Identifiers.ParseMultiple(tok);
+							parsedIdentifier = true;
+						}
+						catch
+						{
+							tok.setCursor(iCursor);
+						}
 
-						strTok = Identifiers.ParseMultiple(tok);
-						if (tok.CouldBeNext("="))
+						if (parsedIdentifier && tok.CouldBeNext("="))
 						{
 							NewObjectExpression.ObjectInitializer initializer = new NewObjectExpression.ObjectInitializer();
 							initializer.Info.StartStatement(iCursor);
@@ -98,7 +107,8 @@
 						}
 						else
 						{
-							lstInitializers.Expressions.Add(new Identifier(strTok));							
+							tok.setCursor(iCursor);
+							lstInitializers.Expressions.Add(Expressions.Parse(tok));
 						}
 					}
 
@@ -134,3 +144,4 @@
 		}
 	}
 }
+

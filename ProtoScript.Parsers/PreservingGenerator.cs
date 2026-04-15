@@ -1,4 +1,4 @@
-﻿using BasicUtilities;
+using BasicUtilities;
 
 namespace ProtoScript.Parsers
 {
@@ -713,7 +713,14 @@ namespace ProtoScript.Parsers
 				else
 					Write("{");
 
-				ToString(oNew.Initializers[i]);
+				if (oNew.Initializers[i] is NewObjectExpression.ObjectInitializer objectInitializer)
+				{
+					ToString(objectInitializer);
+				}
+				else
+				{
+					ToString(oNew.Initializers[i]);
+				}
 
 				if (i == oNew.Initializers.Count - 1)
 					Write("}");
@@ -972,3 +979,4 @@ namespace ProtoScript.Parsers
 	}
 
 }
+

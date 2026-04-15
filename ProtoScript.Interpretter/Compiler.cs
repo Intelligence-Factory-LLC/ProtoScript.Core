@@ -1,4 +1,4 @@
-﻿using BasicUtilities;
+using BasicUtilities;
 using BasicUtilities.Collections;
 using Ontology;
 using Ontology.Simulation;
@@ -2157,7 +2157,15 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					{
 						foreach (Expression expInitializer in expr.Initializers)
 						{
-							NewInstance.ObjectInitializer initializer = Compile(expInitializer as NewObjectExpression.ObjectInitializer, prototypeTypeInfo.Prototype);
+							if (expInitializer is not NewObjectExpression.ObjectInitializer objectInitializer)
+							{
+								this.AddDiagnostic(new Diagnostic("Prototype object initializers only support identifier assignments (Name = Value)."), null, expInitializer);
+								return null;
+							}
+
+							NewInstance.ObjectInitializer initializer = Compile(objectInitializer, prototypeTypeInfo.Prototype);
+							if (initializer == null)
+								return null;
 							newInstance.Initializers.Add(initializer);
 						}
 					}
@@ -2201,7 +2209,46 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 					return null;
 				}
 
-				return new DotNetNewInstance() { Constructor = constructor, Parameters = lstParams, InferredType = new TypeInfo(type) };
+				DotNetNewInstance newInstance = new DotNetNewInstance() { Constructor = constructor, Parameters = lstParams, InferredType = new TypeInfo(type) };
+
+				if (expr.Initializers != null)
+				{
+					foreach (Expression expInitializer in expr.Initializers)
+					{
+						if (expInitializer is NewObjectExpression.ObjectInitializer objectInitializer)
+						{
+							Compiled.Expression memberValueExpression = Compile(objectInitializer.Value);
+							if (memberValueExpression == null)
+							{
+								this.AddDiagnostic(new Diagnostic($"Could not compile initializer value for member '{objectInitializer.Name}'."), null, objectInitializer);
+								return null;
+							}
+				
+							newInstance.MemberInitializers.Add(new DotNetNewInstance.MemberInitializer
+							{
+								Name = objectInitializer.Name,
+								Value = memberValueExpression,
+								Info = objectInitializer.Info
+							});
+							continue;
+						}
+				
+						Compiled.Expression collectionValueExpression = Compile(expInitializer);
+						if (collectionValueExpression == null)
+						{
+							this.AddDiagnostic(new Diagnostic("Could not compile collection initializer entry."), null, expInitializer);
+							return null;
+						}
+						newInstance.CollectionInitializers.Add(new DotNetNewInstance.CollectionInitializer
+						{
+							Value = collectionValueExpression,
+							Info = expInitializer.Info
+						});
+						continue;
+					}
+				}
+
+				return newInstance;
 			}
 
 			throw new ProtoScriptCompilerException(
@@ -3837,5 +3884,4 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 		}
 	}
 }
-
 

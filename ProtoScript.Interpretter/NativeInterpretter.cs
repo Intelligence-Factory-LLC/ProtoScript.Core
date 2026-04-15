@@ -1,4 +1,4 @@
-﻿//added
+//added
 using BasicUtilities;
 using Ontology;
 using Ontology.BaseTypes;
@@ -7,6 +7,7 @@ using ProtoScript.Interpretter.Compiled;
 using ProtoScript.Interpretter.Interpretting;
 using ProtoScript.Interpretter.RuntimeInfo;
 using ProtoScript.Interpretter.Symbols;
+using System;
 
 namespace ProtoScript.Interpretter
 {
@@ -2506,12 +2507,93 @@ namespace ProtoScript.Interpretter
 			var activator = ReflectionCache.GetConstructor(exp.Constructor);   // Func<object?[],object?>
 			object oReturn = activator(lstParameters.ToArray());
 
+			foreach (DotNetNewInstance.MemberInitializer initializer in exp.MemberInitializers)
+			{
+				ApplyDotNetMemberInitializer(oReturn, initializer);
+			}
+
+			foreach (DotNetNewInstance.CollectionInitializer initializer in exp.CollectionInitializers)
+			{
+				ApplyDotNetCollectionInitializer(oReturn, initializer);
+			}
+
 			return oReturn;
+		}
+
+		private void ApplyDotNetMemberInitializer(object target, DotNetNewInstance.MemberInitializer initializer)
+		{
+			object value = Evaluate(initializer.Value);
+			if (value is ValueRuntimeInfo valueRuntimeInfo)
+				value = valueRuntimeInfo.Value;
+
+			System.Type targetType = target.GetType();
+			System.Reflection.PropertyInfo? property = targetType.GetProperty(initializer.Name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+			if (property != null && property.SetMethod != null)
+			{
+				object converted = ConvertDotNetInitializerValue(value, property.PropertyType, initializer.Info);
+				property.SetValue(target, converted);
+				return;
+			}
+
+			System.Reflection.FieldInfo? field = targetType.GetField(initializer.Name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+			if (field != null)
+			{
+				object converted = ConvertDotNetInitializerValue(value, field.FieldType, initializer.Info);
+				field.SetValue(target, converted);
+				return;
+			}
+
+			throw new RuntimeException($"Cannot apply object initializer member '{initializer.Name}' to type '{targetType.FullName}'.", initializer.Info);
+		}
+
+		private void ApplyDotNetCollectionInitializer(object target, DotNetNewInstance.CollectionInitializer initializer)
+		{
+			object value = Evaluate(initializer.Value);
+			if (value is ValueRuntimeInfo valueRuntimeInfo)
+				value = valueRuntimeInfo.Value;
+
+			if (TryAddDotNetCollectionValue(target, value, initializer.Info))
+				return;
+
+			throw new RuntimeException($"Cannot apply collection initializer entry to type '{target.GetType().FullName}'.", initializer.Info);
+		}
+
+		private bool TryAddDotNetCollectionValue(object target, object value, StatementParsingInfo info)
+		{
+			System.Type type = target.GetType();
+			foreach (System.Reflection.MethodInfo method in type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
+			{
+				if (!string.Equals(method.Name, "Add", StringComparison.Ordinal))
+					continue;
+
+				System.Reflection.ParameterInfo[] parameters = method.GetParameters();
+				if (parameters.Length != 1)
+					continue;
+
+				object convertedValue = ConvertDotNetInitializerValue(value, parameters[0].ParameterType, info);
+				method.Invoke(target, new object[] { convertedValue });
+				return true;
+			}
+
+			return false;
+		}
+		private static object ConvertDotNetInitializerValue(object value, System.Type targetType, StatementParsingInfo info)
+		{
+			if (targetType == typeof(JsonValue))
+			{
+				if (value is JsonValue jsonValue)
+					return jsonValue;
+
+				return new JsonValue(value);
+			}
+
+			if (ValueConversions.TryMakeAssignable(value, new TypeInfo(targetType), out object convertedValue))
+				return convertedValue;
+
+			throw new RuntimeException($"Cannot assign initializer value to target type '{targetType.FullName}'.", info);
 		}
 
 
 	}
 }
-
-
 

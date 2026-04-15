@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace ProtoScript
 {
@@ -79,7 +79,6 @@ namespace ProtoScript
 				yield break;
 			}
 		}
-
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
@@ -130,3 +129,4 @@ namespace ProtoScript
 
 	}
 }
+
