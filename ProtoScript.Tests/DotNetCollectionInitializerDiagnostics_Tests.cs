@@ -85,6 +85,40 @@ function main() : string
 			Assert.IsTrue(ex.Message.Contains("Cannot apply collection initializer entry"), ex.Message);
 		}
 
+		[TestMethod]
+		public void DotNetJsonObject_IndexerAssignment_CompilesAndRuns()
+		{
+			string code = @"
+reference BasicUtilities BasicUtilities;
+import BasicUtilities BasicUtilities.JsonObject JsonObject;
+
+function main() : string
+{
+	JsonObject args = new JsonObject();
+	args[""DeploymentName""] = ""Deploy-A"";
+	args[""Notes""] = ""note text"";
+	args[""IsInstalled""] = false;
+	args[""SiteID""] = 123;
+	return args.GetStringOrDefault(""DeploymentName"", """");
+}
+";
+
+			Compiler compiler = new Compiler();
+			compiler.Initialize();
+			ProtoScript.File file = ProtoScript.Parsers.Files.ParseFileContents(code);
+			ProtoScript.Interpretter.Compiled.File compiled = compiler.Compile(file);
+
+			Assert.AreEqual(
+				0,
+				compiler.Diagnostics.Count,
+				string.Join("\n", compiler.Diagnostics.Select(d => d.Diagnostic?.Message ?? "(null)")));
+
+			NativeInterpretter interpretter = new NativeInterpretter(compiler);
+			interpretter.Evaluate(compiled);
+			object? result = interpretter.RunMethodAsObject(null, "main", new List<object>());
+			Assert.AreEqual("Deploy-A", result);
+		}
+
 		private static Compiler CreateCompilerWithType(string typeAlias, System.Type type)
 		{
 			Compiler compiler = new Compiler();
