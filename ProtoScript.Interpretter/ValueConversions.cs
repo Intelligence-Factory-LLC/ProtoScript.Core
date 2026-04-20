@@ -1,4 +1,4 @@
-﻿using Ontology;
+using Ontology;
 using Ontology.BaseTypes;
 using Ontology.Simulation;
 using ProtoScript.Interpretter.RuntimeInfo;
@@ -422,6 +422,9 @@ namespace ProtoScript.Interpretter
 			if (value == null)
 				return false;
 
+			if (TryConvertJsonValueLike(value, effectiveType, out converted))
+				return true;
+
 			if (value is StringReference stringReferenceValue)
 			{
 				if (effectiveType == typeof(StringReference))
@@ -623,7 +626,38 @@ namespace ProtoScript.Interpretter
 
 			return false;
 		}
+		private static bool TryConvertJsonValueLike(object value, System.Type effectiveType, out object? converted)
+		{
+			converted = null;
 
+			if (!string.Equals(effectiveType.FullName, "BasicUtilities.JsonValue", System.StringComparison.Ordinal))
+				return false;
+
+			if (effectiveType.IsAssignableFrom(value.GetType()))
+			{
+				converted = value;
+				return true;
+			}
+
+			if (value is string stringValue)
+			{
+				System.Reflection.ConstructorInfo? nonParsingStringConstructor = effectiveType.GetConstructor(new[] { typeof(string), typeof(bool) });
+				if (nonParsingStringConstructor != null)
+				{
+					converted = nonParsingStringConstructor.Invoke(new object[] { stringValue, false });
+					return true;
+				}
+			}
+
+			System.Reflection.ConstructorInfo? objectConstructor = effectiveType.GetConstructor(new[] { typeof(object) });
+			if (objectConstructor != null)
+			{
+				converted = objectConstructor.Invoke(new object[] { value });
+				return true;
+			}
+
+			return false;
+		}
 		private static bool TryConvertPrototype(Prototype prototype, TypeInfo targetTypeInfo, System.Type effectiveType, out object? converted)
 		{
 			converted = null;

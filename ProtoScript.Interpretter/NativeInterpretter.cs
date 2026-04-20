@@ -44,6 +44,12 @@ namespace ProtoScript.Interpretter
 	public class NativeInterpretter
 	{
 		private class UninitializedReturn { }
+		private sealed class DotNetIndexSetterInfo
+		{
+			public object Target;
+			public System.Reflection.PropertyInfo Indexer;
+			public object ConvertedKey;
+		}
 
 
 		public Compiler Compiler;
@@ -1529,6 +1535,14 @@ namespace ProtoScript.Interpretter
 				right = MakeAssignable(right, exp.Left.InferredType, exp.Info);
 				ReflectionCache.GetSetter(dotNetPropertyReference.Property)(obj, right);
 			}
+			else if (left is DotNetIndexSetterInfo dotNetIndexSetterInfo)
+			{
+				right = MakeAssignable(right, new TypeInfo(dotNetIndexSetterInfo.Indexer.PropertyType), exp.Info);
+				dotNetIndexSetterInfo.Indexer.SetValue(
+					dotNetIndexSetterInfo.Target,
+					right,
+					new object[] { dotNetIndexSetterInfo.ConvertedKey });
+			}
 
 
 			else if (left is FunctionRuntimeInfo && right is FunctionRuntimeInfo)
@@ -1726,6 +1740,22 @@ namespace ProtoScript.Interpretter
 				return fieldSetter;
 			}
 
+			object dotNetTarget = left;
+			if (dotNetTarget is ValueRuntimeInfo valueRuntimeInfo)
+				dotNetTarget = valueRuntimeInfo.Value;
+			else if (dotNetTarget is PrototypeTypeInfo prototypeTypeInfo)
+				dotNetTarget = prototypeTypeInfo.Prototype;
+
+			if (dotNetTarget != null && dotNetTarget is not Prototype)
+			{
+				if (TryCreateDotNetIndexSetter(dotNetTarget, right, exp.Info, out DotNetIndexSetterInfo? dotNetIndexSetterInfo))
+					return dotNetIndexSetterInfo;
+
+				throw new RuntimeException(
+					$"No applicable public indexer setter was found on type '{dotNetTarget.GetType().FullName}'.",
+					exp.Info);
+			}
+
 			Prototype protoLeft = GetAsPrototype(left);
 
 			if (null == protoLeft)
@@ -1744,6 +1774,42 @@ namespace ProtoScript.Interpretter
 				throw new RuntimeException("Index is outside the bounds of the collection", exp.Info);
 
 			return indexSetterInfo;
+		}
+
+		private static bool TryCreateDotNetIndexSetter(object target, object keyValue, StatementParsingInfo info, out DotNetIndexSetterInfo? setter)
+		{
+			setter = null;
+
+			object convertedKeyCandidate = keyValue;
+			if (convertedKeyCandidate is ValueRuntimeInfo valueRuntimeInfo)
+				convertedKeyCandidate = valueRuntimeInfo.Value;
+			else if (convertedKeyCandidate is PrototypeTypeInfo prototypeTypeInfo)
+				convertedKeyCandidate = prototypeTypeInfo.Prototype;
+
+			System.Reflection.PropertyInfo[] properties = target.GetType().GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+			foreach (System.Reflection.PropertyInfo property in properties)
+			{
+				if (property.SetMethod == null)
+					continue;
+
+				System.Reflection.ParameterInfo[] indexParameters = property.GetIndexParameters();
+				if (indexParameters.Length != 1)
+					continue;
+
+				if (!ValueConversions.TryMakeAssignable(convertedKeyCandidate, new TypeInfo(indexParameters[0].ParameterType), out object convertedKey))
+					continue;
+
+				setter = new DotNetIndexSetterInfo
+				{
+					Target = target,
+					Indexer = property,
+					ConvertedKey = convertedKey
+				};
+
+				return true;
+			}
+
+			return false;
 		}
 
 		public object EvaluateAsSet(PrototypeFieldReference exp)
@@ -1882,7 +1948,10 @@ namespace ProtoScript.Interpretter
 					if (oReturn is ValueRuntimeInfo)
 						oReturn = (oReturn as ValueRuntimeInfo).Value;
 
-					if (oReturn != null && oReturn.GetType() != infoFunc.ReturnType.Type)
+					if (oReturn != null
+						&& (infoFunc.ReturnType.Type == typeof(StringReference)
+							|| infoFunc.ReturnType.Type == typeof(string))
+						&& oReturn.GetType() != infoFunc.ReturnType.Type)
 					{
 						object? converted;
 						if (ValueConversions.TryMakeAssignable(oReturn, infoFunc.ReturnType, out converted))
