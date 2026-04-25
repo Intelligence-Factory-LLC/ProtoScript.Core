@@ -1,0 +1,403 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "Buffaly.GoogleWorkspace/1.0.1": {
+        "dependencies": {
+          "Google.Apis.Auth": "1.73.0",
+          "Google.Apis.Calendar.v3": "1.72.0.3953",
+          "Google.Apis.Docs.v1": "1.73.0.3980",
+          "Google.Apis.Drive.v3": "1.71.0.3905",
+          "Google.Apis.Gmail.v1": "1.72.0.3966",
+          "Google.Apis.HangoutsChat.v1": "1.73.0.3974",
+          "Google.Apis.Sheets.v4": "1.72.0.3966",
+          "BasicUtilities": "1.0.0.0",
+          "Buffaly.Agent.Common": "1.0.0.0"
+        },
+        "runtime": {
+          "Buffaly.GoogleWorkspace.dll": {}
+        }
+      },
+      "Google.Apis/1.73.0": {
+        "dependencies": {
+          "Google.Apis.Core": "1.73.0"
+        },
+        "runtime": {
+          "lib/net6.0/Google.Apis.dll": {
+            "assemblyVersion": "1.73.0.0",
+            "fileVersion": "1.73.0.0"
+          }
+        }
+      },
+      "Google.Apis.Auth/1.73.0": {
+        "dependencies": {
+          "Google.Apis": "1.73.0",
+          "Google.Apis.Core": "1.73.0",
+          "System.Management": "7.0.2"
+        },
+        "runtime": {
+          "lib/net6.0/Google.Apis.Auth.dll": {
+            "assemblyVersion": "1.73.0.0",
+            "fileVersion": "1.73.0.0"
+          }
+        }
+      },
+      "Google.Apis.Calendar.v3/1.72.0.3953": {
+        "dependencies": {
+          "Google.Apis": "1.73.0",
+          "Google.Apis.Auth": "1.73.0"
+        },
+        "runtime": {
+          "lib/net6.0/Google.Apis.Calendar.v3.dll": {
+            "assemblyVersion": "1.72.0.3953",
+            "fileVersion": "1.72.0.3953"
+          }
+        }
+      },
+      "Google.Apis.Core/1.73.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.4"
+        },
+        "runtime": {
+          "lib/net6.0/Google.Apis.Core.dll": {
+            "assemblyVersion": "1.73.0.0",
+            "fileVersion": "1.73.0.0"
+          }
+        }
+      },
+      "Google.Apis.Docs.v1/1.73.0.3980": {
+        "dependencies": {
+          "Google.Apis": "1.73.0",
+          "Google.Apis.Auth": "1.73.0"
+        },
+        "runtime": {
+          "lib/net6.0/Google.Apis.Docs.v1.dll": {
+            "assemblyVersion": "1.73.0.3980",
+            "fileVersion": "1.73.0.3980"
+          }
+        }
+      },
+      "Google.Apis.Drive.v3/1.71.0.3905": {
+        "dependencies": {
+          "Google.Apis": "1.73.0",
+          "Google.Apis.Auth": "1.73.0"
+        },
+        "runtime": {
+          "lib/net6.0/Google.Apis.Drive.v3.dll": {
+            "assemblyVersion": "1.71.0.3905",
+            "fileVersion": "1.71.0.3905"
+          }
+        }
+      },
+      "Google.Apis.Gmail.v1/1.72.0.3966": {
+        "dependencies": {
+          "Google.Apis": "1.73.0",
+          "Google.Apis.Auth": "1.73.0"
+        },
+        "runtime": {
+          "lib/net6.0/Google.Apis.Gmail.v1.dll": {
+            "assemblyVersion": "1.72.0.3966",
+            "fileVersion": "1.72.0.3966"
+          }
+        }
+      },
+      "Google.Apis.HangoutsChat.v1/1.73.0.3974": {
+        "dependencies": {
+          "Google.Apis": "1.73.0",
+          "Google.Apis.Auth": "1.73.0"
+        },
+        "runtime": {
+          "lib/net6.0/Google.Apis.HangoutsChat.v1.dll": {
+            "assemblyVersion": "1.73.0.3974",
+            "fileVersion": "1.73.0.3974"
+          }
+        }
+      },
+      "Google.Apis.Sheets.v4/1.72.0.3966": {
+        "dependencies": {
+          "Google.Apis": "1.73.0",
+          "Google.Apis.Auth": "1.73.0"
+        },
+        "runtime": {
+          "lib/net6.0/Google.Apis.Sheets.v4.dll": {
+            "assemblyVersion": "1.72.0.3966",
+            "fileVersion": "1.72.0.3966"
+          }
+        }
+      },
+      "Newtonsoft.Json/13.0.4": {
+        "runtime": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.4.30916"
+          }
+        }
+      },
+      "System.CodeDom/7.0.0": {
+        "runtime": {
+          "lib/net7.0/System.CodeDom.dll": {
+            "assemblyVersion": "7.0.0.0",
+            "fileVersion": "7.0.22.51805"
+          }
+        }
+      },
+      "System.Management/7.0.2": {
+        "dependencies": {
+          "System.CodeDom": "7.0.0"
+        },
+        "runtime": {
+          "lib/net7.0/System.Management.dll": {
+            "assemblyVersion": "7.0.0.2",
+            "fileVersion": "7.0.723.27404"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net7.0/System.Management.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "7.0.0.2",
+            "fileVersion": "7.0.723.27404"
+          }
+        }
+      },
+      "BasicUtilities/1.0.0.0": {
+        "runtime": {
+          "BasicUtilities.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Buffaly.Agent.Common/1.0.0.0": {
+        "runtime": {
+          "Buffaly.Agent.Common.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Buffaly.Sessions.DB/1.0.0.0": {
+        "runtime": {
+          "Buffaly.Sessions.DB.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Microsoft.Data.SqlClient/6.0.0.0": {
+        "runtime": {
+          "Microsoft.Data.SqlClient.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.2.25115.4"
+          }
+        }
+      },
+      "Microsoft.Extensions.Configuration.Abstractions/9.0.0.0": {
+        "runtime": {
+          "Microsoft.Extensions.Configuration.Abstractions.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.825.36511"
+          }
+        }
+      },
+      "RooTrax.Common.DB/1.0.0.0": {
+        "runtime": {
+          "RooTrax.Common.DB.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "RooTrax.Cache/1.0.0.0": {
+        "runtime": {
+          "RooTrax.Cache.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "RooTrax.Common/1.0.0.0": {
+        "runtime": {
+          "RooTrax.Common.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Microsoft.Extensions.Primitives/9.0.0.0": {
+        "runtime": {
+          "Microsoft.Extensions.Primitives.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.825.36511"
+          }
+        }
+      },
+      "WebAppUtilities/1.0.0.0": {
+        "runtime": {
+          "WebAppUtilities.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "kScript/1.0.0.0": {
+        "runtime": {
+          "kScript.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Buffaly.GoogleWorkspace/1.0.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Google.Apis/1.73.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-TnCjEyV2aCLQ6Zl40OCbEJULDuEkEWc6C/g81KYw5l1PqGo+G7pFZrV+YH8XgUL0JRUanz+IrUp8SsKF4dzkqg==",
+      "path": "google.apis/1.73.0",
+      "hashPath": "google.apis.1.73.0.nupkg.sha512"
+    },
+    "Google.Apis.Auth/1.73.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-wEu12uhnRv3zrPBSqv4E2vPH6lYLtc1RPAnU9MJRCMFlBVwZ7Lnq3NfbYXi6VG7EurkYInTaMpeBZkbM/HrAog==",
+      "path": "google.apis.auth/1.73.0",
+      "hashPath": "google.apis.auth.1.73.0.nupkg.sha512"
+    },
+    "Google.Apis.Calendar.v3/1.72.0.3953": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-DBmDXXFHDzXKl7fPJ0S91u6gqc68SOnoVhYA+IHtxFvCYodd9CCNXWgTfyql8XAHuFHRuEzK6YRegoMhlFpexw==",
+      "path": "google.apis.calendar.v3/1.72.0.3953",
+      "hashPath": "google.apis.calendar.v3.1.72.0.3953.nupkg.sha512"
+    },
+    "Google.Apis.Core/1.73.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-vSc7CY4KCP7HE4QTElDx/ExnGLbg9kXb89MS6cdvI+0D4sxvTYb16vGtXmF2jSDMV3iDmykSXdIUPTz8TDS6gg==",
+      "path": "google.apis.core/1.73.0",
+      "hashPath": "google.apis.core.1.73.0.nupkg.sha512"
+    },
+    "Google.Apis.Docs.v1/1.73.0.3980": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-4AEDIheH+FXYppkoUyAO4YUoot52BMYnVet+mAagvaWoYf2khNPL9JCsXorw24JD4sXufm/pJq+M+INmejNxsA==",
+      "path": "google.apis.docs.v1/1.73.0.3980",
+      "hashPath": "google.apis.docs.v1.1.73.0.3980.nupkg.sha512"
+    },
+    "Google.Apis.Drive.v3/1.71.0.3905": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-3UU7IWYm7LpqgrRONt1PQm6Fh75RuDkC4d1nem2VjAlVHFm6Vb4eouDyvQZYA/cun7sBasF8SmkABkpp07Ny9g==",
+      "path": "google.apis.drive.v3/1.71.0.3905",
+      "hashPath": "google.apis.drive.v3.1.71.0.3905.nupkg.sha512"
+    },
+    "Google.Apis.Gmail.v1/1.72.0.3966": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-d36037417A0xBPD4N4LTAS4hvTT8uOEhMPr3aUVT06sr5jAnMqogrEN6XAEZYX3uVNp7jvoufw3RWGIOwMzLLQ==",
+      "path": "google.apis.gmail.v1/1.72.0.3966",
+      "hashPath": "google.apis.gmail.v1.1.72.0.3966.nupkg.sha512"
+    },
+    "Google.Apis.HangoutsChat.v1/1.73.0.3974": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZbQyZi/BhjhVYN4gopCaO4oScv6x3xoYei6+P0d/W3mpkUuwtbnl4mwFsSbk9/vkrCBoPaIpt2/wTiz6GK86YQ==",
+      "path": "google.apis.hangoutschat.v1/1.73.0.3974",
+      "hashPath": "google.apis.hangoutschat.v1.1.73.0.3974.nupkg.sha512"
+    },
+    "Google.Apis.Sheets.v4/1.72.0.3966": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-rJZfRcgrwKzYl+H8AsDi5mlhVDzdIjLjxA7l9vTjcar2v42s1tcd55C0n/lDi1++E+Z9pMuqosLAuT19S4nUxQ==",
+      "path": "google.apis.sheets.v4/1.72.0.3966",
+      "hashPath": "google.apis.sheets.v4.1.72.0.3966.nupkg.sha512"
+    },
+    "Newtonsoft.Json/13.0.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A==",
+      "path": "newtonsoft.json/13.0.4",
+      "hashPath": "newtonsoft.json.13.0.4.nupkg.sha512"
+    },
+    "System.CodeDom/7.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GLltyqEsE5/3IE+zYRP5sNa1l44qKl9v+bfdMcwg+M9qnQf47wK3H0SUR/T+3N4JEQXF3vV4CSuuo0rsg+nq2A==",
+      "path": "system.codedom/7.0.0",
+      "hashPath": "system.codedom.7.0.0.nupkg.sha512"
+    },
+    "System.Management/7.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/qEUN91mP/MUQmJnM5y5BdT7ZoPuVrtxnFlbJ8a3kBJGhe2wCzBfnPFtK2wTtEEcf3DMGR9J00GZZfg6HRI6yA==",
+      "path": "system.management/7.0.2",
+      "hashPath": "system.management.7.0.2.nupkg.sha512"
+    },
+    "BasicUtilities/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Buffaly.Agent.Common/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Buffaly.Sessions.DB/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Data.SqlClient/6.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Extensions.Configuration.Abstractions/9.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "RooTrax.Common.DB/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "RooTrax.Cache/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "RooTrax.Common/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Extensions.Primitives/9.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WebAppUtilities/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "kScript/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
