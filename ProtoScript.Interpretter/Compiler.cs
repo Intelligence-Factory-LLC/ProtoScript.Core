@@ -1021,9 +1021,13 @@ import Ontology.Simulation Ontology.Simulation.BoolWrapper Boolean;
 
 		public Compiled.ExpressionStatement Compile(ExpressionStatement statement)
 		{
+			Compiled.Expression? expression = Compile(statement.Expression);
+			if (expression == null)
+				return null;
+
 			return new Compiled.ExpressionStatement
 			{
-				Expression = Compile(statement.Expression),
+				Expression = expression,
 				Info = statement.Info
 			};
 		}
