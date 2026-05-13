@@ -1,3 +1,14 @@
+# ProtoScript has moved
+
+This repository is kept for historical continuity. Active development and the public Buffaly source release now live here:
+
+**https://github.com/buffaly-ai/protoscript**
+
+Please use the new uffaly-ai repository for current source, issues, licensing information, and future updates.
+
+Buffaly is developed by Matt Furnari.
+
+---
 # ProtoScript.Core
 *A full programming language for prototypes, rules, and executable ontologies*
 
@@ -100,3 +111,4 @@ We deploy explainable, neurosymbolic systems in regulated domains (healthcare an
 If you'd like guidance or custom development, email **support@intelligencefactory.ai** or visit **https://intelligencefactory.ai**.
 
 *© 2026 Intelligence Factory, LLC*
+
